@@ -5649,7 +5649,7 @@ if song param of <a href="DisTube.html#play">DisTube#play</a>() is invalid url</
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = truedistube.on("searchResult", (message, result) => {    let i = 0;    message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.title} - \`${song.duration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);});</code></pre>
+    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = truedistube.on("searchResult", (message, result) => {    let i = 0;    message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);});</code></pre>
 
     </div>
 
