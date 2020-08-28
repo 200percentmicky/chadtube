@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+      
+        <meta name="author" content="Skick">
+      
+        <meta name="description" content="A Discord.js v12 module to easily manage music commands and play Youtube song on Discord without any API key.">
+      
+    
+    <title>Queue</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/search.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.5/fuse.min.js"></script> -->
+    <script src="scripts/fuse.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme.css">
+    
+    
+    
+<svg aria-hidden="true" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display:none">
+    <defs>
+        <symbol id="copy-icon" viewbox="0 0 488.3 488.3">
+            <g>
+                <path d="M314.25,85.4h-227c-21.3,0-38.6,17.3-38.6,38.6v325.7c0,21.3,17.3,38.6,38.6,38.6h227c21.3,0,38.6-17.3,38.6-38.6V124    C352.75,102.7,335.45,85.4,314.25,85.4z M325.75,449.6c0,6.4-5.2,11.6-11.6,11.6h-227c-6.4,0-11.6-5.2-11.6-11.6V124    c0-6.4,5.2-11.6,11.6-11.6h227c6.4,0,11.6,5.2,11.6,11.6V449.6z"/>
+                <path d="M401.05,0h-227c-21.3,0-38.6,17.3-38.6,38.6c0,7.5,6,13.5,13.5,13.5s13.5-6,13.5-13.5c0-6.4,5.2-11.6,11.6-11.6h227    c6.4,0,11.6,5.2,11.6,11.6v325.7c0,6.4-5.2,11.6-11.6,11.6c-7.5,0-13.5,6-13.5,13.5s6,13.5,13.5,13.5c21.3,0,38.6-17.3,38.6-38.6    V38.6C439.65,17.3,422.35,0,401.05,0z"/>
+            </g>
+        </symbol>
+    </defs>
+</svg>
+
+</head>
+<body>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html"><div class="text">DisTube</div></a></h2><div class="search-box"><input type="text" placeholder="Search..." id="search-box" /><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-list-div"><ul><li><a href='https://www.npmjs.com/package/distube' class='' id='' target='_blank'>NPM</a></li><li><a href='https://github.com/skick1234/DisTube/' class='' id='' target='_blank'>Github</a></li></ul><h3>Classes</h3><ul><li><a href="DisTube.html">DisTube</a><ul class='methods'><li data-type='method'><a href="DisTube.html#getQueue">getQueue</a></li><li data-type='method'><a href="DisTube.html#isPaused">isPaused</a></li><li data-type='method'><a href="DisTube.html#isPlaying">isPlaying</a></li><li data-type='method'><a href="DisTube.html#jump">jump</a></li><li data-type='method'><a href="DisTube.html#pause">pause</a></li><li data-type='method'><a href="DisTube.html#play">play</a></li><li data-type='method'><a href="DisTube.html#playCustomPlaylist">playCustomPlaylist</a></li><li data-type='method'><a href="DisTube.html#playSkip">playSkip</a></li><li data-type='method'><a href="DisTube.html#resume">resume</a></li><li data-type='method'><a href="DisTube.html#runAutoplay">runAutoplay</a></li><li data-type='method'><a href="DisTube.html#search">search</a></li><li data-type='method'><a href="DisTube.html#setFilter">setFilter</a></li><li data-type='method'><a href="DisTube.html#setRepeatMode">setRepeatMode</a></li><li data-type='method'><a href="DisTube.html#setVolume">setVolume</a></li><li data-type='method'><a href="DisTube.html#shuffle">shuffle</a></li><li data-type='method'><a href="DisTube.html#skip">skip</a></li><li data-type='method'><a href="DisTube.html#stop">stop</a></li><li data-type='method'><a href="DisTube.html#toggleAutoplay">toggleAutoplay</a></li></ul></li><li><a href="Queue.html">Queue</a></li><li><a href="Song.html">Song</a></li></ul><h3>Events</h3><ul><li><a href="DisTube.html#event:addList">addList</a></li><li><a href="DisTube.html#event:addSong">addSong</a></li><li><a href="DisTube.html#event:empty">empty</a></li><li><a href="DisTube.html#event:error">error</a></li><li><a href="DisTube.html#event:finish">finish</a></li><li><a href="DisTube.html#event:initQueue">initQueue</a></li><li><a href="DisTube.html#event:noRelated">noRelated</a></li><li><a href="DisTube.html#event:playList">playList</a></li><li><a href="DisTube.html#event:playSong">playSong</a></li><li><a href="DisTube.html#event:searchCancel">searchCancel</a></li><li><a href="DisTube.html#event:searchResult">searchResult</a></li></ul><h3><a href="global.html">Global</a></h3></div>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Queue</h1>
+    
+
+    
+
+
+
+
+<section>
+
+
+<header>
+    
+        
+        <h2>
+        
+        Queue
+        
+        </h2>
+        
+        
+            <div class="class-description"><p>Represents a queue.</p></div>
+            <hr/>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+        <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Queue"><span class="type-signature"></span>new Queue<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+    <div class="description">
+        <p>Create a queue.</p>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="autoplay"><span class="type-signature"></span>autoplay<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether or not the autoplay mode is enabled.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="connection"><span class="type-signature"></span>connection<span class="type-signature"> :Discord.VoiceConnection</span></h4>
+
+
+
+
+<div class="description">
+    <p>Voice connection.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Discord.VoiceConnection</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="dispatcher"><span class="type-signature"></span>dispatcher<span class="type-signature"> :Discord.StreamDispatcher</span></h4>
+
+
+
+
+<div class="description">
+    <p>Stream dispatcher.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Discord.StreamDispatcher</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="duration"><span class="type-signature"></span>duration<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Queue's duration.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="filter"><span class="type-signature"></span>filter<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p><code>@2.0.0</code> Queue audio filter.
+Available filters: <a href="global.html#Filter">Filter</a></p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="formattedDuration"><span class="type-signature"></span>formattedDuration<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Formatted duration string.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="initMessage"><span class="type-signature"></span>initMessage<span class="type-signature"> :Discord.Message</span></h4>
+
+
+
+
+<div class="description">
+    <p><code>@2.2.0</code> Message which initialize the queue</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Discord.Message</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="pause"><span class="type-signature"></span>pause<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether or not the stream is currently paused.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="playing"><span class="type-signature"></span>playing<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether or not the stream is currently playing.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="repeatMode"><span class="type-signature"></span>repeatMode<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Type of repeat mode (0 is disabled, 1 is repeating a song, 2 is repeating all the playlist)</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="skipped"><span class="type-signature"></span>skipped<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether or not the last song was skipped.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="songs"><span class="type-signature"></span>songs<span class="type-signature"> :Array.&lt;<a href="Song.html">Song</a>></span></h4>
+
+
+
+
+<div class="description">
+    <p>List of songs</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;<a href="Song.html">Song</a>></span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="stopped"><span class="type-signature"></span>stopped<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether stream is currently stopped.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="stream"><span class="type-signature"></span>stream<span class="type-signature"> :Readable</span></h4>
+
+
+
+
+<div class="description">
+    <p><code>@2.5.0</code> ytdl stream</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Readable</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="volume"><span class="type-signature"></span>volume<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Stream volume.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+  Powered by <a href='https://jsdoc.app/' target='_blank'>JSDoc</a>, <a href='https://github.com/ankitskvmdam/clean-jsdoc-theme' target='_blank'>clean-jsdoc-theme</a>, <a href='https://js.org' target='_blank'>js.org</a> and Love
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+var list = [{"title":"DisTube","link":"<a href=\"DisTube.html\">DisTube</a>"},{"title":"DisTube#getQueue","link":"<a href=\"DisTube.html#getQueue\">DisTube &rtrif; getQueue</a>"},{"title":"DisTube#isPaused","link":"<a href=\"DisTube.html#isPaused\">DisTube &rtrif; isPaused</a>"},{"title":"DisTube#isPlaying","link":"<a href=\"DisTube.html#isPlaying\">DisTube &rtrif; isPlaying</a>"},{"title":"DisTube#jump","link":"<a href=\"DisTube.html#jump\">DisTube &rtrif; jump</a>"},{"title":"DisTube#pause","link":"<a href=\"DisTube.html#pause\">DisTube &rtrif; pause</a>"},{"title":"DisTube#play","link":"<a href=\"DisTube.html#play\">DisTube &rtrif; play</a>"},{"title":"DisTube#playCustomPlaylist","link":"<a href=\"DisTube.html#playCustomPlaylist\">DisTube &rtrif; playCustomPlaylist</a>"},{"title":"DisTube#playSkip","link":"<a href=\"DisTube.html#playSkip\">DisTube &rtrif; playSkip</a>"},{"title":"DisTube#resume","link":"<a href=\"DisTube.html#resume\">DisTube &rtrif; resume</a>"},{"title":"DisTube#runAutoplay","link":"<a href=\"DisTube.html#runAutoplay\">DisTube &rtrif; runAutoplay</a>"},{"title":"DisTube#search","link":"<a href=\"DisTube.html#search\">DisTube &rtrif; search</a>"},{"title":"DisTube#setFilter","link":"<a href=\"DisTube.html#setFilter\">DisTube &rtrif; setFilter</a>"},{"title":"DisTube#setRepeatMode","link":"<a href=\"DisTube.html#setRepeatMode\">DisTube &rtrif; setRepeatMode</a>"},{"title":"DisTube#setVolume","link":"<a href=\"DisTube.html#setVolume\">DisTube &rtrif; setVolume</a>"},{"title":"DisTube#shuffle","link":"<a href=\"DisTube.html#shuffle\">DisTube &rtrif; shuffle</a>"},{"title":"DisTube#skip","link":"<a href=\"DisTube.html#skip\">DisTube &rtrif; skip</a>"},{"title":"DisTube#stop","link":"<a href=\"DisTube.html#stop\">DisTube &rtrif; stop</a>"},{"title":"DisTube#toggleAutoplay","link":"<a href=\"DisTube.html#toggleAutoplay\">DisTube &rtrif; toggleAutoplay</a>"},{"title":"Queue","link":"<a href=\"Queue.html\">Queue</a>"},{"title":"Song","link":"<a href=\"Song.html\">Song</a>"},{"title":"addList","link":"<a href=\"DisTube.html#event:addList\">addList</a>"},{"title":"addSong","link":"<a href=\"DisTube.html#event:addSong\">addSong</a>"},{"title":"empty","link":"<a href=\"DisTube.html#event:empty\">empty</a>"},{"title":"error","link":"<a href=\"DisTube.html#event:error\">error</a>"},{"title":"finish","link":"<a href=\"DisTube.html#event:finish\">finish</a>"},{"title":"initQueue","link":"<a href=\"DisTube.html#event:initQueue\">initQueue</a>"},{"title":"noRelated","link":"<a href=\"DisTube.html#event:noRelated\">noRelated</a>"},{"title":"playList","link":"<a href=\"DisTube.html#event:playList\">playList</a>"},{"title":"playSong","link":"<a href=\"DisTube.html#event:playSong\">playSong</a>"},{"title":"searchCancel","link":"<a href=\"DisTube.html#event:searchCancel\">searchCancel</a>"},{"title":"searchResult","link":"<a href=\"DisTube.html#event:searchResult\">searchResult</a>"}];
+setupSearch(list)
+</script>
+
+ 
+<script type="text/javascript" src="scripts/misc.js"></script>
+</body>
+</html>
