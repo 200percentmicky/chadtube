@@ -10,7 +10,7 @@
         <meta name="description" content="A Discord.js v12 module to easily manage music commands and play Youtube song on Discord without any API key.">
       
     
-    <title>Global</title>
+    <title>Playlist</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -53,7 +53,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Playlist</h1>
     
 
     
@@ -64,14 +64,204 @@
 <section>
 
 
+<header>
+    
+        
+        <h2>
+        
+        Playlist
+        
+        </h2>
+        
+        
+            <div class="class-description"><p>Class representing a playlist.</p></div>
+            <hr/>
+        
+    
+</header>
+
 
 <article>
     <div class="container-overview">
     
         
 
+    
+        <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Playlist"><span class="type-signature"></span>new Playlist<span class="signature">(playlist, user, properties)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+    <div class="description">
+        <p>Create a playlist</p>
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
+        <strong>Parameters:</strong>
         
+
+<table class="params">
+    <thead>
+    <tr>
         
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>playlist</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+|
+
+<span class="param-type">Array.&lt;<a href="Song.html">Song</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Playlist</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>user</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Discord.User</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Requested user</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Custom properties</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     </div>
 
@@ -86,22 +276,14 @@
     
 
     
-
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
+        <h3 class="subsection-title">Members</h3>
 
         
-                
-<h4 class="name" id="DisTubeOptions">DisTubeOptions</h4>
+            
+<h4 class="name" id="author"><span class="type-signature"></span>author<span class="type-signature"> :string</span></h4>
 
 
 
-
-<div class="description">
-    <p>DisTube options.</p>
-</div>
 
 
 
@@ -110,7 +292,7 @@
         <ul>
             <li>
                 
-<span class="param-type">object</span>
+<span class="param-type">string</span>
 
 
             </li>
@@ -121,331 +303,75 @@
 
 
 
-    <h5 class="subsection-title">Properties</h5>
+<dl class="details">
 
     
 
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
-
-        <tr>
-            
-                <td class="name"><code>emitNewSongOnly</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last"><p><code>@1.3.0</code>. If <code>true</code>, <a href="DisTube.html#event:playSong">DisTube#event:playSong</a> is not emitted when looping a song or next song is the same as the previous one</p></td>
-        </tr>
 
     
 
-        <tr>
-            
-                <td class="name"><code>highWaterMark</code></td>
-            
+    
 
-            <td class="type">
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
             
+<h4 class="name" id="duration"><span class="type-signature"></span>duration<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Playlist duration in second.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
                 
 <span class="param-type">number</span>
 
 
-            
-            </td>
+            </li>
+        </ul>
+    </div>
 
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    1&lt;&lt;24
-                
-                </td>
-            
-
-            <td class="description last"><p><code>@2.2.0</code> ytdl's highWaterMark option.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>leaveOnEmpty</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether or not leaving voice channel if channel is empty in 60s. (Avoid accident leaving)</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>leaveOnFinish</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether or not leaving voice channel when the queue ends.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>leaveOnStop</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether or not leaving voice channel after using <a href="DisTube.html#stop">stop()</a> function.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>searchSongs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether or not searching for multiple songs to select manually, DisTube will play the first result if <code>false</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>youtubeCookie</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p><code>@2.4.0</code> YouTube cookies. How to get it: <a href="https://github.com/fent/node-ytdl-core/blob/784c04eaf9f3cfac0fe0933155adffe0e2e0848a/example/cookies.js#L6-L12">YTDL's Example</a></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>youtubeIdentityToken</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    null
-                
-                </td>
-            
-
-            <td class="description last"><p><code>@2.4.0</code> If not given, ytdl-core will try to find it. You can find this by going to a video's watch page, viewing the source, and searching for &quot;ID_TOKEN&quot;.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -490,15 +416,15 @@
 
 
 
+        
             
-                
-<h4 class="name" id="Filter">Filter</h4>
+<h4 class="name" id="formattedDuration"><span class="type-signature"></span>formattedDuration<span class="type-signature"> :string</span></h4>
 
 
 
 
 <div class="description">
-    <p>DisTube audio filters.</p>
+    <p>Formatted duration string <code>hh:mm:ss</code>.</p>
 </div>
 
 
@@ -519,261 +445,209 @@
 
 
 
-    <h5 class="subsection-title">Properties</h5>
+<dl class="details">
 
     
 
-<table class="props">
-    <thead>
-    <tr>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
         
-        <th>Name</th>
+            
+<h4 class="name" id="id"><span class="type-signature"></span>id<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
         
+            
+<h4 class="name" id="items"><span class="type-signature"></span>items<span class="type-signature"> :Array.&lt;<a href="Song.html">Song</a>></span></h4>
 
-        <th>Type</th>
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;<a href="Song.html">Song</a>></span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Playlist.songs` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
 
         
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
             
-                <td class="name"><code>3d</code></td>
-            
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :string</span></h4>
 
-            <td class="type">
-            
+
+
+
+<div class="description">
+    <p>Playlist name.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
                 
 <span class="param-type">string</span>
 
 
-            
-            </td>
+            </li>
+        </ul>
+    </div>
 
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>bassboost</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>echo</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>flanger</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.4.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>gate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.4.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>haas</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.4.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>karaoke</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>nightcore</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>reverse</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.4.0</code></p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>vaporwave</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>@2.0.0</code></p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -818,7 +692,425 @@
 
 
 
+        
             
+<h4 class="name" id="songs"><span class="type-signature"></span>songs<span class="type-signature"> :Array.&lt;<a href="Song.html">Song</a>></span></h4>
+
+
+
+
+<div class="description">
+    <p>PLaylist songs.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;<a href="Song.html">Song</a>></span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="thumbnail"><span class="type-signature"></span>thumbnail<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>PLaylist thumbnail.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="title"><span class="type-signature"></span>title<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Playlist.name` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="total_items"><span class="type-signature"></span>total_items<span class="type-signature"> :number</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Playlist.songs.length` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="url"><span class="type-signature"></span>url<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>PLaylist URL.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="user"><span class="type-signature"></span>user<span class="type-signature"> :Discord.User</span></h4>
+
+
+
+
+<div class="description">
+    <p>User requested.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">Discord.User</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
     
 
     
