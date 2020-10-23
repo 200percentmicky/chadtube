@@ -1573,8 +1573,8 @@ The next one is 1,...</p>
     <div class="description">
         <p><code>@2.1.0</code> Play or add array of Youtube video urls.
 <a href="DisTube.html#event:playList">DisTube#event:playList</a> or <a href="DisTube.html#event:addList">DisTube#event:addList</a> will be emitted
-with <code>playlist</code>'s properties include <code>properties</code> parameter's properties,
-<code>user</code>, <code>items</code>, <code>total_items</code>, <code>duration</code>, <code>formattedDuration</code>, <code>thumbnail</code> like <a href="Playlist.html">Playlist</a></p>
+with <code>playlist</code>'s properties include <code>properties</code> parameter's properties such as
+<code>user</code>, <code>songs</code>, <code>duration</code>, <code>formattedDuration</code>, <code>thumbnail</code> like <a href="Playlist.html">Playlist</a></p>
     </div>
 
 
@@ -1717,7 +1717,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
                 </td>
             
 
-            <td class="description last"><p>Additional properties such as <code>title</code></p></td>
+            <td class="description last"><p>Additional properties such as <code>name</code></p></td>
         </tr>
 
     
@@ -1821,7 +1821,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];    distube.playCustomPlaylist(message, songs, { title: "My playlist name" });</code></pre>
+    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];    distube.playCustomPlaylist(message, songs, { name: "My playlist name" });</code></pre>
 
     </div>
 
