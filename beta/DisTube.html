@@ -5,25 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
       
-        <meta name="author" content="Skick">
+        <meta name='author' content='Skick'>
       
-        <meta name="description" content="A Discord.js v12 module to easily manage music commands and play Youtube song on Discord without any API key.">
+        <meta name='description' content='A Discord.js v12 module to manage music commands and play song on Discord without any API key.'>
+      
+        <meta itemprop='name' content='DisTube'>
+      
+        <meta itemprop='image' content='https://cdn.jsdelivr.net/gh/skick1234/MaBu-CDN@4.6.10/DisTube/img/banner.png'>
+      
+        <meta property='og:url' content='https://DisTube.js.org'>
+      
+        <meta property='og:type' content='website'>
+      
+        <meta property='og:title' content='DisTube'>
+      
+        <meta property='og:description' content='A Discord.js v12 module to manage music commands and play song on Discord without any API key.'>
+      
+        <meta property='og:image' content='https://cdn.jsdelivr.net/gh/skick1234/MaBu-CDN@4.6.10/DisTube/img/banner.png'>
+      
+        <link rel='shortcut icon' type='image/png' href='https://cdn.jsdelivr.net/gh/skick1234/MaBu-CDN@4.6.10/DisTube/img/favicon.png'>
       
     
     <title>DisTube</title>
 
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <script src="scripts/search.js"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.5/fuse.min.js"></script> -->
-    <script src="scripts/fuse.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/ionicons.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/third-party/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/third-party/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
-    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-base.css">
+    <link type="text/css" rel="stylesheet" href="styles/clean-jsdoc-theme-dark.css">
     
     
     
@@ -48,7 +60,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html"><div class="text">DisTube</div></a></h2><div class="search-box"><input type="text" placeholder="Search..." id="search-box" /><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-list-div"><ul><li><a href='https://www.npmjs.com/package/distube' class='' id='' target='_blank'>NPM</a></li><li><a href='https://github.com/skick1234/DisTube/' class='' id='' target='_blank'>Github</a></li></ul><h3>Classes</h3><ul><li><a href="DisTube.html">DisTube</a><ul class='methods'><li data-type='method'><a href="DisTube.html#getQueue">getQueue</a></li><li data-type='method'><a href="DisTube.html#isPaused">isPaused</a></li><li data-type='method'><a href="DisTube.html#isPlaying">isPlaying</a></li><li data-type='method'><a href="DisTube.html#jump">jump</a></li><li data-type='method'><a href="DisTube.html#pause">pause</a></li><li data-type='method'><a href="DisTube.html#play">play</a></li><li data-type='method'><a href="DisTube.html#playCustomPlaylist">playCustomPlaylist</a></li><li data-type='method'><a href="DisTube.html#playSkip">playSkip</a></li><li data-type='method'><a href="DisTube.html#resume">resume</a></li><li data-type='method'><a href="DisTube.html#runAutoplay">runAutoplay</a></li><li data-type='method'><a href="DisTube.html#search">search</a></li><li data-type='method'><a href="DisTube.html#setFilter">setFilter</a></li><li data-type='method'><a href="DisTube.html#setRepeatMode">setRepeatMode</a></li><li data-type='method'><a href="DisTube.html#setVolume">setVolume</a></li><li data-type='method'><a href="DisTube.html#shuffle">shuffle</a></li><li data-type='method'><a href="DisTube.html#skip">skip</a></li><li data-type='method'><a href="DisTube.html#stop">stop</a></li><li data-type='method'><a href="DisTube.html#toggleAutoplay">toggleAutoplay</a></li></ul></li><li><a href="Playlist.html">Playlist</a></li><li><a href="Queue.html">Queue</a></li><li><a href="Song.html">Song</a></li></ul><h3>Events</h3><ul><li><a href="DisTube.html#event:addList">addList</a></li><li><a href="DisTube.html#event:addSong">addSong</a></li><li><a href="DisTube.html#event:empty">empty</a></li><li><a href="DisTube.html#event:error">error</a></li><li><a href="DisTube.html#event:finish">finish</a></li><li><a href="DisTube.html#event:initQueue">initQueue</a></li><li><a href="DisTube.html#event:noRelated">noRelated</a></li><li><a href="DisTube.html#event:playList">playList</a></li><li><a href="DisTube.html#event:playSong">playSong</a></li><li><a href="DisTube.html#event:searchCancel">searchCancel</a></li><li><a href="DisTube.html#event:searchResult">searchResult</a></li></ul><h3><a href="global.html">Global</a></h3></div>
+    <h2><a href="index.html"><div class="text">DisTube</div></a></h2><div class="search-box"><input type="text" placeholder="Search..." id="search-box" /><div class="search-item-container" id="search-item-container"><ul class="search-item-ul" id="search-item-ul"></ul></div></div><div class="sidebar-list-div"><ul><li><a href='https://www.npmjs.com/package/distube' class='' id='' target='_blank'>NPM</a></li><li><a href='https://github.com/skick1234/DisTube/' class='' id='' target='_blank'>GitHub</a></li></ul><h3>Classes</h3><ul><li><a href="DisTube.html">DisTube</a><ul class='methods'><li data-type='method'><a href="DisTube.html#getQueue">getQueue</a></li><li data-type='method'><a href="DisTube.html#isPaused">isPaused</a></li><li data-type='method'><a href="DisTube.html#isPlaying">isPlaying</a></li><li data-type='method'><a href="DisTube.html#jump">jump</a></li><li data-type='method'><a href="DisTube.html#pause">pause</a></li><li data-type='method'><a href="DisTube.html#play">play</a></li><li data-type='method'><a href="DisTube.html#playCustomPlaylist">playCustomPlaylist</a></li><li data-type='method'><a href="DisTube.html#playSkip">playSkip</a></li><li data-type='method'><a href="DisTube.html#resume">resume</a></li><li data-type='method'><a href="DisTube.html#runAutoplay">runAutoplay</a></li><li data-type='method'><a href="DisTube.html#search">search</a></li><li data-type='method'><a href="DisTube.html#setFilter">setFilter</a></li><li data-type='method'><a href="DisTube.html#setRepeatMode">setRepeatMode</a></li><li data-type='method'><a href="DisTube.html#setVolume">setVolume</a></li><li data-type='method'><a href="DisTube.html#shuffle">shuffle</a></li><li data-type='method'><a href="DisTube.html#skip">skip</a></li><li data-type='method'><a href="DisTube.html#stop">stop</a></li><li data-type='method'><a href="DisTube.html#toggleAutoplay">toggleAutoplay</a></li></ul></li><li><a href="Playlist.html">Playlist</a></li><li><a href="Queue.html">Queue</a></li><li><a href="Song.html">Song</a></li></ul><h3>Events</h3><ul><li><a href="DisTube.html#event:addList">addList</a></li><li><a href="DisTube.html#event:addSong">addSong</a></li><li><a href="DisTube.html#event:empty">empty</a></li><li><a href="DisTube.html#event:error">error</a></li><li><a href="DisTube.html#event:finish">finish</a></li><li><a href="DisTube.html#event:initQueue">initQueue</a></li><li><a href="DisTube.html#event:noRelated">noRelated</a></li><li><a href="DisTube.html#event:playList">playList</a></li><li><a href="DisTube.html#event:playSong">playSong</a></li><li><a href="DisTube.html#event:searchCancel">searchCancel</a></li><li><a href="DisTube.html#event:searchResult">searchResult</a></li></ul><h3><a href="global.html">Global</a></h3></div>
 </nav>
 
 <div id="main">
@@ -321,6 +333,75 @@
             <li>
                 
 <span class="param-type">Discord.Client</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="filters"><span class="type-signature"></span>filters<span class="type-signature"> :<a href="global.html#Filter">Filter</a></span></h4>
+
+
+
+
+<div class="description">
+    <p>DisTube filters</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="global.html#Filter">Filter</a></span>
 
 
             </li>
@@ -844,7 +925,7 @@
 
 
     <div class="description">
-        <p>Whether or not a guild is playing or paused music.</p>
+        <p>Whether or not a guild is playing music.</p>
     </div>
 
 
@@ -1398,7 +1479,7 @@ The next one is 1,...</p>
 
 
     <div class="description">
-        <p>Play / add a song from Youtube video url or playlist from Youtube playlist url. Search and play a song if it is not a valid url.</p>
+        <p>Play / add a song or playlist from url. Search and play a song if it is not a valid url.</p>
     </div>
 
 
@@ -1561,8 +1642,8 @@ The next one is 1,...</p>
     <div class="description">
         <p><code>@2.1.0</code> Play or add array of Youtube video urls.
 <a href="DisTube.html#event:playList">DisTube#event:playList</a> or <a href="DisTube.html#event:addList">DisTube#event:addList</a> will be emitted
-with <code>playlist</code>'s properties include <code>properties</code> parameter's properties,
-<code>user</code>, <code>items</code>, <code>total_items</code>, <code>duration</code>, <code>formattedDuration</code>, <code>thumbnail</code> like <a href="Playlist.html">Playlist</a></p>
+with <code>playlist</code>'s properties include <code>properties</code> parameter's properties such as
+<code>user</code>, <code>songs</code>, <code>duration</code>, <code>formattedDuration</code>, <code>thumbnail</code> like <a href="Playlist.html">Playlist</a></p>
     </div>
 
 
@@ -1705,7 +1786,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
                 </td>
             
 
-            <td class="description last"><p>Additional properties such as <code>title</code></p></td>
+            <td class="description last"><p>Additional properties such as <code>name</code></p></td>
         </tr>
 
     
@@ -1809,7 +1890,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];    distube.playCustomPlaylist(message, songs, { title: "My playlist name" });</code></pre>
+    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];    distube.playCustomPlaylist(message, songs, { name: "My playlist name" });</code></pre>
 
     </div>
 
@@ -1826,7 +1907,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
 
 
     <div class="description">
-        <p><code>@2.0.0</code> Skip the playing song and play a song or a playlist</p>
+        <p><code>@2.0.0</code> Skip the playing song and play a song or playlist</p>
     </div>
 
 
@@ -5637,11 +5718,17 @@ if song param of <a href="DisTube.html#play">play()</a> is invalid url</p>
 <br class="clear">
 
 <footer>
-  Powered by <a href='https://jsdoc.app/' target='_blank'>JSDoc</a>, <a href='https://github.com/ankitskvmdam/clean-jsdoc-theme' target='_blank'>clean-jsdoc-theme</a>, <a href='https://js.org' target='_blank'>js.org</a> and Love
+  <a href='https://github.com/skick1234/DisTube/' target='_blank'>GitHub</a> • Powered by <a href='https://jsdoc.app/' target='_blank'>JSDoc</a>, <a href='https://github.com/ankitskvmdam/clean-jsdoc-theme' target='_blank'>clean-jsdoc-theme</a>, <a href='https://js.org' target='_blank'>js.org</a> and Love
 </footer>
+
+<script src="scripts/third-party/prettify.js"></script>
+<script src="scripts/third-party/lang-css.js"></script>
+<script src="scripts/search.js"></script>
+<script src="scripts/third-party/fuse.js"></script>
 
 <script>prettyPrint();</script>
 <script src="scripts/linenumber.js"></script>
+<script src="scripts/fix-code-block.js"></script>
 <script>
 var list = [{"title":"DisTube","link":"<a href=\"DisTube.html\">DisTube</a>"},{"title":"DisTube#getQueue","link":"<a href=\"DisTube.html#getQueue\">DisTube &rtrif; getQueue</a>"},{"title":"DisTube#isPaused","link":"<a href=\"DisTube.html#isPaused\">DisTube &rtrif; isPaused</a>"},{"title":"DisTube#isPlaying","link":"<a href=\"DisTube.html#isPlaying\">DisTube &rtrif; isPlaying</a>"},{"title":"DisTube#jump","link":"<a href=\"DisTube.html#jump\">DisTube &rtrif; jump</a>"},{"title":"DisTube#pause","link":"<a href=\"DisTube.html#pause\">DisTube &rtrif; pause</a>"},{"title":"DisTube#play","link":"<a href=\"DisTube.html#play\">DisTube &rtrif; play</a>"},{"title":"DisTube#playCustomPlaylist","link":"<a href=\"DisTube.html#playCustomPlaylist\">DisTube &rtrif; playCustomPlaylist</a>"},{"title":"DisTube#playSkip","link":"<a href=\"DisTube.html#playSkip\">DisTube &rtrif; playSkip</a>"},{"title":"DisTube#resume","link":"<a href=\"DisTube.html#resume\">DisTube &rtrif; resume</a>"},{"title":"DisTube#runAutoplay","link":"<a href=\"DisTube.html#runAutoplay\">DisTube &rtrif; runAutoplay</a>"},{"title":"DisTube#search","link":"<a href=\"DisTube.html#search\">DisTube &rtrif; search</a>"},{"title":"DisTube#setFilter","link":"<a href=\"DisTube.html#setFilter\">DisTube &rtrif; setFilter</a>"},{"title":"DisTube#setRepeatMode","link":"<a href=\"DisTube.html#setRepeatMode\">DisTube &rtrif; setRepeatMode</a>"},{"title":"DisTube#setVolume","link":"<a href=\"DisTube.html#setVolume\">DisTube &rtrif; setVolume</a>"},{"title":"DisTube#shuffle","link":"<a href=\"DisTube.html#shuffle\">DisTube &rtrif; shuffle</a>"},{"title":"DisTube#skip","link":"<a href=\"DisTube.html#skip\">DisTube &rtrif; skip</a>"},{"title":"DisTube#stop","link":"<a href=\"DisTube.html#stop\">DisTube &rtrif; stop</a>"},{"title":"DisTube#toggleAutoplay","link":"<a href=\"DisTube.html#toggleAutoplay\">DisTube &rtrif; toggleAutoplay</a>"},{"title":"Playlist","link":"<a href=\"Playlist.html\">Playlist</a>"},{"title":"Queue","link":"<a href=\"Queue.html\">Queue</a>"},{"title":"Song","link":"<a href=\"Song.html\">Song</a>"},{"title":"addList","link":"<a href=\"DisTube.html#event:addList\">addList</a>"},{"title":"addSong","link":"<a href=\"DisTube.html#event:addSong\">addSong</a>"},{"title":"empty","link":"<a href=\"DisTube.html#event:empty\">empty</a>"},{"title":"error","link":"<a href=\"DisTube.html#event:error\">error</a>"},{"title":"finish","link":"<a href=\"DisTube.html#event:finish\">finish</a>"},{"title":"initQueue","link":"<a href=\"DisTube.html#event:initQueue\">initQueue</a>"},{"title":"noRelated","link":"<a href=\"DisTube.html#event:noRelated\">noRelated</a>"},{"title":"playList","link":"<a href=\"DisTube.html#event:playList\">playList</a>"},{"title":"playSong","link":"<a href=\"DisTube.html#event:playSong\">playSong</a>"},{"title":"searchCancel","link":"<a href=\"DisTube.html#event:searchCancel\">searchCancel</a>"},{"title":"searchResult","link":"<a href=\"DisTube.html#event:searchResult\">searchResult</a>"}];
 setupSearch(list)
