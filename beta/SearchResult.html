@@ -26,7 +26,7 @@
         <link rel='shortcut icon' type='image/png' href='https://cdn.jsdelivr.net/gh/skick1234/MaBu-CDN@4.6.10/DisTube/img/favicon.png'>
       
     
-    <title>Home</title>
+    <title>SearchResult</title>
 
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,15 +65,160 @@
 
 <div id="main">
     
+    <h1 class="page-title">SearchResult</h1>
+    
 
     
 
 
 
+
+<section>
+
+
+<header>
+    
+        
+        <h2>
+        
+        SearchResult
+        
+        </h2>
+        
+        
+            <div class="class-description"><p><code>@2.7.0</code> Class representing a search result.</p></div>
+            <hr/>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+        <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="SearchResult"><span class="type-signature"></span>new SearchResult<span class="signature">(info)</span><span class="type-signature"></span></h4>
+
     
 
 
 
+    <div class="description">
+        <p>Create a search result.</p>
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
+        <strong>Parameters:</strong>
+        
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ytsr.Video</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Video info</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -81,125 +226,722 @@
 
 
     
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="duration"><span class="type-signature"></span>duration<span class="type-signature"> :number</span></h4>
 
 
-    <section class="readme">
-        <article><div align="center">
-  <p>
-    <a href="https://nodei.co/npm/distube/"><img src="https://nodei.co/npm/distube.png?downloads=true&downloadRank=true&stars=true"></a>
-  </p>
-  <p>
-    <img alt="npm" src="https://img.shields.io/npm/dt/distube">
-    <img alt="Codacy Grade" src="https://img.shields.io/codacy/grade/79c8b7d7d026410f8e1b7e9d326167a7?label=Codacy%20Score">
-    <img alt="CodeFactor Grade" src="https://img.shields.io/codefactor/grade/github/skick1234/DisTube?label=Codefactor%20Score">
-  </p>
+
+
+<div class="description">
+    <p>Song duration.</p>
 </div>
-<h1>DisTube</h1>
-<p>A Discord.js module to manage music commands and play songs on Discord without any API key.</p>
-<p><a href="https://discord.gg/feaDd9h">DisTube Support Server</a> - <a href="https://github.com/skick1234/DisTube/wiki/Frequently-Asked-Questions">Frequently Asked Questions</a></p>
-<h2>Features</h2>
-<ul>
-<li>Support YouTube, SoundCloud, Facebook, and <a href="https://ytdl-org.github.io/youtube-dl/supportedsites.html">700+ more sites</a>.</li>
-<li>Build on discord.js v12</li>
-<li>Easily to use and customize</li>
-<li>Work on multiple servers</li>
-</ul>
-<h2>Installation</h2>
-<pre class="prettyprint source lang-npm"><code>npm install distube
-</code></pre>
-<h3>Requirement</h3>
-<ul>
-<li><a href="https://discord.js.org">discord.js</a> v12</li>
-<li><a href="https://www.ffmpeg.org/download.html">FFmpeg</a> - <code>npm install ffmpeg-static</code></li>
-<li><a href="https://github.com/discordjs/opus">@discordjs/opus</a> - <code>npm install @discordjs/opus</code></li>
-<li><a href="https://www.python.org/">python</a> <em>(For <a href="http://ytdl-org.github.io/youtube-dl/"><code>youtube-dl</code></a> to support <a href="https://ytdl-org.github.io/youtube-dl/supportedsites.html">700+ more sites</a>.)</em></li>
-</ul>
-<h2>Documentation</h2>
-<p>Read DisTube's definitions, properties and events details in the <a href="https://distube.js.org/">Documentation page</a>.</p>
-<h2>Example Bot</h2>
-<ul>
-<li><a href="https://skick.xyz/DisTube">DisTube-Bot</a> - A music bot with reaction controller, filters, DJ mode, user's custom playlist and voting.</li>
-<li><a href="https://github.com/skick1234/DisTube-Example">DisTube-Example</a> - Example bot with simple command handler.</li>
-</ul>
-<pre class="prettyprint source lang-javascript"><code>// DisTube example bot, definitions, properties and events details in the Documentation page.
-const Discord = require('discord.js'),
-    DisTube = require('distube'),
-    client = new Discord.Client(),
-    config = {
-        prefix: &quot;.&quot;,
-        token: process.env.TOKEN || &quot;Your Discord Token&quot;
-    };
-
-// Create a new DisTube
-const distube = new DisTube(client, { searchSongs: true, emitNewSongOnly: true, highWaterMark: 1 &lt;&lt; 25 });
-
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-});
-
-client.on(&quot;message&quot;, async (message) => {
-    if (message.author.bot) return;
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-
-    if (command == &quot;play&quot;)
-        distube.play(message, args.join(&quot; &quot;));
-
-    if ([&quot;repeat&quot;, &quot;loop&quot;].includes(command))
-        distube.setRepeatMode(message, parseInt(args[0]));
-
-    if (command == &quot;stop&quot;) {
-        distube.stop(message);
-        message.channel.send(&quot;Stopped the music!&quot;);
-    }
-
-    if (command == &quot;queue&quot;) {
-        let queue = distube.getQueue(message);
-        message.channel.send('Current queue:\n' + queue.songs.map((song, id) =>
-            `**${id + 1}**. ${song.name} - \`${song.formattedDuration}\``
-        ).join(&quot;\n&quot;));
-    }
-
-    if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {
-        let filter = distube.setFilter(message, command);
-        message.channel.send(&quot;Current queue filter: &quot; + (filter || &quot;Off&quot;));
-    }
-});
-
-// Queue status template
-const status = (queue) => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filter || &quot;Off&quot;}\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? &quot;All Queue&quot; : &quot;This Song&quot; : &quot;Off&quot;}\` | Autoplay: \`${queue.autoplay ? &quot;On&quot; : &quot;Off&quot;}\``;
-
-// DisTube event listeners, more in the documentation page
-distube
-    .on(&quot;playSong&quot;, (message, queue, song) => message.channel.send(
-        `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`
-    ))
-    .on(&quot;addSong&quot;, (message, queue, song) => message.channel.send(
-        `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`
-    ))
-    .on(&quot;playList&quot;, (message, queue, playlist, song) => message.channel.send(
-        `Play \`${playlist.title}\` playlist (${playlist.total_items} songs).\nRequested by: ${song.user}\nNow playing \`${song.name}\` - \`${song.formattedDuration}\`\n${status(queue)}`
-    ))
-    .on(&quot;addList&quot;, (message, queue, playlist) => message.channel.send(
-        `Added \`${playlist.title}\` playlist (${playlist.total_items} songs) to queue\n${status(queue)}`
-    ))
-    // DisTubeOptions.searchSongs = true
-    .on(&quot;searchResult&quot;, (message, result) => {
-        let i = 0;
-        message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join(&quot;\n&quot;)}\n*Enter anything else or wait 60 seconds to cancel*`);
-    })
-    // DisTubeOptions.searchSongs = true
-    .on(&quot;searchCancel&quot;, (message) => message.channel.send(`Searching canceled`))
-    .on(&quot;error&quot;, (message, err) => message.channel.send(
-        &quot;An error encountered: &quot; + err
-    ));
-
-client.login(config.token);
-</code></pre></article>
-    </section>
 
 
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="formattedDuration"><span class="type-signature"></span>formattedDuration<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Formatted duration string <code>hh:mm:ss</code> or <code>mm:ss</code>.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="id"><span class="type-signature"></span>id<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Youtube video id</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="isLive"><span class="type-signature"></span>isLive<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Indicates if the video is an active live.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="link"><span class="type-signature"></span>link<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Song.url` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Song name aka video title.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="thumbnail"><span class="type-signature"></span>thumbnail<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Song thumbnail.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="title"><span class="type-signature"></span>title<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Song.name` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="url"><span class="type-signature"></span>url<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Song URL.</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="views"><span class="type-signature"></span>views<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    <p>Song views count</p>
+</div>
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">number</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
