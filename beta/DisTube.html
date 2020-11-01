@@ -2854,7 +2854,7 @@ Then use <a href="DisTube.html#play">play(message, aResultFromSearch)</a> or <a 
 
             
 
-            <td class="description last"><p>time in milliseconds</p></td>
+            <td class="description last"><p>Time in milliseconds</p></td>
         </tr>
 
     
@@ -2919,7 +2919,7 @@ Then use <a href="DisTube.html#play">play(message, aResultFromSearch)</a> or <a 
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {        let filter = distube.setFilter(message, command);        message.channel.send("Current queue filter: " + (filter || "Off"));    }});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', message => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command = 'seek')        distube.seek(message, Number(args[0]));});</code></pre>
 
     </div>
 
