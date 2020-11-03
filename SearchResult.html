@@ -26,7 +26,7 @@
         <link rel='shortcut icon' type='image/png' href='https://cdn.jsdelivr.net/gh/skick1234/MaBu-CDN@4.6.10/DisTube/img/favicon.png'>
       
     
-    <title>Queue</title>
+    <title>SearchResult</title>
 
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -65,7 +65,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Queue</h1>
+    <h1 class="page-title">SearchResult</h1>
     
 
     
@@ -81,12 +81,12 @@
         
         <h2>
         
-        Queue
+        SearchResult
         
         </h2>
         
         
-            <div class="class-description"><p>Represents a queue.</p></div>
+            <div class="class-description"><p><code>@2.7.0</code> Class representing a search result.</p></div>
             <hr/>
         
     
@@ -102,14 +102,14 @@
         <h2>Constructor</h2>
     
 
-    <h4 class="name" id="Queue"><span class="type-signature"></span>new Queue<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="SearchResult"><span class="type-signature"></span>new SearchResult<span class="signature">(info)</span><span class="type-signature"></span></h4>
 
     
 
 
 
     <div class="description">
-        <p>Create a queue.</p>
+        <p>Create a search result.</p>
     </div>
 
 
@@ -119,6 +119,57 @@
 
 
 
+
+    <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
+        <strong>Parameters:</strong>
+        
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>info</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ytsr.Video</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Video info</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
 
 
 
@@ -192,358 +243,13 @@
 
         
             
-<h4 class="name" id="autoplay"><span class="type-signature"></span>autoplay<span class="type-signature"> :boolean</span></h4>
-
-
-
-
-<div class="description">
-    <p>Whether or not the autoplay mode is enabled.</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="beginTime"><span class="type-signature"></span>beginTime<span class="type-signature"> :number</span></h4>
-
-
-
-
-<div class="description">
-    <p><code>@2.7.0</code> What time in the song to begin (in milliseconds).</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="connection"><span class="type-signature"></span>connection<span class="type-signature"> :Discord.VoiceConnection</span></h4>
-
-
-
-
-<div class="description">
-    <p>Voice connection.</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">Discord.VoiceConnection</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="currentTime"><span class="type-signature"></span>currentTime<span class="type-signature"> :number</span></h4>
-
-
-
-
-<div class="description">
-    <p><code>@2.7.0</code> What time in the song is playing (in milliseconds).</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="dispatcher"><span class="type-signature"></span>dispatcher<span class="type-signature"> :Discord.StreamDispatcher</span></h4>
-
-
-
-
-<div class="description">
-    <p>Stream dispatcher.</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">Discord.StreamDispatcher</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
 <h4 class="name" id="duration"><span class="type-signature"></span>duration<span class="type-signature"> :number</span></h4>
 
 
 
 
 <div class="description">
-    <p>Queue's duration.</p>
+    <p>Song duration.</p>
 </div>
 
 
@@ -554,76 +260,6 @@
             <li>
                 
 <span class="param-type">number</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="filter"><span class="type-signature"></span>filter<span class="type-signature"> :string</span></h4>
-
-
-
-
-<div class="description">
-    <p><code>@2.0.0</code> Queue audio filter.
-Available filters: <a href="global.html#Filter">Filter</a></p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">string</span>
 
 
             </li>
@@ -682,7 +318,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
 
 <div class="description">
-    <p>Formatted duration string.</p>
+    <p>Formatted duration string <code>hh:mm:ss</code> or <code>mm:ss</code>.</p>
 </div>
 
 
@@ -745,13 +381,13 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="initMessage"><span class="type-signature"></span>initMessage<span class="type-signature"> :Discord.Message</span></h4>
+<h4 class="name" id="id"><span class="type-signature"></span>id<span class="type-signature"> :string</span></h4>
 
 
 
 
 <div class="description">
-    <p><code>@2.2.0</code> Message which initialize the queue</p>
+    <p>Youtube video id</p>
 </div>
 
 
@@ -761,7 +397,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
         <ul>
             <li>
                 
-<span class="param-type">Discord.Message</span>
+<span class="param-type">string</span>
 
 
             </li>
@@ -814,82 +450,13 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="pause"><span class="type-signature"></span>pause<span class="type-signature"> :boolean</span></h4>
+<h4 class="name" id="isLive"><span class="type-signature"></span>isLive<span class="type-signature"> :boolean</span></h4>
 
 
 
 
 <div class="description">
-    <p>Whether or not the stream is currently paused.</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="playing"><span class="type-signature"></span>playing<span class="type-signature"> :boolean</span></h4>
-
-
-
-
-<div class="description">
-    <p>Whether or not the stream is currently playing.</p>
+    <p>Indicates if the video is an active live.</p>
 </div>
 
 
@@ -952,13 +519,82 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="repeatMode"><span class="type-signature"></span>repeatMode<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="link"><span class="type-signature"></span>link<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Song.url` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :string</span></h4>
 
 
 
 
 <div class="description">
-    <p>Type of repeat mode (0 is disabled, 1 is repeating a song, 2 is repeating all the playlist)</p>
+    <p>Song name aka video title.</p>
 </div>
 
 
@@ -968,7 +604,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
         <ul>
             <li>
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             </li>
@@ -1021,13 +657,13 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="skipped"><span class="type-signature"></span>skipped<span class="type-signature"> :boolean</span></h4>
+<h4 class="name" id="thumbnail"><span class="type-signature"></span>thumbnail<span class="type-signature"> :string</span></h4>
 
 
 
 
 <div class="description">
-    <p>Whether or not the last song was skipped.</p>
+    <p>Song thumbnail.</p>
 </div>
 
 
@@ -1037,7 +673,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
         <ul>
             <li>
                 
-<span class="param-type">boolean</span>
+<span class="param-type">string</span>
 
 
             </li>
@@ -1090,13 +726,82 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="songs"><span class="type-signature"></span>songs<span class="type-signature"> :Array.&lt;<a href="Song.html">Song</a>></span></h4>
+<h4 class="name" id="title"><span class="type-signature"></span>title<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+
+    <div class="member-item-container flex">
+        <strong>Type: </strong>
+        <ul>
+            <li>
+                
+<span class="param-type">string</span>
+
+
+            </li>
+        </ul>
+    </div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class="details-item-container">
+            <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>use `Song.name` instead</li></ul></dd>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="url"><span class="type-signature"></span>url<span class="type-signature"> :string</span></h4>
 
 
 
 
 <div class="description">
-    <p>List of songs</p>
+    <p>Song URL.</p>
 </div>
 
 
@@ -1106,7 +811,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
         <ul>
             <li>
                 
-<span class="param-type">Array.&lt;<a href="Song.html">Song</a>></span>
+<span class="param-type">string</span>
 
 
             </li>
@@ -1159,151 +864,13 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
 
         
             
-<h4 class="name" id="stopped"><span class="type-signature"></span>stopped<span class="type-signature"> :boolean</span></h4>
+<h4 class="name" id="views"><span class="type-signature"></span>views<span class="type-signature"> :number</span></h4>
 
 
 
 
 <div class="description">
-    <p>Whether stream is currently stopped.</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="stream"><span class="type-signature"></span>stream<span class="type-signature"> :Readable</span></h4>
-
-
-
-
-<div class="description">
-    <p><code>@2.5.0</code> ytdl stream</p>
-</div>
-
-
-
-    <div class="member-item-container flex">
-        <strong>Type: </strong>
-        <ul>
-            <li>
-                
-<span class="param-type">Readable</span>
-
-
-            </li>
-        </ul>
-    </div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="volume"><span class="type-signature"></span>volume<span class="type-signature"> :number</span></h4>
-
-
-
-
-<div class="description">
-    <p>Stream volume.</p>
+    <p>Song views count</p>
 </div>
 
 
