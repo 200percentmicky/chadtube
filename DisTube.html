@@ -282,13 +282,7 @@
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>const Discord = require('discord.js'),
-    DisTube = require('distube'),
-    client = new Discord.Client();
-// Create a new DisTube
-const distube = new DisTube(client, { searchSongs: true });
-// client.DisTube = distube // make it access easily
-client.login("Your Discord Bot Token")</code></pre>
+    <pre class="prettyprint"><code>const Discord = require('discord.js'),    DisTube = require('distube'),    client = new Discord.Client();// Create a new DisTubeconst distube = new DisTube(client, { searchSongs: true });// client.DisTube = distube // make it access easilyclient.login("Your Discord Bot Token")</code></pre>
 
     </div>
 
@@ -914,17 +908,7 @@ client.login("Your Discord Bot Token")</code></pre>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "queue") {
-        let queue = distube.getQueue(message);
-        message.channel.send('Current queue:\n' + queue.songs.map((song, id) =>
-            `**${id+1}**. [${song.name}](${song.url}) - \`${song.formattedDuration}\``
-        ).join("\n"));
-    }
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "queue") {        let queue = distube.getQueue(message);        message.channel.send('Current queue:\n' + queue.songs.map((song, id) =>            `**${id+1}**. [${song.name}](${song.url}) - \`${song.formattedDuration}\``        ).join("\n"));    }});</code></pre>
 
     </div>
 
@@ -1449,14 +1433,7 @@ The next one is 1,...</p>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "jump")
-        distube.jump(message, parseInt(args[0]))
-            .catch(err => message.channel.send("Invalid song number."));
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "jump")        distube.jump(message, parseInt(args[0]))            .catch(err => message.channel.send("Invalid song number."));});</code></pre>
 
     </div>
 
@@ -1804,13 +1781,7 @@ The next one is 1,...</p>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "play")
-        distube.play(message, args.join(" "));
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "play")        distube.play(message, args.join(" "));});</code></pre>
 
     </div>
 
@@ -2077,8 +2048,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];
-    distube.playCustomPlaylist(message, songs, { name: "My playlist name" });</code></pre>
+    <pre class="prettyprint"><code>let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];    distube.playCustomPlaylist(message, songs, { name: "My playlist name" });</code></pre>
 
     </div>
 
@@ -2242,13 +2212,7 @@ with <code>playlist</code>'s properties include <code>properties</code> paramete
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "playSkip")
-        distube.playSkip(message, args.join(" "));
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "playSkip")        distube.playSkip(message, args.join(" "));});</code></pre>
 
     </div>
 
@@ -2955,13 +2919,7 @@ Then use <a href="DisTube.html#play">play(message, aResultFromSearch)</a> or <a 
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', message => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command = 'seek')
-        distube.seek(message, Number(args[0]));
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', message => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command = 'seek')        distube.seek(message, Number(args[0]));});</code></pre>
 
     </div>
 
@@ -3144,15 +3102,7 @@ Available filters: <a href="global.html#Filter">Filter</a></p>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {
-        let filter = distube.setFilter(message, command);
-        message.channel.send("Current queue filter: " + (filter || "Off"));
-    }
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {        let filter = distube.setFilter(message, command);        message.channel.send("Current queue filter: " + (filter || "Off"));    }});</code></pre>
 
     </div>
 
@@ -3351,16 +3301,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "repeat") {
-        let mode = distube.setRepeatMode(message, parseInt(args[0]));
-        mode = mode ? mode == 2 ? "Repeat queue" : "Repeat song" : "Off";
-        message.channel.send("Set repeat mode to `" + mode + "`");
-    }
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "repeat") {        let mode = distube.setRepeatMode(message, parseInt(args[0]));        mode = mode ? mode == 2 ? "Repeat queue" : "Repeat song" : "Off";        message.channel.send("Set repeat mode to `" + mode + "`");    }});</code></pre>
 
     </div>
 
@@ -3574,13 +3515,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "volume")
-        distube.setVolume(message, args[0]);
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "volume")        distube.setVolume(message, args[0]);});</code></pre>
 
     </div>
 
@@ -3742,13 +3677,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "shuffle")
-        distube.shuffle(message);
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "shuffle")        distube.shuffle(message);});</code></pre>
 
     </div>
 
@@ -3970,13 +3899,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "skip")
-        distube.skip(message);
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "skip")        distube.skip(message);});</code></pre>
 
     </div>
 
@@ -4143,15 +4066,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "stop") {
-        distube.stop(message);
-        message.channel.send("Stopped the queue!");
-    }
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "stop") {        distube.stop(message);        message.channel.send("Stopped the queue!");    }});</code></pre>
 
     </div>
 
@@ -4342,15 +4257,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>client.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix)) return;
-    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-    const command = args.shift();
-    if (command == "autoplay") {
-        let mode = distube.toggleAutoplay(message);
-        message.channel.send("Set autoplay mode to `" + (mode ? "On" : "Off") + "`");
-    }
-});</code></pre>
+    <pre class="prettyprint"><code>client.on('message', (message) => {    if (!message.content.startsWith(config.prefix)) return;    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);    const command = args.shift();    if (command == "autoplay") {        let mode = distube.toggleAutoplay(message);        message.channel.send("Set autoplay mode to `" + (mode ? "On" : "Off") + "`");    }});</code></pre>
 
     </div>
 
@@ -4544,10 +4451,7 @@ Toggle mode: <code>mode = null</code> <code>(0 -&gt; 1 -&gt; 2 -&gt; 0...)</code
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
-distube.on("addList", (message, queue, playlist) => message.channel.send(
-    `Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`
-));</code></pre>
+    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;distube.on("addList", (message, queue, playlist) => message.channel.send(    `Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`));</code></pre>
 
     </div>
 
@@ -4728,10 +4632,7 @@ distube.on("addList", (message, queue, playlist) => message.channel.send(
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
-distube.on("addSong", (message, queue, song) => message.channel.send(
-    `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`
-));</code></pre>
+    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;distube.on("addSong", (message, queue, song) => message.channel.send(    `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`));</code></pre>
 
     </div>
 
@@ -5024,9 +4925,7 @@ distube.on("addSong", (message, queue, song) => message.channel.send(
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>distube.on("error", (message, err) => message.channel.send(
-    "An error encountered: " + err
-));</code></pre>
+    <pre class="prettyprint"><code>distube.on("error", (message, err) => message.channel.send(    "An error encountered: " + err));</code></pre>
 
     </div>
 
@@ -5297,10 +5196,7 @@ DisTube will leave voice channel if <a href="global.html#DisTubeOptions">DisTube
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>distube.on("initQueue", queue => {
-    queue.autoplay = false;
-    queue.volume = 100;
-});</code></pre>
+    <pre class="prettyprint"><code>distube.on("initQueue", queue => {    queue.autoplay = false;    queue.volume = 100;});</code></pre>
 
     </div>
 
@@ -5641,10 +5537,7 @@ and add the rest to the guild queue</p>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
-distube.on("playList", (message, queue, playlist, song) => message.channel.send(
-    `Play \`${playlist.name}\` playlist (${playlist.songs.length} songs).\nRequested by: ${song.user}\nNow playing \`${song.name}\` - \`${song.formattedDuration}\`\n${status(queue)}`
-));</code></pre>
+    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;distube.on("playList", (message, queue, playlist, song) => message.channel.send(    `Play \`${playlist.name}\` playlist (${playlist.songs.length} songs).\nRequested by: ${song.user}\nNow playing \`${song.name}\` - \`${song.formattedDuration}\`\n${status(queue)}`));</code></pre>
 
     </div>
 
@@ -5826,10 +5719,7 @@ If <a href="global.html#DisTubeOptions">DisTubeOptions</a>.emitNewSongOnly is <c
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
-distube.on("playSong", (message, queue, song) => message.channel.send(
-    `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`
-));</code></pre>
+    <pre class="prettyprint"><code>const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;distube.on("playSong", (message, queue, song) => message.channel.send(    `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`));</code></pre>
 
     </div>
 
@@ -5965,8 +5855,7 @@ Search will be canceled if user's next message is invalid number or timeout (60s
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = true
-distube.on("searchCancel", (message) => message.channel.send(`Searching canceled`));</code></pre>
+    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = truedistube.on("searchCancel", (message) => message.channel.send(`Searching canceled`));</code></pre>
 
     </div>
 
@@ -6126,11 +6015,7 @@ if song param of <a href="DisTube.html#play">play()</a> is invalid url</p>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Example</strong>
         
-    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = true
-distube.on("searchResult", (message, result) => {
-    let i = 0;
-    message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);
-});</code></pre>
+    <pre class="prettyprint"><code>// DisTubeOptions.searchSongs = truedistube.on("searchResult", (message, result) => {    let i = 0;    message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);});</code></pre>
 
     </div>
 
