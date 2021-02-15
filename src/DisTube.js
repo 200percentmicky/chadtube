@@ -873,7 +873,8 @@ class DisTube extends EventEmitter {
    */
   _createStream(queue) {
     let song = queue.songs[0];
-    let encoderArgs = queue.filter ? ["-af", this.filters[queue.filter]] : null;
+    let filters = queue.filter ? queue.filter.map(x => x.value) : null;
+    let encoderArgs = queue.filter ? ["-af", filters] : null;
     let streamOptions = {
       opusEncoded: true,
       filter: song.isLive ? "audioandvideo" : "audioonly",
