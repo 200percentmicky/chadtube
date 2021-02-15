@@ -10,7 +10,7 @@
   </p>
 </div>
 
-This fork adds multiple filters with interchangable values to the filters. No support will be given if you decide to use this fork. Please support the official release!
+This fork adds support for multiple filters with interchangable values. No support will be given if you decide to use this fork. Please support the official release!
 
 # DisTube
 
