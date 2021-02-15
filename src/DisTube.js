@@ -795,6 +795,13 @@ class DisTube extends EventEmitter {
     // If queue.filter is already an empty array, or all filters are removed...
     if (filter === "OFF".toLowerCase() || queue.filter === []) queue.filter = null;
     else if (queue.filter === null) queue.filter = []; // Initialize it as an array.
+    if (args === "off") {
+      if (!queue.filter) throw new Error("No filters are applied to the player.")
+      const index = queue.filter.findIndex(x => x.name === filter)
+      _.remove(queue.filter, n => {
+        return n === index
+      })
+    }
     const filters = queue.filter.find(x => x.name === filter)
     if (!filters) {
       queue.filter.push({
@@ -802,15 +809,7 @@ class DisTube extends EventEmitter {
         value: args
       });
     } else {
-      // eslint-disable-next-line no-lonely-if
-      if (args === "OFF".toLowerCase()) {
-        const index = queue.filter.findIndex(x => x.name === filter)
-        _.remove(queue.filter, n => {
-          return n === index
-        })
-      } else {
-        filters.value = args;
-      }
+      filters.value = args;
     }
     // if (!Object.prototype.hasOwnProperty.call(this.filters, filter)) throw new TypeError(`${filter} is not a Filter (https://DisTube.js.org/global.html#Filter).`);
     queue.beginTime = queue.currentTime;
