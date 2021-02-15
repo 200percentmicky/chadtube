@@ -777,6 +777,7 @@ class DisTube extends EventEmitter {
    *
    * @param {Discord.Message} message The message from guild channel
    * @param {Filter} filter A filter name
+   * @paran {FFMpegArgument} args A filter argument to provide to ffmpeg
    * @returns {string} Current queue's filter name.
    * @example
    * client.on('message', (message) => {

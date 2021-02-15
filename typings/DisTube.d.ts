@@ -383,6 +383,7 @@ declare class DisTube extends EventEmitter {
      *
      * @param {Discord.Message} message The message from guild channel
      * @param {Filter} filter A filter name
+     * @param {FFMpegArgument} args A filter argument to provide to ffmpeg
      * @returns {string} Current queue's filter name.
      * @example
      * client.on('message', (message) => {
@@ -395,7 +396,7 @@ declare class DisTube extends EventEmitter {
      *     }
      * });
      */
-    setFilter(message: Discord.Message, filter: Filter): string;
+    setFilter(message: Discord.Message, filter: Filter, args: string): string;
     /**
      * `@2.7.0` Set the playing time to another position
      *
@@ -576,6 +577,12 @@ declare namespace DisTubeOptions {
  * DisTube audio filters.
  */
 type Filter = "3d" | "bassboost" | "echo" | "karaoke" | "nightcore" | "vaporwave" | "flanger" | "gate" | "haas" | "reverse" | "surround" | "mcompand" | "phaser" | "tremolo" | "earwax";
+
+/**
+ * FFMpeg filter argument string
+ */
+type FFMpegArgument = string;
+
 /**
  * DisTube options.
  */
