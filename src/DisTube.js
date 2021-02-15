@@ -793,21 +793,23 @@ class DisTube extends EventEmitter {
     let queue = this.getQueue(message);
     if (!queue) throw new Error("NotPlaying");
     // If queue.filter is already an empty array, or all filters are removed...
-    if (filter === "off" || queue.filter === []) queue.filter = null;
     else if (queue.filter === null) queue.filter = []; // Initialize it as an array.
-    if (args === "off") {
-      if (!queue.filter) throw new Error("No filters are applied to the player.")
-      const index = queue.filter.findIndex(x => x.name === filter)
-      _.remove(queue.filter, n => {
-        return n === index
-      })
-    }
     const filters = queue.filter.find(x => x.name === filter)
+    if (args === "off") {
+      if (!queue.filter) throw new Error("No filters are applied to the player.");
+      if (!filters) throw new Error(`The filter ${filter} is not applied to the player.`);
+      _.remove(queue.filter, n => n === filters)
+      if (queue.filter == 0) queue.filter = null;
+    }
     if (!filters) {
-      queue.filter.push({
-        name: filter,
-        value: args
-      });
+      if (filter === "off") {
+        queue.filter = null;
+      } else {
+        queue.filter.push({
+          name: filter,
+          value: args
+        });
+      }
     } else {
       filters.value = args;
     }
