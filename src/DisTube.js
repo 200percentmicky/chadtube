@@ -803,6 +803,7 @@ class DisTube extends EventEmitter {
     }
     if (!filters) {
       if (filter === "off") {
+        if (!queue.filter) throw new Error("No filters are applied to the player.");
         queue.filter = null;
       } else {
         queue.filter.push({
