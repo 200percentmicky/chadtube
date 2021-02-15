@@ -10,6 +10,8 @@
   </p>
 </div>
 
+This fork adds multiple filters with interchangable values to the filters. No support will be given if you decide to use this fork. Please support the official release!
+
 # DisTube
 
 A Discord.js v12 module to simplify your music commands and play songs with audio filters on Discord without any API key.
