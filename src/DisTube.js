@@ -793,7 +793,7 @@ class DisTube extends EventEmitter {
     let queue = this.getQueue(message);
     if (!queue) throw new Error("NotPlaying");
     // If queue.filter is already an empty array, or all filters are removed...
-    if (filter === "OFF".toLowerCase() || queue.filter === []) queue.filter = null;
+    if (filter === "off" || queue.filter === []) queue.filter = null;
     else if (queue.filter === null) queue.filter = []; // Initialize it as an array.
     if (args === "off") {
       if (!queue.filter) throw new Error("No filters are applied to the player.")
