@@ -10,6 +10,7 @@ const ytdl = require("@distube/ytdl"),
   youtube_dl = require("@distube/youtube-dl"),
   path = require("path"),
   fs = require("fs"),
+  _ = require('lodash')
   { promisify } = require("util");
 const youtube_dlOptions = ["--no-warnings", "--force-ipv4"];
 const binPath = path.join(__dirname, `../youtube-dl/youtube-dl${process.platform === "win32" || process.env.NODE_PLATFORM === "windows" ? ".exe" : ""}`);
@@ -788,16 +789,35 @@ class DisTube extends EventEmitter {
    *     }
    * });
    */
-  setFilter(message, filter) {
+  setFilter(message, filter, args) {
     let queue = this.getQueue(message);
     if (!queue) throw new Error("NotPlaying");
-    if (!Object.prototype.hasOwnProperty.call(this.filters, filter)) throw new TypeError(`${filter} is not a Filter (https://DisTube.js.org/global.html#Filter).`);
-    if (queue.filter === filter) queue.filter = null;
-    else queue.filter = filter;
+    // If queue.filter is already an empty array, or all filters are removed...
+    if (filter === "OFF".toLowerCase() || queue.filter === []) queue.filter = null;
+    else if (queue.filter === null) queue.filter = []; // Initialize it as an array.
+    const filters = queue.filter.find(x => x.name === filter)
+    if (!filters) {
+      queue.filter.push({
+        name: filter,
+        value: args
+      });
+    } else {
+      // eslint-disable-next-line no-lonely-if
+      if (args === "OFF".toLowerCase()) {
+        const index = queue.filter.findIndex(x => x.name === filter)
+        _.remove(queue.filter, n => {
+          return n === index
+        })
+      } else {
+        filters.value = args;
+      }
+    }
+    // if (!Object.prototype.hasOwnProperty.call(this.filters, filter)) throw new TypeError(`${filter} is not a Filter (https://DisTube.js.org/global.html#Filter).`);
     queue.beginTime = queue.currentTime;
     this._playSong(message);
     return queue.filter;
   }
+
 
   /**
    * `@2.7.0` Set the playing time to another position

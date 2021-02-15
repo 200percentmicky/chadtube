@@ -45,6 +45,7 @@
     "@distube/ytdl": "^1.0.6",
     "@distube/ytpl": "^1.0.8",
     "@distube/ytsr": "^1.0.7",
+    "lodash": "^4.17.20",
     "ytdl-core": "^4.2.1"
   },
   "devDependencies": {
