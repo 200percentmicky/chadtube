@@ -10,7 +10,7 @@ const ytdl = require("@distube/ytdl"),
   youtube_dl = require("@distube/youtube-dl"),
   path = require("path"),
   fs = require("fs"),
-  _ = require('lodash')
+  _ = require('lodash'),
   { promisify } = require("util");
 const youtube_dlOptions = ["--no-warnings", "--force-ipv4"];
 const binPath = path.join(__dirname, `../youtube-dl/youtube-dl${process.platform === "win32" || process.env.NODE_PLATFORM === "windows" ? ".exe" : ""}`);
