@@ -73,6 +73,7 @@ const DisTubeOptions = {
  * @prop {string} tremolo `@2.7.0`
  * @prop {string} earwax `@2.7.0`
  */
+/*
 const ffmpegFilters = {
   "3d": "apulsator=hz=0.125",
   bassboost: "bass=g=10,dynaudnorm=f=150:g=15",
@@ -90,6 +91,7 @@ const ffmpegFilters = {
   surround: "surround",
   earwax: "earwax",
 }
+*/
 
 /**
  * Class representing a DisTube.
@@ -143,8 +145,8 @@ class DisTube extends EventEmitter {
      * DisTube filters
      * @type {Filter}
      */
-    this.filters = ffmpegFilters;
-    if (typeof otp.customFilters === "object") Object.assign(this.filters, otp.customFilters);
+    // this.filters = ffmpegFilters;
+    // if (typeof otp.customFilters === "object") Object.assign(this.filters, otp.customFilters);
 
     this.requestOptions = this.options.youtubeCookie ? { headers: { cookie: this.options.youtubeCookie, "x-youtube-identity-token": this.options.youtubeIdentityToken } } : undefined;
 
