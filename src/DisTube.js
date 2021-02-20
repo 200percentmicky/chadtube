@@ -241,6 +241,7 @@ class DisTube extends EventEmitter {
    */
   async play(message, song) {
     if (!song) return;
+    if (song.startsWith("<") && song.endsWith(">")) song.substring(1).slice(0, -1)
     try {
       if (ytpl.validateID(song)) await this._handlePlaylist(message, song);
       else await this._handleSong(message, await this._resolveSong(message, song));
