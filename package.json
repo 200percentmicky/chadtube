@@ -47,7 +47,7 @@
     "@distube/ytsr": "^1.1.0",
     "discord-ytdl-core": "^5.0.4",
     "lodash": "^4.17.21",
-    "ytdl-core": "github:fent/node-ytdl-core#pull/938/head"
+    "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
     "@discordjs/opus": "^0.3.3",
