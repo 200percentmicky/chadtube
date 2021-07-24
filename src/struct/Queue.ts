@@ -2,6 +2,7 @@ import DisTube from "../DisTube";
 import { DisTubeBase, DisTubeVoice } from "../core";
 import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { DisTubeError, SearchResult, Song, TaskQueue, formatDuration } from "..";
+import _ from 'lodash';
 
 /**
  * Represents a queue.
@@ -58,7 +59,7 @@ export class Queue extends DisTubeBase {
    * Enabled audio filters.
    * Available filters: {@link Filters}
    */
-  filters: string[];
+  filters: Record<string, unknown>[];
   /**
    * What time in the song to begin (in seconds).
    */
@@ -404,31 +405,36 @@ export class Queue extends DisTubeBase {
   }
   /**
    * Enable or disable filter(s) of the queue.
+   * 
+   * This function is different from the main repository.
+   * This allows you to apply multiple filters with interchangable values.
+   * 
    * Available filters: {@link Filters}
    * @param {string|string[]|false} filter A filter name, an array of filter name or `false` to clear all the filters
-   * @param {boolean} [force=false] Force enable the input filter(s) even if it's enabled
+   * @param {string|null} ffargs The FFMPEG argument to provide to the filter. `null` to remove the filter.
    * @returns {Array<string>} Enabled filters.
    * @throws {Error}
    */
-  setFilter(filter: string | string[] | false, force = false): Array<string> {
-    if (Array.isArray(filter)) {
-      filter = filter.filter(f => Object.prototype.hasOwnProperty.call(this.distube.filters, f));
-      if (!filter.length) throw new DisTubeError("EMPTY_FILTERED_ARRAY", "filter", "filter name");
-      for (const f of filter) {
-        if (this.filters.includes(f)) {
-          if (!force) this.filters.splice(this.filters.indexOf(f), 1);
-        } else {
-          this.filters.push(f);
+  setFilter(filter: string | string[] | false, ffargs: string | null): Record<string, unknown>[] {
+    const filterList = this.filters.find(x => x.name === filter);
+    if (ffargs == null) {
+      if (!this.filters) throw new TypeError("No filters are applied to the player.");
+      if (!filterList) throw new TypeError(`The filter ${filter} is not applied to the player.`)
+      _.remove(this.filters, n => n === filterList);
+    }
+    if (!filterList) {
+      if (filter == false) {
+        if (!this.filters) throw new TypeError("No filters are applied to the player.");
+        this.filters = [];
+      } else {
+        const filterPush = {
+          name: filter,
+          value: ffargs
         }
+        this.filters.push(filterPush)
       }
-    } else if (filter === false) {
-      this.filters = [];
-    } else if (!Object.prototype.hasOwnProperty.call(this.distube.filters, filter)) {
-      throw new DisTubeError("INVALID_TYPE", "filter name", filter, "filter");
-    } else if (this.filters.includes(filter)) {
-      if (!force) this.filters.splice(this.filters.indexOf(filter), 1);
     } else {
-      this.filters.push(filter);
+      filterList.value = ffargs;
     }
     this.beginTime = this.currentTime;
     this.queues.playSong(this);

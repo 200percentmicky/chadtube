@@ -70,7 +70,7 @@ export class DisTube extends EventEmitter {
    */
   constructor(client: Client, otp: DisTubeOptions = {}) {
     super();
-    if (!(client instanceof Client)) throw new DisTubeError("INVALID_TYPE", "Discord.Client", client, "client");
+    // if (!(client instanceof Client)) throw new DisTubeError("INVALID_TYPE", "Discord.Client", client, "client");
     /**
      * Discord.JS client
      * @type {Discord.Client}
@@ -604,26 +604,20 @@ export class DisTube extends EventEmitter {
 
   /**
    * Enable or disable filter(s) of the queue.
+   * 
+   * This function is different from the main repository.
+   * This allows you to apply multiple filters with interchangable values.
+   * 
    * Available filters: {@link Filters}
    * @param {GuildIDResolvable} queue The type can be resolved to give a {@link Queue}
    * @param {string|false} filter A filter name, `false` to clear all the filters
-   * @param {boolean} [force=false] Force enable the input filter(s) even if it's enabled
+   * @param {string|null} ffargs The FFMPEG argument to provide to the filter. 'null' to clear the filter.
    * @returns {Array<string>} Enabled filters.
-   * @example
-   * client.on('message', (message) => {
-   *     if (!message.content.startsWith(config.prefix)) return;
-   *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-   *     const command = args.shift();
-   *     if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {
-   *         let filter = distube.setFilter(message, command);
-   *         message.channel.send("Current queue filter: " + (filter.join(", ") || "Off"));
-   *     }
-   * });
    */
-  setFilter(queue: GuildIDResolvable, filter: string | false, force = false): Array<string> {
+  setFilter(queue: GuildIDResolvable, filter: string | false, ffargs: string | null): Record<string, unknown>[] {
     const q = this.getQueue(queue);
     if (!q) throw new DisTubeError("NO_QUEUE");
-    return q.setFilter(filter, force);
+    return q.setFilter(filter, ffargs);
   }
 
   /**
