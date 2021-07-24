@@ -1,17 +1,22 @@
 {
   "name": "distube",
-  "version": "2.8.8-chadtube-2021.6.27",
-  "description": "A Discord.js v12 module to simplify your music commands and play songs with audio filters on Discord without any API key. Support YouTube, SoundCloud, Bandcamp, Facebook, and 700+ more sites",
-  "main": "src/DisTube.js",
-  "typings": "typings/DisTube.d.ts",
+  "version": "3.0.0-alpha.17",
+  "description": "A Discord.js module to simplify your music commands and play songs with audio filters on Discord without any API key. Support YouTube, SoundCloud, Bandcamp, Facebook, and 700+ more sites",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "types": "tsc -p .",
-    "docs": "jsdoc -c jsdoc.json",
-    "djs/docgen": "npx docgen --source src --output docs/master.json"
+    "test": "jest --config .jestrc.json",
+    "docs": "npm run build && docgen --source dist --output docs/docs.json --custom pages/index.yml",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --write **/*.{js,ts,json,yml,yaml}",
+    "build": "tsc",
+    "build:check": "tsc --noEmit --incremental false",
+    "publish:alpha": "npm publish --tag alpha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mickykuna/chadtube.git"
+    "url": "git+https://github.com/skick1234/DisTube.git"
   },
   "keywords": [
     "youtube",
@@ -21,45 +26,64 @@
     "bot",
     "distube",
     "queue",
-    "search",
-    "loop",
-    "repeat",
     "musicbot",
-    "module",
-    "nodejs",
     "discord-music-bot",
     "music-bot",
     "discord-js"
   ],
-  "author": "Skick (https://github.com/distubejs/)",
+  "author": "Skick (https://github.com/skick1234/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/distubejs/distube/issues"
+    "url": "https://github.com/skick1234/DisTube/issues"
   },
   "funding": {
     "url": "https://patreon.com/DisTube"
   },
   "homepage": "https://distube.js.org/",
   "dependencies": {
-    "@distube/youtube-dl": "^1.0.4",
-    "@distube/ytdl": "^1.0.6",
-    "@distube/ytpl": "^1.0.8",
-    "@distube/ytsr": "^1.1.0",
-    "discord-ytdl-core": "^5.0.4",
-    "lodash": "^4.17.21",
+    "@distube/youtube-dl": "^2.2.2",
+    "@distube/ytpl": "^1.0.12",
+    "@distube/ytsr": "^1.1.2",
     "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
-    "@discordjs/opus": "^0.3.3",
-    "@types/node": "^14.14.45",
-    "clean-jsdoc-theme": "^3.2.7",
-    "discord.js": "^12.5.3",
-    "discord.js-docgen": "github:distubejs/docgen",
-    "jsdoc": "^3.6.6",
-    "typescript": "^4.2.4"
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-typescript": "^7.14.5",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "@discordjs/voice": "0.5.3",
+    "@distube/docgen": "distubejs/docgen",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.3.3",
+    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/parser": "^4.28.4",
+    "babel-jest": "^27.0.6",
+    "discord.js": "discordjs/discord.js",
+    "eslint": "^7.31.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsdoc": "^35.4.6",
+    "husky": "^7.0.1",
+    "jest": "^27.0.6",
+    "lint-staged": "^11.0.1",
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5"
+  },
+  "peerDependencies": {
+    "@discordjs/opus": "*",
+    "@discordjs/voice": "^0.5.3",
+    "discord.js": "^12.5.0||13||^13.0.0-0"
   },
   "engines": {
-    "discord.js": "^12.0.0",
-    "node": ">=12"
+    "node": ">=12.0.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "eslint"
+    ],
+    "*.{js,json,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
