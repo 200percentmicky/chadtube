@@ -614,7 +614,7 @@ export class DisTube extends EventEmitter {
    * @param {string|null} ffargs The FFMPEG argument to provide to the filter. 'null' to clear the filter.
    * @returns {Array<string>} Enabled filters.
    */
-  setFilter(queue: GuildIDResolvable, filter: string | false, ffargs: string | null): Record<string, unknown>[] {
+  setFilter(queue: GuildIDResolvable, filter: string | false, ffargs: string | false): Record<string, unknown>[] {
     const q = this.getQueue(queue);
     if (!q) throw new DisTubeError("NO_QUEUE");
     return q.setFilter(filter, ffargs);

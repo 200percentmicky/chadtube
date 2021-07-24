@@ -415,9 +415,9 @@ export class Queue extends DisTubeBase {
    * @returns {Array<string>} Enabled filters.
    * @throws {Error}
    */
-  setFilter(filter: string | string[] | false, ffargs: string | null): Record<string, unknown>[] {
+  setFilter(filter: string | string[] | false, ffargs: string | false): Record<string, unknown>[] {
     const filterList = this.filters.find(x => x.name === filter);
-    if (ffargs == null) {
+    if (ffargs == false) {
       if (!this.filters) throw new TypeError("No filters are applied to the player.");
       if (!filterList) throw new TypeError(`The filter ${filter} is not applied to the player.`)
       _.remove(this.filters, n => n === filterList);
