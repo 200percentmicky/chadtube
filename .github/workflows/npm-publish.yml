@@ -1,9 +1,10 @@
-name: Publish DisTube Alpha
+name: Publish DisTube Beta
 on:
   release:
     types: [created]
 jobs:
-  build:
+  publish:
+    name: Build & Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,6 +14,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm install
       - run: npm run build
-      - run: npm run publish:alpha
+      - run: npm run publish:beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

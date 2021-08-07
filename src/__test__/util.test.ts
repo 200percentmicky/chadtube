@@ -10,6 +10,7 @@ import {
   isURL,
   isVoiceChannelEmpty,
   parseNumber,
+  resolveGuildID,
   toSecond,
 } from "..";
 import { rawBotVoiceState, rawClientUser, rawGuild, rawMessage, rawUserVoiceState } from "./raw";
@@ -34,6 +35,8 @@ test("isSupportedVoiceChannel()", () => {
   expect(testFn(client)).toBe(false);
   expect(testFn(client.user)).toBe(false);
   expect(testFn(guild.me)).toBe(false);
+  expect(testFn(botVoiceState)).toBe(false);
+  expect(testFn(userVoiceState)).toBe(false);
 });
 
 test("isMessageInstance()", () => {
@@ -46,6 +49,8 @@ test("isMessageInstance()", () => {
   expect(testFn(client)).toBe(false);
   expect(testFn(client.user)).toBe(false);
   expect(testFn(guild.me)).toBe(false);
+  expect(testFn(botVoiceState)).toBe(false);
+  expect(testFn(userVoiceState)).toBe(false);
 });
 
 test("isTextChannelInstance()", () => {
@@ -58,6 +63,8 @@ test("isTextChannelInstance()", () => {
   expect(testFn(client)).toBe(false);
   expect(testFn(client.user)).toBe(false);
   expect(testFn(guild.me)).toBe(false);
+  expect(testFn(botVoiceState)).toBe(false);
+  expect(testFn(userVoiceState)).toBe(false);
 });
 
 test("isMemberInstance()", () => {
@@ -70,6 +77,8 @@ test("isMemberInstance()", () => {
   expect(testFn(client)).toBe(false);
   expect(testFn(client.user)).toBe(false);
   expect(testFn(guild.me)).toBe(true);
+  expect(testFn(botVoiceState)).toBe(false);
+  expect(testFn(userVoiceState)).toBe(false);
 });
 
 test("isVoiceChannelEmpty()", () => {
@@ -147,4 +156,20 @@ test("formatDuration()", () => {
   expect(formatDuration(70.6)).toBe("01:11");
   expect(formatDuration(5025)).toBe("01:23:45");
   expect(formatDuration(91425)).toBe("25:23:45");
+});
+
+test("resolveGuildID()", () => {
+  const gID = "737499502763704370";
+  const testFn = resolveGuildID;
+  expect(testFn(voiceChannel)).toBe(gID);
+  expect(testFn(stageChannel)).toBe(gID);
+  expect(testFn(textChannel)).toBe(gID);
+  expect(testFn(message)).toBe(gID);
+  expect(testFn(guild)).toBe(gID);
+  expect(testFn(guild.me)).toBe(gID);
+  expect(testFn(botVoiceState)).toBe(gID);
+  expect(testFn(userVoiceState)).toBe(gID);
+  expect(testFn(gID)).toBe(gID);
+  expect(() => testFn(client as any)).toThrow(new DisTubeError("INVALID_TYPE", "GuildIDResolvable", client));
+  expect(() => testFn(client.user as any)).toThrow(new DisTubeError("INVALID_TYPE", "GuildIDResolvable", client.user));
 });

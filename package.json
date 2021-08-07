@@ -1,6 +1,6 @@
 {
   "name": "distube",
-  "version": "3.0.0-alpha.17",
+  "version": "3.0.0-beta.34",
   "description": "A Discord.js module to simplify your music commands and play songs with audio filters on Discord without any API key. Support YouTube, SoundCloud, Bandcamp, Facebook, and 700+ more sites",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     "prettier": "prettier --write **/*.{js,ts,json,yml,yaml}",
     "build": "tsc",
     "build:check": "tsc --noEmit --incremental false",
-    "publish:alpha": "npm publish --tag alpha"
+    "publish:beta": "npm publish --tag beta"
   },
   "repository": {
     "type": "git",
@@ -43,39 +43,36 @@
   "dependencies": {
     "@distube/youtube-dl": "^2.2.2",
     "@distube/ytpl": "^1.0.12",
-    "@distube/ytsr": "^1.1.2",
-    "@types/lodash": "^4.14.171",
-    "lodash": "^4.17.21",
-    "sodium": "^3.0.2",
-    "ytdl-core": "^4.8.3"
+    "@distube/ytsr": "^1.1.5",
+    "ytdl-core": "^4.9.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.7",
-    "@babel/preset-typescript": "^7.14.5",
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "@discordjs/voice": "0.5.3",
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-typescript": "^7.15.0",
+    "@commitlint/cli": "^13.1.0",
+    "@commitlint/config-conventional": "^13.1.0",
+    "@discordjs/voice": "^0.5.5",
     "@distube/docgen": "distubejs/docgen",
     "@types/jest": "^26.0.24",
-    "@types/node": "^16.3.3",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
-    "@typescript-eslint/parser": "^4.28.4",
+    "@types/node": "^16.4.13",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
     "babel-jest": "^27.0.6",
-    "discord.js": "discordjs/discord.js",
-    "eslint": "^7.31.0",
+    "discord.js": "13.0.0-dev.t1627686972.d2757cf",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jsdoc": "^35.4.6",
+    "eslint-plugin-jsdoc": "^36.0.6",
     "husky": "^7.0.1",
     "jest": "^27.0.6",
-    "lint-staged": "^11.0.1",
+    "lint-staged": "^11.1.2",
     "prettier": "^2.3.2",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
     "@discordjs/opus": "*",
-    "@discordjs/voice": "^0.5.3",
-    "discord.js": "^12.5.0||13||^13.0.0-0"
+    "@discordjs/voice": "^0.5.5",
+    "discord.js": "^12.5.0||^13.0.0"
   },
   "engines": {
     "node": ">=12.0.0"
