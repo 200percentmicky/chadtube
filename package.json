@@ -44,7 +44,9 @@
     "@distube/youtube-dl": "^2.2.2",
     "@distube/ytdl-core": "^4.9.3",
     "@distube/ytpl": "^1.0.12",
-    "@distube/ytsr": "^1.1.5"
+    "@distube/ytsr": "^1.1.5",
+    "@types/lodash": "^4.14.172",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
