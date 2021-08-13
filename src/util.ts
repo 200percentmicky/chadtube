@@ -1,15 +1,16 @@
 import { URL } from "url";
-import { DisTubeError, GuildIDResolvable } from ".";
-import {
+import { DisTubeError } from ".";
+import { Intents, SnowflakeUtil } from "discord.js";
+import type { GuildIDResolvable } from ".";
+import type {
   BitFieldResolvable,
+  Client,
   ClientOptions,
   Guild,
   GuildMember,
-  Intents,
   IntentsString,
   Message,
   Snowflake,
-  SnowflakeUtil,
   StageChannel,
   TextChannel,
   VoiceChannel,
@@ -171,4 +172,21 @@ export function resolveGuildID(resolvable: GuildIDResolvable): Snowflake {
   else if ("id" in resolvable && isGuildInstance(resolvable)) guildID = resolvable.id;
   if (!isSnowflake(guildID)) throw new DisTubeError("INVALID_TYPE", "GuildIDResolvable", resolvable);
   return guildID;
+}
+
+export function isClientInstance(client: any): client is Client {
+  return !!client && typeof client.login === "function";
+}
+
+export function checkInvalidKey(
+  target: Record<string, any>,
+  source: Record<string, any> | string[],
+  sourceName: string,
+) {
+  if (typeof target !== "object" || Array.isArray(target)) {
+    throw new DisTubeError("INVALID_TYPE", "object", target, sourceName);
+  }
+  const sourceKeys = Array.isArray(source) ? source : Object.keys(source);
+  const invalidKey = Object.keys(target).find(key => !sourceKeys.includes(key));
+  if (invalidKey) throw new DisTubeError("INVALID_KEY", sourceName, invalidKey);
 }

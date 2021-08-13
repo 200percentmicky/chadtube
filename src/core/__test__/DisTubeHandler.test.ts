@@ -1,14 +1,15 @@
-import { DisTubeError, DisTubeHandler, Playlist, SearchResult, Song, defaultFilters, defaultOptions } from "../..";
 import { firstPlaylistInfo, playlistResults, videoResults } from "./raw";
+import { DisTubeError, DisTubeHandler, Playlist, SearchResult, Song, defaultFilters, defaultOptions } from "../..";
+import type { DisTubeOptions } from "../..";
 
 import * as _ytpl from "@distube/ytpl";
-import * as _ytdl from "ytdl-core";
+import * as _ytdl from "@distube/ytdl-core";
 import * as _Util from "../../util";
 import * as _Queue from "../../struct/Queue";
 import * as _Stream from "../DisTubeStream";
 
 jest.mock("@distube/ytpl");
-jest.mock("ytdl-core");
+jest.mock("@distube/ytdl-core");
 jest.mock("../../util");
 jest.mock("../../struct/Queue");
 jest.mock("../DisTubeStream");
@@ -33,12 +34,13 @@ const extractor = {
 
 function createFakeDisTube() {
   return {
-    options: { ...defaultOptions },
+    options: { ...defaultOptions } as DisTubeOptions,
     filters: defaultFilters,
     queues: createFakeQueueManager(),
     emit: jest.fn(),
     extractorPlugins: [extractor],
     search: jest.fn(),
+    listenerCount: jest.fn(),
   };
 }
 
@@ -300,11 +302,22 @@ describe("DisTubeHandler#handlePlaylist()", () => {
   test("Play in a nsfw channel", async () => {
     const channel: any = { nsfw: true };
     distube.queues.get.mockReturnValue(undefined);
-    handler.createQueue = jest.fn().mockReturnValue(true);
+    const createQueue = jest.fn().mockReturnValueOnce(true);
+    handler.createQueue = createQueue;
     await expect(handler.handlePlaylist(message, playlist, channel)).resolves.toBeUndefined();
     expect(handler.createQueue).toBeCalledWith(message, playlist.songs, channel);
     expect(distube.emit).not.toBeCalled();
     expect(playlist.songs).toContain(nsfwSong);
+    const queue = new Queue.Queue(distube as any, {} as any, playlist.songs);
+    queue.songs = playlist.songs;
+    distube.options.emitAddListWhenCreatingQueue = false;
+    createQueue.mockReturnValueOnce(queue);
+    await expect(handler.handlePlaylist(message, playlist, channel)).resolves.toBeUndefined();
+    expect(handler.createQueue).toBeCalledWith(message, playlist.songs, channel);
+    expect(distube.emit).not.toBeCalledWith("addList", queue, playlist);
+    expect(distube.emit).toBeCalledWith("playSong", queue, playlist.songs[0]);
+    expect(playlist.songs).toContain(nsfwSong);
+    distube.options.emitAddListWhenCreatingQueue = true;
   });
 
   test("Play in a non-nsfw channel", async () => {
@@ -315,7 +328,8 @@ describe("DisTubeHandler#handlePlaylist()", () => {
     handler.createQueue = jest.fn().mockReturnValue(queue);
     await expect(handler.handlePlaylist(message, playlist, channel)).resolves.toBeUndefined();
     expect(handler.createQueue).toBeCalledWith(message, playlist.songs, channel);
-    expect(distube.emit).toBeCalledWith("playSong", queue, playlist.songs[0]);
+    expect(distube.emit).nthCalledWith(1, "addList", queue, playlist);
+    expect(distube.emit).nthCalledWith(2, "playSong", queue, playlist.songs[0]);
     expect(playlist.songs).not.toContain(nsfwSong);
     playlist.songs.push(nsfwSong);
   });
@@ -407,15 +421,32 @@ describe("DisTubeHandler#createStream()", () => {
 });
 
 describe("DisTubeHandler#searchSong()", () => {
-  test("No result found", async () => {
-    const distube = createFakeDisTube();
-    const handler = new DisTubeHandler(distube as any);
-    const err = new DisTubeError("NO_RESULT");
-    distube.search.mockRejectedValue(err);
-    const message: any = {};
-    const query = "test";
-    await expect(handler.searchSong(message, query)).resolves.toBe(null);
-    expect(distube.emit).toBeCalledWith("searchNoResult", message, query);
+  describe("No result found", () => {
+    test("With listening searchNoResult event", async () => {
+      const distube = createFakeDisTube();
+      distube.emit.mockReturnValue(true);
+      const handler = new DisTubeHandler(distube as any);
+      const err = new DisTubeError("NO_RESULT");
+      distube.search.mockRejectedValue(err);
+      const message: any = {};
+      const query = "test";
+      await expect(handler.searchSong(message, query)).resolves.toBe(null);
+      expect(distube.emit).toBeCalledWith("searchNoResult", message, query);
+    });
+
+    test("Without listening searchNoResult event", async () => {
+      const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+      const distube = createFakeDisTube();
+      distube.emit.mockReturnValue(false);
+      const handler = new DisTubeHandler(distube as any);
+      const err = new DisTubeError("NO_RESULT");
+      distube.search.mockRejectedValue(err);
+      const message: any = {};
+      const query = "test";
+      await expect(handler.searchSong(message, query)).rejects.toThrow(err);
+      expect(distube.emit).toBeCalledWith("searchNoResult", message, query);
+      expect(warn).toBeCalledWith("searchNoResult event does not have any listeners! Emits `error` event instead.");
+    });
   });
 
   test("searchSongs option <= 1", async () => {
@@ -471,6 +502,7 @@ describe("DisTubeHandler#searchSong()", () => {
     };
 
     test("User choose a result (discord.js v13)", async () => {
+      distube.listenerCount.mockReturnValue(true);
       distube.options.nsfw = true;
       distube.search.mockResolvedValue(results);
       const ans = { content: "2", author: { id: 1 } };
@@ -486,9 +518,15 @@ describe("DisTubeHandler#searchSong()", () => {
       );
       expect(distube.emit).nthCalledWith(1, "searchResult", message, results, query);
       expect(distube.emit).nthCalledWith(2, "searchDone", message, ans, query);
+      expect(distube.listenerCount).toBeCalledWith("searchNoResult");
+      expect(distube.listenerCount).toBeCalledWith("searchResult");
+      expect(distube.listenerCount).toBeCalledWith("searchCancel");
+      expect(distube.listenerCount).toBeCalledWith("searchInvalidAnswer");
+      expect(distube.listenerCount).toBeCalledWith("searchDone");
     });
 
     test("User choose a result (discord.js v12)", async () => {
+      distube.listenerCount.mockReturnValue(true);
       distube.search.mockResolvedValue(results);
       const query = "query";
       const ans = { content: "3", author: { id: 1 } };
@@ -497,9 +535,15 @@ describe("DisTubeHandler#searchSong()", () => {
       expect(distube.search).toBeCalledWith(query, expect.objectContaining({ limit: 5 }));
       expect(distube.emit).nthCalledWith(1, "searchResult", message, results, query);
       expect(distube.emit).nthCalledWith(2, "searchDone", message, ans, query);
+      expect(distube.listenerCount).toBeCalledWith("searchNoResult");
+      expect(distube.listenerCount).toBeCalledWith("searchResult");
+      expect(distube.listenerCount).toBeCalledWith("searchCancel");
+      expect(distube.listenerCount).toBeCalledWith("searchInvalidAnswer");
+      expect(distube.listenerCount).toBeCalledWith("searchDone");
     });
 
     test("Message timeout", async () => {
+      distube.listenerCount.mockReturnValue(true);
       distube.search.mockResolvedValue(results);
       const ans = { content: "3", author: { id: 2 } };
       const message = createV12Message(ans);
@@ -507,9 +551,15 @@ describe("DisTubeHandler#searchSong()", () => {
       await expect(handler.searchSong(message, query)).resolves.toBe(null);
       expect(distube.emit).nthCalledWith(1, "searchResult", message, results, query);
       expect(distube.emit).nthCalledWith(2, "searchCancel", message, query);
+      expect(distube.listenerCount).toBeCalledWith("searchNoResult");
+      expect(distube.listenerCount).toBeCalledWith("searchResult");
+      expect(distube.listenerCount).toBeCalledWith("searchCancel");
+      expect(distube.listenerCount).toBeCalledWith("searchInvalidAnswer");
+      expect(distube.listenerCount).toBeCalledWith("searchDone");
     });
 
     test("User sends an invalid number", async () => {
+      distube.listenerCount.mockReturnValue(true);
       // Bigger than result length
       distube.search.mockResolvedValue(results);
       const ans = { content: "6", author: { id: 1 } };
@@ -528,6 +578,27 @@ describe("DisTubeHandler#searchSong()", () => {
       await expect(handler.searchSong(message, query)).resolves.toBe(null);
       expect(distube.emit).nthCalledWith(5, "searchResult", message, results, query);
       expect(distube.emit).nthCalledWith(6, "searchInvalidAnswer", message, ans, query);
+      expect(distube.listenerCount).toBeCalledWith("searchNoResult");
+      expect(distube.listenerCount).toBeCalledWith("searchResult");
+      expect(distube.listenerCount).toBeCalledWith("searchCancel");
+      expect(distube.listenerCount).toBeCalledWith("searchInvalidAnswer");
+      expect(distube.listenerCount).toBeCalledWith("searchDone");
+    });
+
+    test("Disabled `searchSongs` due to missing listener", async () => {
+      const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+      const events = ["searchNoResult", "searchResult", "searchCancel", "searchInvalidAnswer", "searchDone"];
+      distube.search.mockResolvedValue(results);
+      for (const evn of events) {
+        distube.listenerCount = ((e: string) => (e === evn ? 0 : 1)) as any;
+        distube.options.searchSongs = 5;
+        const ans = { content: "2", author: { id: 1 } };
+        const message = createV13Message(ans);
+        const query = "query";
+        await expect(handler.searchSong(message, query)).resolves.toBe(results[0]);
+        expect(warn).toBeCalledWith(`"searchSongs" option is disabled due to missing "${evn}" listener.`);
+        expect(distube.options.searchSongs).toBeLessThanOrEqual(1);
+      }
     });
   });
 });

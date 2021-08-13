@@ -1,8 +1,9 @@
-import ytdl from "ytdl-core";
-import { CustomPlugin, ExtractorPlugin, Queue, Song } from "./struct";
-import {
+import type ytdl from "@distube/ytdl-core";
+import type { CustomPlugin, ExtractorPlugin, Queue, Song } from "./struct";
+import type {
   Guild,
   GuildMember,
+  Interaction,
   Message,
   Snowflake,
   StageChannel,
@@ -12,9 +13,7 @@ import {
   VoiceState,
 } from "discord.js";
 
-export interface Filters {
-  [x: string]: string;
-}
+export type Filters = Record<string, string>;
 
 export interface DisTubeOptions {
   /** DisTube plugins.*/
@@ -65,6 +64,7 @@ export type GuildIDResolvable =
   | Guild
   | TextChannel
   | GuildMember
+  | Interaction
   | string;
 
 export interface OtherSongInfo {

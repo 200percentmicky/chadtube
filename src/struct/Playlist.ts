@@ -1,7 +1,8 @@
-import Song from "./Song";
-import ytpl from "@distube/ytpl";
-import { GuildMember, User } from "discord.js";
-import { DisTubeError, PlaylistInfo, formatDuration } from "..";
+import { DisTubeError, formatDuration } from "..";
+import type Song from "./Song";
+import type ytpl from "@distube/ytpl";
+import type { PlaylistInfo } from "..";
+import type { GuildMember, User } from "discord.js";
 
 /**
  * Class representing a playlist.
@@ -37,16 +38,6 @@ export class Playlist implements PlaylistInfo {
      */
     this.source = (info.source || properties.source || "youtube").toLowerCase();
     /**
-     * User requested.
-     * @type {Discord.GuildMember}
-     */
-    this.member = member || info.member;
-    /**
-     * User requested.
-     * @type {Discord.User}
-     */
-    this.user = this.member?.user;
-    /**
      * Playlist songs.
      * @type {Array<Song>}
      */
@@ -54,7 +45,7 @@ export class Playlist implements PlaylistInfo {
     if (!Array.isArray(this.songs) || !this.songs.length) {
       throw new DisTubeError("EMPTY_PLAYLIST");
     }
-    this.songs.map(s => s.constructor.name === "Song" && s._patchPlaylist(this, this.member));
+    this._patchMember(member || info.member);
     /**
      * Playlist name.
      * @type {string}
@@ -89,6 +80,28 @@ export class Playlist implements PlaylistInfo {
    */
   get formattedDuration() {
     return formatDuration(this.duration);
+  }
+
+  /**
+   * @param {Discord.GuildMember} [member] Requested user
+   * @private
+   * @returns {Playlist}
+   */
+  _patchMember(member?: GuildMember): Playlist {
+    if (member) {
+      /**
+       * User requested.
+       * @type {Discord.GuildMember}
+       */
+      this.member = member;
+      /**
+       * User requested.
+       * @type {Discord.User}
+       */
+      this.user = this.member?.user;
+    }
+    this.songs.map(s => s.constructor.name === "Song" && s._patchPlaylist(this, this.member));
+    return this;
   }
 }
 

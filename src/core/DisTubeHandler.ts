@@ -1,10 +1,8 @@
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import ytpl from "@distube/ytpl";
-import DisTube from "../DisTube";
 import { DisTubeBase, DisTubeStream } from ".";
 import {
   DisTubeError,
-  OtherSongInfo,
   Playlist,
   Queue,
   SearchResult,
@@ -13,7 +11,9 @@ import {
   isSupportedVoiceChannel,
   isURL,
 } from "..";
-import { GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import type DisTube from "../DisTube";
+import type { OtherSongInfo } from "..";
+import type { GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 /**
  * DisTube's Handler
@@ -78,10 +78,10 @@ export class DisTubeHandler extends DisTubeBase {
     song: string | ytdl.videoInfo | Song | Playlist | SearchResult | OtherSongInfo | ytdl.relatedVideo | null,
   ): Promise<Song | Playlist | null> {
     if (!song) return null;
-    if (song instanceof Song || song instanceof Playlist) return song;
+    if (song instanceof Song || song instanceof Playlist) return song._patchMember(member);
     if (song instanceof SearchResult) {
       if (song.type === "video") return new Song(song, member);
-      /*if (song.type === "playlist")*/ else return this.resolvePlaylist(member, song.url);
+      return this.resolvePlaylist(member, song.url);
     }
     if (typeof song === "object") return new Song(song, member);
     if (ytdl.validateURL(song)) return new Song(await this.getYouTubeInfo(song), member);
@@ -200,17 +200,33 @@ export class DisTubeHandler extends DisTubeBase {
    * @returns {Promise<SearchResult?>} Song info
    */
   async searchSong(message: Message, query: string): Promise<SearchResult | null> {
+    if (this.options.searchSongs > 1) {
+      for (const evn of ["searchNoResult", "searchResult", "searchCancel", "searchInvalidAnswer", "searchDone"]) {
+        if (this.distube.listenerCount(evn) === 0) {
+          /* eslint-disable no-console */
+          console.warn(`"searchSongs" option is disabled due to missing "${evn}" listener.`);
+          console.warn(
+            `If you don't want to use "${evn}" event, simply add an empty listener (not recommended):\n<DisTube>.on("${evn}", () => {})`,
+          );
+          /* eslint-enable no-console */
+          this.options.searchSongs = 0;
+        }
+      }
+    }
     const limit = this.options.searchSongs > 1 ? this.options.searchSongs : 1;
     const results = await this.distube
       .search(query, {
         limit,
         safeSearch: this.options.nsfw ? false : !(message.channel as TextChannel)?.nsfw,
       })
-      .catch(() => undefined);
-    if (!results?.length) {
-      this.emit("searchNoResult", message, query);
-      return null;
-    }
+      .catch(() => {
+        if (!this.emit("searchNoResult", message, query)) {
+          // eslint-disable-next-line no-console
+          console.warn("searchNoResult event does not have any listeners! Emits `error` event instead.");
+          throw new DisTubeError("NO_RESULT");
+        }
+      });
+    if (!results) return null;
     let result = results[0];
     if (limit > 1) {
       this.emit("searchResult", message, results, query);

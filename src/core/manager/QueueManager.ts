@@ -1,6 +1,7 @@
 import { BaseManager } from ".";
-import { DisTubeError, Queue, Song } from "../..";
-import { StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { DisTubeError, Queue } from "../..";
+import type { Song } from "../..";
+import type { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 /**
  * Queue manager
@@ -162,7 +163,7 @@ export class QueueManager extends BaseManager<Queue> {
       queue.voice.play(stream);
       song.streamURL = stream.url;
       return false;
-    } catch (e) {
+    } catch (e: any) {
       this._handlePlayingError(queue, e);
       return true;
     }

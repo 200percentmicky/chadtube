@@ -1,13 +1,7 @@
-import DisTubeStream from "../DisTubeStream";
 import { EventEmitter } from "events";
-import { DisTubeVoiceManager } from "./DisTubeVoiceManager";
 import { DisTubeError, createDiscordJSAdapter, isSupportedVoiceChannel } from "../..";
-import { Snowflake, StageChannel, VoiceChannel } from "discord.js";
 import {
-  AudioPlayer,
   AudioPlayerStatus,
-  AudioResource,
-  VoiceConnection,
   VoiceConnectionDisconnectReason,
   VoiceConnectionStatus,
   createAudioPlayer,
@@ -15,6 +9,10 @@ import {
   entersState,
   joinVoiceChannel,
 } from "@discordjs/voice";
+import type DisTubeStream from "../DisTubeStream";
+import type { DisTubeVoiceManager } from "./DisTubeVoiceManager";
+import type { AudioPlayer, AudioResource, VoiceConnection } from "@discordjs/voice";
+import type { Snowflake, StageChannel, VoiceChannel, VoiceState } from "discord.js";
 
 export declare interface DisTubeVoice {
   id: Snowflake;
@@ -64,8 +62,7 @@ export class DisTubeVoice extends EventEmitter {
     this.connection
       .on(VoiceConnectionStatus.Disconnected, (_, newState) => {
         if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
-          entersState(this.connection, VoiceConnectionStatus.Connecting, 3e3).catch(() => {
-            this.emit("disconnect");
+          entersState(this.connection, VoiceConnectionStatus.Connecting, 5e3).catch(() => {
             this.leave();
           });
         } else if (this.connection.rejoinAttempts < 5) {
@@ -73,8 +70,7 @@ export class DisTubeVoice extends EventEmitter {
             this.connection.rejoin();
           }, (this.connection.rejoinAttempts + 1) * 5e3).unref();
         } else if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
-          this.emit("disconnect", new DisTubeError("VOICE_RECONNECT_FAILED"));
-          this.leave();
+          this.leave(new DisTubeError("VOICE_RECONNECT_FAILED"));
         }
       })
       .on(VoiceConnectionStatus.Destroyed, () => {
@@ -129,10 +125,12 @@ export class DisTubeVoice extends EventEmitter {
   }
   /**
    * Leave the voice channel of this connection
+   * @param {Error} [error] Optional, an error to emit with 'error' event.
    */
-  leave() {
+  leave(error?: Error) {
     this.stop();
     if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
+      this.emit("disconnect", error);
       this.connection.destroy();
     }
     this.voices.delete(this.id);
@@ -231,6 +229,13 @@ export class DisTubeVoice extends EventEmitter {
       ...this.connection.joinConfig,
       selfMute,
     });
+  }
+  /**
+   * The voice state of this connection
+   * @type {Discord.VoiceState?}
+   */
+  get voiceState(): VoiceState | undefined {
+    return this.channel?.guild?.me?.voice;
   }
 }
 

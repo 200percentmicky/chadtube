@@ -1,5 +1,6 @@
-import ytdl from "ytdl-core";
-import { CustomPlugin, DisTubeError, DisTubeOptions, ExtractorPlugin, Filters, defaultOptions } from "..";
+import { DisTubeError, checkInvalidKey, defaultOptions } from "..";
+import type ytdl from "@distube/ytdl-core";
+import type { CustomPlugin, DisTubeOptions, ExtractorPlugin, Filters } from "..";
 
 export class Options {
   /** DisTube plugins.*/
@@ -30,8 +31,8 @@ export class Options {
   updateYouTubeDL: boolean;
   /** Override {@link DefaultFilters} or add more ffmpeg filters. Example=`{ "Filter name"="Filter value"; "8d"="apulsator=hz=0.075" }` */
   customFilters: Filters;
-  /** `ytdl-core` options */
-  ytdlOptions: ytdl.downloadOptions;
+  /** `ytdl-core` get info options */
+  ytdlOptions: ytdl.getInfoOptions;
   /** Whether or not playing age-restricted content and disabling safe search when using {@link DisTube#play} in non-NSFW channel. */
   nsfw: boolean;
   /** Whether or not emitting `addList` event when creating a new Queue */
@@ -39,6 +40,9 @@ export class Options {
   /** Whether or not emitting `addSong` event when creating a new Queue */
   emitAddListWhenCreatingQueue: boolean;
   constructor(options: DisTubeOptions) {
+    if (typeof options !== "object" || Array.isArray(options)) {
+      throw new DisTubeError("INVALID_TYPE", "object", options, "DisTubeOptions");
+    }
     const def = { ...defaultOptions };
     // Object.assign(this, defaultOptions, options);
     const opts = Object.assign({}, def, options);
@@ -60,6 +64,7 @@ export class Options {
     this.nsfw = opts.nsfw;
     this.emitAddSongWhenCreatingQueue = opts.emitAddSongWhenCreatingQueue;
     this.emitAddListWhenCreatingQueue = opts.emitAddListWhenCreatingQueue;
+    checkInvalidKey(opts, this, "DisTubeOptions");
     this._validateOptions();
   }
 
