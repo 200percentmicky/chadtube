@@ -1,6 +1,6 @@
 import { BaseManager } from ".";
-import { DisTubeError, Queue } from "../..";
-import type { Song } from "../..";
+import { DisTubeError, Queue, RepeatMode } from "../..";
+import type { DisTubeVoiceEvents, Song } from "../..";
 import type { StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 /**
@@ -29,17 +29,17 @@ export class QueueManager extends BaseManager<Queue> {
       this._voiceEventHandler(queue);
       this.add(queue.id, queue);
       this.emit("initQueue", queue);
-      const err = await this.queues.playSong(queue);
-      return err ? err : queue;
+      const err = await this.playSong(queue);
+      return err || queue;
     } finally {
       queue.taskQueue.resolve();
     }
   }
   /**
-   * Get a Queue from a QueueManager with a GuildIDResolvable.
+   * Get a Queue from this QueueManager.
    * @method get
    * @memberof QueueManager#
-   * @param {GuildIDResolvable} queue The queue resolvable to resolve
+   * @param {GuildIDResolvable} queue Resolvable thing from a guild
    * @returns {Queue?}
    */
   /**
@@ -48,18 +48,18 @@ export class QueueManager extends BaseManager<Queue> {
    * @param {Queue} queue Queue
    */
   private _voiceEventHandler(queue: Queue) {
-    queue.voice
-      .on("disconnect", error => {
+    queue.listeners = {
+      disconnect: error => {
         queue.delete();
-        if (!error) this.emit("disconnect", queue);
-        else this.emitError(error, queue.textChannel);
-      })
-      .on("error", error => {
-        this._handlePlayingError(queue, error);
-      })
-      .on("finish", () => {
-        this._handleSongFinish(queue);
-      });
+        this.emit("disconnect", queue);
+        if (error) this.emitError(error, queue.textChannel);
+      },
+      error: error => this._handlePlayingError(queue, error),
+      finish: () => this._handleSongFinish(queue),
+    };
+    for (const event of Object.keys(queue.listeners) as (keyof DisTubeVoiceEvents)[]) {
+      queue.voice.on(event, queue.listeners[event]);
+    }
   }
   /**
    * Handle the queue when a Song finish
@@ -72,12 +72,12 @@ export class QueueManager extends BaseManager<Queue> {
     await queue.taskQueue.queuing();
     try {
       if (queue.stopped) return;
-      if (queue.repeatMode === 2 && !queue.prev) queue.songs.push(queue.songs[0]);
+      if (queue.repeatMode === RepeatMode.QUEUE && !queue.prev) queue.songs.push(queue.songs[0]);
       if (queue.prev) {
-        if (queue.repeatMode === 2) queue.songs.unshift(queue.songs.pop() as Song);
+        if (queue.repeatMode === RepeatMode.QUEUE) queue.songs.unshift(queue.songs.pop() as Song);
         else queue.songs.unshift(queue.previousSongs.pop() as Song);
       }
-      if (queue.songs.length <= 1 && (queue.next || !queue.repeatMode)) {
+      if (queue.songs.length <= 1 && (queue.next || queue.repeatMode !== RepeatMode.DISABLED)) {
         if (queue.autoplay) {
           try {
             await queue.addRelatedSong();
@@ -93,7 +93,7 @@ export class QueueManager extends BaseManager<Queue> {
         }
       }
       const emitPlaySong = this._emitPlaySong(queue);
-      if (!queue.prev && (queue.repeatMode !== 1 || queue.next)) {
+      if (!queue.prev && (queue.repeatMode !== RepeatMode.SONG || queue.next)) {
         const prev = queue.songs.shift() as Song;
         delete prev.formats;
         delete prev.streamURL;
@@ -142,6 +142,7 @@ export class QueueManager extends BaseManager<Queue> {
       queue.stop();
       return true;
     }
+    if (queue.stopped) return false;
     queue.playing = true;
     queue.paused = false;
     const song = queue.songs[0];
@@ -175,6 +176,9 @@ export class QueueManager extends BaseManager<Queue> {
    * @returns {boolean}
    */
   private _emitPlaySong(queue: Queue): boolean {
-    return !this.options.emitNewSongOnly || (queue.repeatMode !== 1 && queue.songs[0]?.id !== queue.songs[1]?.id);
+    return (
+      !this.options.emitNewSongOnly ||
+      (queue.repeatMode !== RepeatMode.SONG && queue.songs[0]?.id !== queue.songs[1]?.id)
+    );
   }
 }

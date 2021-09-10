@@ -1,15 +1,14 @@
 import DisTubeBase from "../DisTubeBase";
 import { resolveGuildID } from "../..";
 import { Collection } from "discord.js";
-import type DisTube from "../../DisTube";
-import type { GuildIDResolvable } from "../..";
+import type { DisTube, GuildIDResolvable } from "../..";
 
 /**
  * Manages the collection of a data model.
  * @abstract
  * @private
  */
-export class BaseManager<V> extends DisTubeBase {
+export abstract class BaseManager<V> extends DisTubeBase {
   collection: Collection<string, V>;
   constructor(distube: DisTube) {
     super(distube);

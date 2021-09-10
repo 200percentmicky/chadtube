@@ -1,7 +1,7 @@
 import ytpl from "@distube/ytpl";
 import ytsr from "@distube/ytsr";
-import { EventEmitter } from "events";
-import { checkIntents, isURL, isVoiceChannelEmpty } from "./util";
+import { checkIntents, isURL } from "./util";
+import { TypedEmitter } from "tiny-typed-emitter";
 import {
   DisTubeError,
   DisTubeHandler,
@@ -21,9 +21,13 @@ import {
   isTextChannelInstance,
 } from ".";
 import type { Client, GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
-import type { CustomPlugin, DisTubeOptions, ExtractorPlugin, Filters, GuildIDResolvable, Song } from ".";
+import type { CustomPlugin, DisTubeEvents, DisTubeOptions, ExtractorPlugin, Filters, GuildIDResolvable, Song } from ".";
 
-export declare interface DisTube {
+/**
+ * DisTube class
+ * @extends EventEmitter
+ */
+export class DisTube extends TypedEmitter<DisTubeEvents> {
   handler: DisTubeHandler;
   options: Options;
   client: Client;
@@ -32,28 +36,9 @@ export declare interface DisTube {
   extractorPlugins: ExtractorPlugin[];
   customPlugins: CustomPlugin[];
   filters: Filters;
-  on(event: "addList", listener: (queue: Queue, playlist: Playlist) => void): this;
-  on(event: "addSong" | "playSong" | "finishSong", listener: (queue: Queue, song: Song) => void): this;
-  on(
-    event: "empty" | "finish" | "initQueue" | "noRelated" | "disconnect" | "deleteQueue",
-    listener: (queue: Queue) => void,
-  ): this;
-  on(event: "error", listener: (channel: TextChannel, error: Error) => void): this;
-  on(event: "searchNoResult" | "searchCancel", listener: (message: Message, query: string) => void): this;
-  on(event: "searchResult", listener: (message: Message, results: SearchResult[], query: string) => void): this;
-  on(
-    event: "searchInvalidAnswer" | "searchDone",
-    listener: (message: Message, answer: Message, query: string) => void,
-  ): this;
-}
-/**
- * DisTube class
- * @extends EventEmitter
- */
-export class DisTube extends EventEmitter {
   /**
    * Create a new DisTube class.
-   * @param {Discord.Client} client JS client
+   * @param {Discord.Client} client Discord.JS client
    * @param {DisTubeOptions} [otp] Custom DisTube options
    * @example
    * const Discord = require('discord.js'),
@@ -75,15 +60,15 @@ export class DisTube extends EventEmitter {
     this.client = client;
     checkIntents(client.options);
     /**
-     * Voice connections manager
-     * @type {DisTubeVoiceManager}
-     */
-    this.voices = new DisTubeVoiceManager(this);
-    /**
      * DisTube options
      * @type {DisTubeOptions}
      */
     this.options = new Options(otp);
+    /**
+     * Voice connections manager
+     * @type {DisTubeVoiceManager}
+     */
+    this.voices = new DisTubeVoiceManager(this);
     /**
      * DisTube's Handler
      * @type {DisTubeHandler}
@@ -100,35 +85,7 @@ export class DisTube extends EventEmitter {
      * @type {Filters}
      */
     this.filters = defaultFilters;
-    if (typeof this.options.customFilters === "object") Object.assign(this.filters, this.options.customFilters);
-    if (this.options.leaveOnEmpty) {
-      client.on("voiceStateUpdate", oldState => {
-        if (!oldState?.channel) return;
-        const queue = this.getQueue(oldState);
-        if (!queue) {
-          if (isVoiceChannelEmpty(oldState)) {
-            setTimeout(() => {
-              const guildID = oldState.guild.id;
-              if (!this.getQueue(oldState) && isVoiceChannelEmpty(oldState)) this.voices.leave(guildID);
-            }, this.options.emptyCooldown * 1e3).unref();
-          }
-          return;
-        }
-        if (queue.emptyTimeout) {
-          clearTimeout(queue.emptyTimeout);
-          delete queue.emptyTimeout;
-        }
-        if (isVoiceChannelEmpty(oldState)) {
-          queue.emptyTimeout = setTimeout(() => {
-            if (isVoiceChannelEmpty(oldState)) {
-              queue.voice.leave();
-              this.emit("empty", queue);
-              queue.delete();
-            }
-          }, this.options.emptyCooldown * 1e3).unref();
-        }
-      });
-    }
+    Object.assign(this.filters, this.options.customFilters);
     // Default plugin
     this.options.plugins.push(new HTTPPlugin(), new HTTPSPlugin());
     if (this.options.youtubeDL) this.options.plugins.push(new YouTubeDLPlugin(this.options.updateYouTubeDL));
@@ -151,10 +108,12 @@ export class DisTube extends EventEmitter {
    * Shorthand method for {@link DisTube#playVoiceChannel}
    * @returns {Promise<void>}
    * @param {Discord.Message} message A message from guild channel
-   * @param {string|Song|SearchResult|Playlist} song YouTube url | Search string | {@link Song} | {@link SearchResult} | {@link Playlist}
+   * @param {string|Song|SearchResult|Playlist} song URL | Search string |
+   * {@link Song} | {@link SearchResult} | {@link Playlist}
    * @param {Object} [options] Optional options
    * @param {boolean} [options.skip=false] Skip the playing song (if exists) and play the added song/playlist instantly
-   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue (after the playing song if exists)
+   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue
+   * (after the playing song if exists)
    * @example
    * client.on('message', (message) => {
    *     if (!message.content.startsWith(config.prefix)) return;
@@ -193,10 +152,12 @@ export class DisTube extends EventEmitter {
    * Emit {@link DisTube#addList}, {@link DisTube#addSong} or {@link DisTube#playSong} after executing
    * @returns {Promise<void>}
    * @param {Discord.VoiceChannel|Discord.StageChannel} voiceChannel The voice channel will be joined
-   * @param {string|Song|SearchResult|Playlist} song YouTube url | Search string | {@link Song} | {@link SearchResult} | {@link Playlist}
+   * @param {string|Song|SearchResult|Playlist} song URL | Search string |
+   * {@link Song} | {@link SearchResult} | {@link Playlist}
    * @param {Object} [options] Optional options
    * @param {boolean} [options.skip=false] Skip the playing song (if exists) and play the added song/playlist instantly
-   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue (after the playing song if exists)
+   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue
+   * (after the playing song if exists)
    * @param {Discord.GuildMember} [options.member] Requested user (default is your bot)
    * @param {Discord.TextChannel} [options.textChannel] Default {@link Queue#textChannel} (if the queue wasn't created)
    * @param {Discord.Message} [options.message] Called message (For built-in search events. If this is a {@link https://developer.mozilla.org/en-US/docs/Glossary/Falsy|falsy value}, it will play the first result instead)
@@ -280,6 +241,11 @@ export class DisTube extends EventEmitter {
   }
 
   /**
+   * <info>Shorthand method of {@link DisTubeHandler#createCustomPlaylist} and {@link DisTube#playVoiceChannel}
+   *
+   * If you doesn't have a user message (interaction,...),
+   * see {@link DisTubeHandler#createCustomPlaylist} example</info>
+   *
    * Play or add array of video urls.
    * {@link DisTube#event:playSong} or {@link DisTube#event:addList} will be emitted
    * with `playlist`'s properties include `properties` parameter's properties such as
@@ -290,10 +256,11 @@ export class DisTube extends EventEmitter {
    * @param {Object} [properties={}] Additional properties such as `name`
    * @param {Object} [options] Optional options
    * @param {boolean} [options.skip=false] Skip the playing song (if exists) and play the added song/playlist instantly
-   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue (after the playing song if exists)
+   * @param {boolean} [options.unshift=false] Add the song/playlist to the beginning of the queue
+   * (after the playing song if exists)
    * @param {boolean} [options.parallel=true] Whether or not fetch the songs in parallel
    * @example
-   *     let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];
+   *     const songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];
    *     distube.playCustomPlaylist(message, songs, { name: "My playlist name" });
    *     // Fetching custom playlist sequentially (reduce lag for low specs)
    *     distube.playCustomPlaylist(message, songs, { name: "My playlist name" }, false, false);
@@ -333,7 +300,7 @@ export class DisTube extends EventEmitter {
   /**
    * Search for a song.
    * You can customize how user answers instead of send a number.
-   * Then use {@link DisTube#play} or {@link DisTube#playSkip} to play it.
+   * Then use {@link DisTube#play} or {@link DisTube#playVoiceChannel} to play it.
    * @param {string} string The string search for
    * @param {Object} options Search options
    * @param {number} [options.limit=10] Limit the results
@@ -458,7 +425,9 @@ export class DisTube extends EventEmitter {
   }
 
   /**
-   * Skip the playing song
+   * Skip the playing song if there is a next song in the queue.
+   * <info>If {@link Queue#autoplay} is `true` and there is no up next song,
+   * DisTube will add and play a related song.</info>
    * @param {GuildIDResolvable} queue The type can be resolved to give a {@link Queue}
    * @returns {Promise<Song>} The new Song will be played
    * @throws {Error}
@@ -541,12 +510,11 @@ export class DisTube extends EventEmitter {
   }
 
   /**
-   * Set the repeat mode of the guild queue.
-   * Turn off if repeat mode is the same value as new mode.
-   * Toggle mode `(0 -> 1 -> 2 -> 0...)`: `mode` is `undefined`
+   * Set the repeat mode of the guild queue.\
+   * Toggle mode `(Disabled -> Song -> Queue -> Disabled ->...)` if `mode` is `undefined`
    * @param {GuildIDResolvable} queue The type can be resolved to give a {@link Queue}
-   * @param {number?} [mode] The repeat modes `(0: disabled, 1: Repeat a song, 2: Repeat all the queue)`
-   * @returns {number} The new repeat mode
+   * @param {RepeatMode?} [mode] The repeat modes (toggle if `undefined`)
+   * @returns {RepeatMode} The new repeat mode
    * @example
    * client.on('message', (message) => {
    *     if (!message.content.startsWith(config.prefix)) return;
@@ -558,6 +526,21 @@ export class DisTube extends EventEmitter {
    *         message.channel.send("Set repeat mode to `" + mode + "`");
    *     }
    * });
+   * @example
+   * const { RepeatMode } = require("distube");
+   * let mode;
+   * switch(distube.setRepeatMode(message, parseInt(args[0]))) {
+   *     case RepeatMode.DISABLED:
+   *         mode = "Off";
+   *         break;
+   *     case RepeatMode.SONG:
+   *         mode = "Repeat a song";
+   *         break;
+   *     case RepeatMode.QUEUE:
+   *         mode = "Repeat all queue";
+   *         break;
+   * }
+   * message.channel.send("Set repeat mode to `" + mode + "`");
    */
   setRepeatMode(queue: GuildIDResolvable, mode?: number): number {
     const q = this.getQueue(queue);
@@ -576,7 +559,7 @@ export class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "autoplay") {
-   *         let mode = distube.toggleAutoplay(message);
+   *         const mode = distube.toggleAutoplay(message);
    *         message.channel.send("Set autoplay mode to `" + (mode ? "On" : "Off") + "`");
    *     }
    * });
@@ -664,7 +647,7 @@ export class DisTube extends EventEmitter {
 export default DisTube;
 
 /**
- * Emitted after DisTube add a new playlist to the playing {@link Queue}
+ * Emitted after DisTube add a new playlist to the playing {@link Queue}.
  *
  * @event DisTube#addList
  * @param {Queue} queue The guild queue
@@ -676,7 +659,7 @@ export default DisTube;
  */
 
 /**
- *  Emitted after DisTube add a new song to the playing {@link Queue}
+ * Emitted after DisTube add a new song to the playing {@link Queue}.
  *
  * @event DisTube#addSong
  * @param {Queue} queue The guild queue
@@ -688,9 +671,11 @@ export default DisTube;
  */
 
 /**
- * Emitted when there is no user in the voice channel, {@link DisTubeOptions}.leaveOnEmpty is `true` and there is a playing queue.
- * If there is no playing queue (stopped and {@link DisTubeOptions}.leaveOnStop is `false`), it will leave the channel without emitting this event.
+ * Emitted when there is no user in the voice channel,
+ * {@link DisTubeOptions}.leaveOnEmpty is `true` and there is a playing queue.
  *
+ * If there is no playing queue (stopped and {@link DisTubeOptions}.leaveOnStop is `false`),
+ * it will leave the channel without emitting this event.
  * @event DisTube#empty
  * @param {Queue} queue The guild queue
  * @example
@@ -698,7 +683,7 @@ export default DisTube;
  */
 
 /**
- * Emitted when {@link DisTube} encounters an error.
+ * Emitted when DisTube encounters an error.
  *
  * @event DisTube#error
  * @param {Discord.TextChannel} channel Text channel where the error is encountered.
@@ -711,7 +696,7 @@ export default DisTube;
 
 /**
  * Emitted when there is no more song in the queue and {@link Queue#autoplay} is `false`.
- * DisTube will leave voice channel if {@link DisTubeOptions}.leaveOnFinish is `true`
+ * DisTube will leave voice channel if {@link DisTubeOptions}.leaveOnFinish is `true`.
  *
  * @event DisTube#finish
  * @param {Queue} queue The guild queue
@@ -732,8 +717,8 @@ export default DisTube;
  */
 
 /**
- * Emitted when {@link Queue#autoplay} is `true`, the {@link Queue#songs} is empty and
- * DisTube cannot find related songs to play
+ * Emitted when {@link Queue#autoplay} is `true`, {@link Queue#songs} is empty,
+ * and DisTube cannot find related songs to play.
  *
  * @event DisTube#noRelated
  * @param {Queue} queue The guild queue
@@ -743,20 +728,21 @@ export default DisTube;
 
 /**
  * Emitted when DisTube play a song.
- * If {@link DisTubeOptions}.emitNewSongOnly is `true`, event is not emitted when looping a song or next song is the previous one
+ *
+ * If {@link DisTubeOptions}.emitNewSongOnly is `true`,
+ * this event is not emitted when looping a song or next song is the previous one.
  *
  * @event DisTube#playSong
  * @param {Queue} queue The guild queue
  * @param {Song} song Playing song
  * @example
- * const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
  * distube.on("playSong", (queue, song) => queue.textChannel.send(
- *     `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`
+ *     `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}`
  * ));
  */
 
 /**
- * Emitted when DisTube cannot find any results for the query
+ * Emitted when DisTube cannot find any results for the query.
  *
  * @event DisTube#searchNoResult
  * @param {Discord.Message} message The user message called play method
@@ -766,9 +752,9 @@ export default DisTube;
  */
 
 /**
- * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0
- * and song param of {@link DisTube#play|play()} is invalid url.
- * DisTube will wait for user's next message to choose song manually.
+ * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0,
+ * and song param of {@link DisTube#playVoiceChannel} is invalid url.
+ * DisTube will wait for user's next message to choose a song manually.
  * <info>{@link https://support.google.com/youtube/answer/7354993|Safe search} is enabled
  * if {@link DisTubeOptions}.nsfw is disabled and the message's channel is not a nsfw channel.</info>
  *
@@ -779,13 +765,15 @@ export default DisTube;
  * @example
  * // DisTubeOptions.searchSongs > 0
  * distube.on("searchResult", (message, results) => {
- *     message.channel.send(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);
+ *     message.channel.send(`**Choose an option from below**\n${
+ *         results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
+ *     }\n*Enter anything else or wait 60 seconds to cancel*`);
  * });
  */
 
 /**
- * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0
- * and the search canceled due to {@link DisTubeOptions|DisTubeOptions.searchTimeout}
+ * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0,
+ * and the search canceled due to {@link DisTubeOptions|DisTubeOptions.searchTimeout}.
  *
  * @event DisTube#searchCancel
  * @param {Discord.Message} message The user message called play method
@@ -796,8 +784,8 @@ export default DisTube;
  */
 
 /**
- * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0
- * and the search canceled due to user's next message is not a number or out of results range
+ * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0,
+ * and the search canceled due to user's next message is not a number or out of results range.
  *
  * @event DisTube#searchInvalidAnswer
  * @param {Discord.Message} message The user message called play method
@@ -809,8 +797,8 @@ export default DisTube;
  */
 
 /**
- * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0
- * and after the user chose a search result to play
+ * Emitted when {@link DisTubeOptions|DisTubeOptions.searchSongs} bigger than 0,
+ * and after the user chose a search result to play.
  *
  * @event DisTube#searchDone
  * @param {Discord.Message} message The user message called play method
@@ -819,7 +807,7 @@ export default DisTube;
  */
 
 /**
- * Emitted when the bot is disconnected to the voice channel
+ * Emitted when the bot is disconnected to a voice channel.
  *
  * @event DisTube#disconnect
  * @param {Queue} queue The guild queue
@@ -833,7 +821,7 @@ export default DisTube;
  */
 
 /**
- * Emitted when DisTube finished a song
+ * Emitted when DisTube finished a song.
  *
  * @event DisTube#finishSong
  * @param {Queue} queue The guild queue

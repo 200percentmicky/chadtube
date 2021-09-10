@@ -1,10 +1,8 @@
 import { DisTubeBase } from "../core";
-import { DisTubeError, Song, TaskQueue, formatDuration } from "..";
-import type DisTube from "../DisTube";
-import type { SearchResult } from "..";
-import type { DisTubeVoice } from "../core";
+import { DisTubeError, RepeatMode, Song, TaskQueue, formatDuration } from "..";
 import type { GuildMember, Snowflake, TextChannel } from "discord.js";
-import _ from 'lodash';
+import _ from "lodash";
+import type { DisTube, DisTubeVoice, DisTubeVoiceEvents, SearchResult } from "..";
 
 /**
  * Represents a queue.
@@ -51,7 +49,7 @@ export class Queue extends DisTubeBase {
    * Type of repeat mode (`0` is disabled, `1` is repeating a song, `2` is repeating all the queue).
    * Default value: `0` (disabled)
    */
-  repeatMode: number;
+  repeatMode: RepeatMode;
   /**
    * Whether or not the autoplay mode is enabled.
    * Default value: `false`
@@ -83,6 +81,7 @@ export class Queue extends DisTubeBase {
    * Task queuing system
    */
   taskQueue: TaskQueue;
+  listeners?: DisTubeVoiceEvents;
   /**
    * Create a queue for the guild
    * @param {DisTube} distube DisTube
@@ -153,9 +152,9 @@ export class Queue extends DisTubeBase {
     /**
      * Type of repeat mode (`0` is disabled, `1` is repeating a song, `2` is repeating all the queue).
      * Default value: `0` (disabled)
-     * @type {number}
+     * @type {RepeatMode}
      */
-    this.repeatMode = 0;
+    this.repeatMode = RepeatMode.DISABLED;
     /**
      * Whether or not the autoplay mode is enabled.
      * Default value: `false`
@@ -190,6 +189,12 @@ export class Queue extends DisTubeBase {
      * @private
      */
     this.taskQueue = new TaskQueue();
+    /**
+     * DisTubeVoice listener
+     * @type {Object}
+     * @private
+     */
+    this.listeners = undefined;
   }
   /**
    * Formatted duration string.
@@ -291,7 +296,9 @@ export class Queue extends DisTubeBase {
   }
 
   /**
-   * Skip the playing song
+   * Skip the playing song if there is a next song in the queue.
+   * <info>If {@link Queue#autoplay} is `true` and there is no up next song,
+   * DisTube will add and play a related song.</info>
    * @returns {Promise<Song>} The song will skip to
    * @throws {Error}
    */
@@ -312,7 +319,7 @@ export class Queue extends DisTubeBase {
   }
 
   /**
-   * Play the previous song
+   * Play the previous song if exists
    * @returns {Song} The guild queue
    * @throws {Error}
    */
@@ -320,7 +327,9 @@ export class Queue extends DisTubeBase {
     await this.taskQueue.queuing();
     try {
       if (!this.options.savePreviousSongs) throw new DisTubeError("DISABLED_OPTION", "savePreviousSongs");
-      if (this.previousSongs?.length === 0 && this.repeatMode !== 2) throw new DisTubeError("NO_PREVIOUS");
+      if (this.previousSongs?.length === 0 && this.repeatMode !== RepeatMode.QUEUE) {
+        throw new DisTubeError("NO_PREVIOUS");
+      }
       const song =
         this.repeatMode === 2 ? this.songs[this.songs.length - 1] : this.previousSongs[this.previousSongs.length - 1];
       this.prev = true;
@@ -390,18 +399,17 @@ export class Queue extends DisTubeBase {
     }
   }
   /**
-   * Set the repeat mode of the guild queue.
-   * Turn off if repeat mode is the same value as new mode.
-   * Toggle mode `(0 -> 1 -> 2 -> 0...)`: `mode` is `undefined`
-   * @param {number?} [mode] The repeat modes `(0: disabled, 1: Repeat a song, 2: Repeat all the queue)`
-   * @returns {number} The new repeat mode
+   * Set the repeat mode of the guild queue.\
+   * Toggle mode `(Disabled -> Song -> Queue -> Disabled ->...)` if `mode` is `undefined`
+   * @param {RepeatMode?} [mode] The repeat modes (toggle if `undefined`)
+   * @returns {RepeatMode} The new repeat mode
    */
-  setRepeatMode(mode?: number): number {
-    if (mode !== undefined && ![0, 1, 2].includes(mode)) {
-      throw new DisTubeError("INVALID_TYPE", [0, 1, 2, "undefined"], mode, "mode");
+  setRepeatMode(mode?: RepeatMode): RepeatMode {
+    if (mode !== undefined && !Object.values(RepeatMode).includes(mode)) {
+      throw new DisTubeError("INVALID_TYPE", ["RepeatMode", "undefined"], mode, "mode");
     }
     if (mode === undefined) this.repeatMode = (this.repeatMode + 1) % 3;
-    else if (this.repeatMode === mode) this.repeatMode = 0;
+    else if (this.repeatMode === mode) this.repeatMode = RepeatMode.DISABLED;
     else this.repeatMode = mode;
     return this.repeatMode;
   }
@@ -483,12 +491,19 @@ export class Queue extends DisTubeBase {
     }
   }
   /**
-   * Delete the queue
+   * Delete the queue from the manager
+   * (This does not leave the queue even if {@link DisTubeOptions|DisTubeOptions.leaveOnStop} is enabled)
+   * @private
    */
   delete() {
     this.stopped = true;
     this.songs = [];
     this.previousSongs = [];
+    if (this.listeners) {
+      for (const event of Object.keys(this.listeners) as (keyof DisTubeVoiceEvents)[]) {
+        this.voice.removeListener(event, this.listeners[event]);
+      }
+    }
     this.queues.delete(this.id);
     this.emit("deleteQueue", this);
   }

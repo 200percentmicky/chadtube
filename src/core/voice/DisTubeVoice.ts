@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import { TypedEmitter } from "tiny-typed-emitter";
 import { DisTubeError, createDiscordJSAdapter, isSupportedVoiceChannel } from "../..";
 import {
   AudioPlayerStatus,
@@ -9,26 +9,21 @@ import {
   entersState,
   joinVoiceChannel,
 } from "@discordjs/voice";
-import type DisTubeStream from "../DisTubeStream";
-import type { DisTubeVoiceManager } from "./DisTubeVoiceManager";
+import type { DisTubeStream, DisTubeVoiceEvents, DisTubeVoiceManager } from "../..";
 import type { AudioPlayer, AudioResource, VoiceConnection } from "@discordjs/voice";
 import type { Snowflake, StageChannel, VoiceChannel, VoiceState } from "discord.js";
 
-export declare interface DisTubeVoice {
-  id: Snowflake;
-  voices: DisTubeVoiceManager;
-  audioPlayer: AudioPlayer;
-  connection: VoiceConnection;
-  audioResource?: AudioResource;
-  emittedError: boolean;
-  on(event: "disconnect", listener: (error?: Error) => void): this;
-  on(event: "error", listener: (error: Error) => void): this;
-  on(event: "finish", listener: () => void): this;
-}
 /**
  * Create a voice connection to the voice channel
  */
-export class DisTubeVoice extends EventEmitter {
+export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
+  id: Snowflake;
+  voices: DisTubeVoiceManager;
+  audioPlayer: AudioPlayer;
+  connection!: VoiceConnection;
+  audioResource?: AudioResource;
+  emittedError!: boolean;
+  isDisconnected: boolean;
   private _channel!: VoiceChannel | StageChannel;
   private _volume: number;
   constructor(voiceManager: DisTubeVoiceManager, channel: VoiceChannel | StageChannel) {
@@ -38,6 +33,7 @@ export class DisTubeVoice extends EventEmitter {
       if (channel.full) throw new DisTubeError("VOICE_FULL");
       else throw new DisTubeError("VOICE_MISSING_PERMS");
     }
+    this.isDisconnected = false;
     this.id = channel.guild.id;
     this.channel = channel;
     /**
@@ -129,10 +125,11 @@ export class DisTubeVoice extends EventEmitter {
    */
   leave(error?: Error) {
     this.stop();
-    if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
+    if (!this.isDisconnected) {
       this.emit("disconnect", error);
-      this.connection.destroy();
+      this.isDisconnected = true;
     }
+    if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) this.connection.destroy();
     this.voices.delete(this.id);
   }
   /**

@@ -1,16 +1,17 @@
 import Playlist from "./Playlist";
 import { DisTubeError, formatDuration, parseNumber, toSecond } from "..";
 import type ytdl from "@distube/ytdl-core";
-import type { SearchResult } from ".";
-import type { Chapter, OtherSongInfo } from "..";
 import type { GuildMember, User } from "discord.js";
+import type { Chapter, OtherSongInfo, SearchResult } from "..";
 
 /**
  * Class representing a song.
- * <info>If {@link Song} is added from a YouTube {@link SearchResult} or {@link Playlist}, some info will be missing to save your resources.
- * It will be filled when emitting {@link DisTube#playSong} event.
  *
- * Missing info: {@link Song#likes}, {@link Song#dislikes}, {@link Song#streamURL}, {@link Song#related}, {@link Song#chapters}, {@link Song#age_restricted}</info>
+ * <info>If {@link Song} is added from a YouTube {@link SearchResult} or {@link Playlist},
+ * some info will be missing to save your resources. It will be filled when emitting {@link DisTube#playSong} event.
+ *
+ * Missing info: {@link Song#likes}, {@link Song#dislikes}, {@link Song#streamURL},
+ * {@link Song#related}, {@link Song#chapters}, {@link Song#age_restricted}</info>
  */
 export class Song {
   source: string;
@@ -29,11 +30,8 @@ export class Song {
   views!: number;
   likes!: number;
   dislikes!: number;
-  /** Song uploader */
   uploader!: {
-    /** Uploader name */
     name?: string;
-    /** Uploader url */
     url?: string;
   };
   age_restricted!: boolean;

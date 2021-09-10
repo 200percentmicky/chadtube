@@ -10,9 +10,9 @@ import {
   isMessageInstance,
   isSupportedVoiceChannel,
   isURL,
+  isVoiceChannelEmpty,
 } from "..";
-import type DisTube from "../DisTube";
-import type { OtherSongInfo } from "..";
+import type { DisTube, OtherSongInfo } from "..";
 import type { GuildMember, Message, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 
 /**
@@ -25,6 +25,7 @@ export class DisTubeHandler extends DisTubeBase {
   constructor(distube: DisTube) {
     super(distube);
     this.ytdlOptions = this.options.ytdlOptions;
+
     if (this.options.youtubeCookie) {
       const requestOptions: any = {
         headers: {
@@ -36,11 +37,41 @@ export class DisTubeHandler extends DisTubeBase {
       }
       Object.assign(this.ytdlOptions, { requestOptions });
     }
+
+    const client = this.client;
+    if (this.options.leaveOnEmpty) {
+      client.on("voiceStateUpdate", oldState => {
+        if (!oldState?.channel) return;
+        const queue = this.queues.get(oldState);
+        if (!queue) {
+          if (isVoiceChannelEmpty(oldState)) {
+            setTimeout(() => {
+              if (!this.queues.get(oldState) && isVoiceChannelEmpty(oldState)) this.voices.leave(oldState);
+            }, this.options.emptyCooldown * 1e3).unref();
+          }
+          return;
+        }
+        if (queue.emptyTimeout) {
+          clearTimeout(queue.emptyTimeout);
+          delete queue.emptyTimeout;
+        }
+        if (isVoiceChannelEmpty(oldState)) {
+          queue.emptyTimeout = setTimeout(() => {
+            delete queue.emptyTimeout;
+            if (isVoiceChannelEmpty(oldState)) {
+              queue.voice.leave();
+              this.emit("empty", queue);
+              if (queue.stopped) queue.delete();
+            }
+          }, this.options.emptyCooldown * 1e3).unref();
+        }
+      });
+    }
   }
 
   /**
    * Create a new guild queue
-   * @param {Discord.Message|Discord.VoiceChannel|Discord.StageChannel} message A message from guild channel | a voice channel
+   * @param {Discord.Message|Discord.VoiceChannel|Discord.StageChannel} message A user message | a voice channel
    * @param {Song|Song[]} song Song to play
    * @param {Discord.TextChannel} textChannel A text channel of the queue
    * @throws {Error}
@@ -126,6 +157,12 @@ export class DisTubeHandler extends DisTubeBase {
    * @param {Array<string|Song|SearchResult>} songs Array of url, Song or SearchResult
    * @param {Object} [properties={}] Additional properties such as `name`
    * @param {boolean} [parallel=true] Whether or not fetch the songs in parallel
+   * @example
+   *     const songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];
+   *     const playlist = await distube.handler.createCustomPlaylist(member, songs, { name: "My playlist name" }, true);
+   *     // Or fetching custom playlist sequentially (reduce lag for low specs)
+   *     const playlist = await distube.handler.createCustomPlaylist(member, songs, false);
+   *     distube.playVoiceChannel(voiceChannel, playlist, { ... });
    */
   async createCustomPlaylist(
     message: Message | GuildMember,
@@ -135,7 +172,7 @@ export class DisTubeHandler extends DisTubeBase {
   ): Promise<Playlist> {
     const member = (message as Message)?.member || (message as GuildMember);
     if (!Array.isArray(songs)) throw new DisTubeError("INVALID_TYPE", "Array", songs, "songs");
-    if (!songs.length) throw new DisTubeError("EMPTY_ARRAY");
+    if (!songs.length) throw new DisTubeError("EMPTY_ARRAY", "songs");
     songs = songs.filter(
       song => song instanceof Song || (song instanceof SearchResult && song.type === "video") || isURL(song),
     );
@@ -159,7 +196,7 @@ export class DisTubeHandler extends DisTubeBase {
   /**
    * Play / add a playlist
    * @returns {Promise<void>}
-   * @param {Discord.Message|Discord.VoiceChannel|Discord.StageChannel} message A message from guild channel | a voice channel
+   * @param {Discord.Message|Discord.VoiceChannel|Discord.StageChannel} message A message | a voice channel
    * @param {Playlist|string} playlist A YouTube playlist url | a Playlist
    * @param {Discord.TextChannel|boolean} [textChannel] The default text channel of the queue
    * @param {boolean} [skip=false] Skip the playing song (if exists) and play the added playlist instantly
@@ -201,12 +238,20 @@ export class DisTubeHandler extends DisTubeBase {
    */
   async searchSong(message: Message, query: string): Promise<SearchResult | null> {
     if (this.options.searchSongs > 1) {
-      for (const evn of ["searchNoResult", "searchResult", "searchCancel", "searchInvalidAnswer", "searchDone"]) {
+      const searchEvents = [
+        "searchNoResult",
+        "searchResult",
+        "searchCancel",
+        "searchInvalidAnswer",
+        "searchDone",
+      ] as const;
+      for (const evn of searchEvents) {
         if (this.distube.listenerCount(evn) === 0) {
           /* eslint-disable no-console */
           console.warn(`"searchSongs" option is disabled due to missing "${evn}" listener.`);
           console.warn(
-            `If you don't want to use "${evn}" event, simply add an empty listener (not recommended):\n<DisTube>.on("${evn}", () => {})`,
+            `If you don't want to use "${evn}" event, simply add an empty listener (not recommended):\n` +
+              `<DisTube>.on("${evn}", () => {})`,
           );
           /* eslint-enable no-console */
           this.options.searchSongs = 0;

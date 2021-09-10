@@ -1,5 +1,5 @@
 const ERROR_MESSAGES = {
-  INVALID_TYPE: (expected: string | string[], got: any, name?: string) =>
+  INVALID_TYPE: (expected: (number | string) | readonly (number | string)[], got: any, name?: string) =>
     `Expected ${
       Array.isArray(expected) ? expected.map(e => (typeof e === "number" ? e : `'${e}'`)).join(" or ") : `'${expected}'`
     }${name ? ` for '${name}'` : ""}, but got ${
@@ -10,7 +10,7 @@ const ERROR_MESSAGES = {
         : Array.isArray(got)
         ? `Array<${got.length}>`
         : got?.constructor?.name || typeof got
-    }`,
+    } (${typeof got})`,
   NUMBER_COMPARE: (name: string, expected: string, value: number) => `'${name}' must be ${expected} ${value}`,
   EMPTY_ARRAY: (name: string) => `'${name}' is an empty array`,
   EMPTY_FILTERED_ARRAY: (name: string, type: string) => `There is no valid '${type}' in the '${name}' array`,
@@ -48,27 +48,36 @@ const ERROR_MESSAGES = {
   CANNOT_RESOLVE_SONG: (t: string) => `Cannot resolve ${t} to a Song`,
   NO_VALID_SONG: "'songs' array does not have any valid Song, SearchResult or url",
   EMPTY_FILTERED_PLAYLIST:
-    "There is no valid video in the playlist\nMaybe age-restricted contents is filtered because you are in non-NSFW channel",
+    "There is no valid video in the playlist\n" +
+    "Maybe age-restricted contents is filtered because you are in non-NSFW channel",
   EMPTY_PLAYLIST: "There is no valid video in the playlist",
 };
 
-const createMessage = (msg: string | ((...x: any) => string), ...args: any) => {
-  if (typeof msg === "string") return msg;
-  return msg(...args);
-};
+type ErrorMessages = typeof ERROR_MESSAGES;
+type ErrorCodes = keyof ErrorMessages;
+type ErrorCode = { [K in ErrorCodes]-?: ErrorMessages[K] extends string ? K : never }[ErrorCodes];
+type ErrorCodeTemplate = Exclude<keyof typeof ERROR_MESSAGES, ErrorCode>;
 
-export class DisTubeError extends Error {
+const errMsg = (msg: string | ((...x: any) => string), ...args: any) => (typeof msg === "string" ? msg : msg(...args));
+
+const haveCode = (code: string): code is ErrorCodes => Object.keys(ERROR_MESSAGES).includes(code);
+
+export class DisTubeError<T extends string> extends Error {
   errorCode: string;
-  constructor(code: keyof typeof ERROR_MESSAGES, ...args: any) {
-    if (!Object.keys(ERROR_MESSAGES).includes(code)) throw new TypeError(`Error code '${code}' does not exist`);
+  constructor(code: ErrorCode);
+  constructor(code: T extends ErrorCodeTemplate ? T : never, ...args: Parameters<ErrorMessages[typeof code]>);
+  constructor(code: ErrorCodeTemplate, _: never);
+  constructor(code: T extends ErrorCodes ? "This is built-in error code" : T, message: string);
+  constructor(code: string, ...args: any) {
+    if (haveCode(code)) super(errMsg(ERROR_MESSAGES[code], ...args));
+    else super(...args);
 
-    super(createMessage(ERROR_MESSAGES[code], ...args));
     this.errorCode = code;
     if (Error.captureStackTrace) Error.captureStackTrace(this, DisTubeError);
   }
 
   get name() {
-    return `${super.name} [${this.errorCode}]`;
+    return `DisTubeError [${this.errorCode}]`;
   }
 
   get code() {
