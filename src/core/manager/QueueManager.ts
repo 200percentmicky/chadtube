@@ -77,7 +77,7 @@ export class QueueManager extends BaseManager<Queue> {
         if (queue.repeatMode === RepeatMode.QUEUE) queue.songs.unshift(queue.songs.pop() as Song);
         else queue.songs.unshift(queue.previousSongs.pop() as Song);
       }
-      if (queue.songs.length <= 1 && (queue.next || queue.repeatMode !== RepeatMode.DISABLED)) {
+      if (queue.songs.length <= 1 && (queue.next || queue.repeatMode === RepeatMode.DISABLED)) {
         if (queue.autoplay) {
           try {
             await queue.addRelatedSong();
@@ -178,6 +178,7 @@ export class QueueManager extends BaseManager<Queue> {
   private _emitPlaySong(queue: Queue): boolean {
     return (
       !this.options.emitNewSongOnly ||
+      (queue.repeatMode === RepeatMode.SONG && queue.next) ||
       (queue.repeatMode !== RepeatMode.SONG && queue.songs[0]?.id !== queue.songs[1]?.id)
     );
   }
