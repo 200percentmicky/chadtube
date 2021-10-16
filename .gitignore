@@ -104,5 +104,4 @@ package-lock.json
 docs
 
 .vscode
-typings/DisTube.js
-.npmignore
+yarn.lock

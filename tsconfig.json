@@ -1,24 +1,24 @@
 {
-    "files": ["src/DisTube.js"],
-    "exclude": [
-        "node_modules"
-    ],
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "esnext",
-        "lib": [
-            "esnext",
-            "esnext.array",
-            "esnext.asynciterable",
-            "esnext.intl",
-            "esnext.symbol"
-        ],
-        "outDir": "typings/",
-        "moduleResolution": "node",
-        "allowJs": true,
-        "declaration": true,
-        "skipLibCheck": true,
-        "emitDeclarationOnly": true,
-        "skipDefaultLibCheck": true
-    }
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/__test__", "src/**/__mocks__"],
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2019",
+    "lib": ["esnext"],
+    "strict": true,
+    "alwaysStrict": true,
+    "removeComments": false,
+    "pretty": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "outDir": "dist",
+    "moduleResolution": "node",
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "incremental": true,
+    "esModuleInterop": true
+  }
 }
