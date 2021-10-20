@@ -584,10 +584,10 @@ export class DisTube extends TypedEmitter<DisTubeEvents> {
 
   /**
    * Enable or disable filter(s) of the queue.
-   * 
+   *
    * This function is different from the main repository.
    * This allows you to apply multiple filters with interchangable values.
-   * 
+   *
    * Available filters: {@link Filters}
    * @param {GuildIDResolvable} queue The type can be resolved to give a {@link Queue}
    * @param {string|false} filter A filter name, `false` to clear all the filters
@@ -637,7 +637,7 @@ export class DisTube extends TypedEmitter<DisTubeEvents> {
       console.error(error);
       console.warn("Unhandled 'error' event.");
       console.warn(
-        "See: https://distube.js.org/#/docs/DisTube/beta/class/DisTube?scrollTo=e-error and https://nodejs.org/api/events.html#events_error_events",
+        "See: https://distube.js.org/#/docs/DisTube/stable/class/DisTube?scrollTo=e-error and https://nodejs.org/api/events.html#events_error_events",
       );
     }
   }
