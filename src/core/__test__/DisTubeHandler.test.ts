@@ -384,11 +384,11 @@ describe("DisTubeHandler#resolvePlaylist()", () => {
 test("DisTubeHandler#createCustomPlaylist()", () => {
   const distube = createFakeDisTube();
   const handler = new DisTubeHandler(distube as any);
-  const m: any = {};
-    const s: any = {};
-    const p: any = {};
-    const a: any = {};
-    const t: any = {};
+  const m: any = {},
+    s: any = {},
+    p: any = {},
+    a: any = {},
+    t: any = {};
   // eslint-disable-next-line deprecation/deprecation
   handler.createCustomPlaylist(m, s, p, a, t);
   expect(distube.createCustomPlaylist).toBeCalledTimes(1);

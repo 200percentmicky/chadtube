@@ -107,7 +107,6 @@ export class DisTube extends TypedEmitter<DisTubeEvents> {
      */
     this.customPlugins = this.options.plugins.filter((p): p is CustomPlugin => p.type === "custom");
   }
-
   /**
    * Play / add a song or playlist from url. Search and play a song if it is not a valid url.
    *
@@ -150,7 +149,6 @@ export class DisTube extends TypedEmitter<DisTubeEvents> {
       metadata?: any;
     },
   ): Promise<void>;
-
   /**
    * Play / add a song or playlist from url. Search and play a song if it is not a valid url.
    *
@@ -171,7 +169,6 @@ export class DisTube extends TypedEmitter<DisTubeEvents> {
     song: string | Song | SearchResult | Playlist,
     options: { skip?: boolean; unshift?: boolean; metadata?: any },
   ): Promise<void>;
-
   async play(
     voiceChannel: Message<true> | VoiceBasedChannel,
     song: string | Song | SearchResult | Playlist | null,

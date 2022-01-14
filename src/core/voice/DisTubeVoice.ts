@@ -82,14 +82,12 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   get channel() {
     return this.#channel;
   }
-
   set channel(channel: VoiceBasedChannel) {
     if (!isSupportedVoiceChannel(channel)) throw new DisTubeError("NOT_SUPPORTED_VOICE");
     if (channel.guild.id !== this.id) throw new DisTubeError("VOICE_CHANGE_GUILD");
     this.connection = this.#join(channel);
     this.#channel = channel;
   }
-
   #join(channel: VoiceBasedChannel) {
     return joinVoiceChannel({
       channelId: channel.id,
