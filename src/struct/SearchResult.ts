@@ -20,6 +20,7 @@ export class SearchResult {
     /** Uploader url */
     url?: string;
   };
+
   /**
    * Create a search result
    * @param {Object} info ytsr result

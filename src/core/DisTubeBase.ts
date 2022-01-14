@@ -14,6 +14,7 @@ export abstract class DisTubeBase {
      */
     this.distube = distube;
   }
+
   /**
    * Emit the {@link DisTube} of this base
    * @param {string} eventName Event name
@@ -23,6 +24,7 @@ export abstract class DisTubeBase {
   emit(eventName: keyof DisTubeEvents, ...args: any): boolean {
     return this.distube.emit(eventName, ...args);
   }
+
   /**
    * Emit error event
    * @param {Error} error error
@@ -31,6 +33,7 @@ export abstract class DisTubeBase {
   emitError(error: Error, channel?: GuildTextBasedChannel) {
     this.distube.emitError(error, channel);
   }
+
   /**
    * The queue manager
    * @type {QueueManager}
@@ -39,6 +42,7 @@ export abstract class DisTubeBase {
   get queues(): QueueManager {
     return this.distube.queues;
   }
+
   /**
    * The voice manager
    * @type {DisTubeVoiceManager}
@@ -47,6 +51,7 @@ export abstract class DisTubeBase {
   get voices(): DisTubeVoiceManager {
     return this.distube.voices;
   }
+
   /**
    * Discord.js client
    * @type {Discord.Client}
@@ -55,6 +60,7 @@ export abstract class DisTubeBase {
   get client(): Client {
     return this.distube.client;
   }
+
   /**
    * DisTube options
    * @type {DisTubeOptions}
@@ -63,6 +69,7 @@ export abstract class DisTubeBase {
   get options(): Options {
     return this.distube.options;
   }
+
   /**
    * DisTube handler
    * @type {DisTubeHandler}

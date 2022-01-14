@@ -41,6 +41,7 @@ export class QueueManager extends BaseManager<Queue> {
       queue.taskQueue.resolve();
     }
   }
+
   /**
    * Get a Queue from this QueueManager.
    * @method get
@@ -67,6 +68,7 @@ export class QueueManager extends BaseManager<Queue> {
       queue.voice.on(event, queue.listeners[event]);
     }
   }
+
   /**
    * Handle the queue when a Song finish
    * @private
@@ -114,6 +116,7 @@ export class QueueManager extends BaseManager<Queue> {
       queue.taskQueue.resolve();
     }
   }
+
   /**
    * Handle error while playing
    * @private
@@ -172,6 +175,7 @@ export class QueueManager extends BaseManager<Queue> {
       return true;
     }
   }
+
   /**
    * Whether or not emit playSong event
    * @param {Queue} queue Queue

@@ -196,6 +196,7 @@ export class Queue extends DisTubeBase {
      */
     this.listeners = undefined;
   }
+
   /**
    * Formatted duration string.
    * @type {string}
@@ -203,6 +204,7 @@ export class Queue extends DisTubeBase {
   get formattedDuration() {
     return formatDuration(this.duration);
   }
+
   /**
    * Queue's duration.
    * @type {number}
@@ -210,6 +212,7 @@ export class Queue extends DisTubeBase {
   get duration() {
     return this.songs.length ? this.songs.reduce((prev, next) => prev + next.duration, 0) : 0;
   }
+
   /**
    * What time in the song is playing (in seconds).
    * @type {number}
@@ -217,6 +220,7 @@ export class Queue extends DisTubeBase {
   get currentTime() {
     return this.voice.playbackDuration + this.beginTime;
   }
+
   /**
    * Formatted {@link Queue#currentTime} string.
    * @type {string}
@@ -224,6 +228,7 @@ export class Queue extends DisTubeBase {
   get formattedCurrentTime() {
     return formatDuration(this.currentTime);
   }
+
   /**
    * The voice channel playing in.
    * @type {Discord.VoiceChannel|Discord.StageChannel|null}
@@ -231,12 +236,15 @@ export class Queue extends DisTubeBase {
   get voiceChannel() {
     return this.clientMember.voice.channel;
   }
+
   get volume() {
     return this.voice.volume;
   }
+
   set volume(value: number) {
     this.voice.volume = value;
   }
+
   /**
    * Add a Song or an array of Song to the queue
    * @param {Song|Song[]} song Song to add
@@ -263,6 +271,7 @@ export class Queue extends DisTubeBase {
     else delete (song as Song).formats;
     return this;
   }
+
   /**
    * Pause the guild stream
    * @returns {Queue} The guild queue
@@ -274,6 +283,7 @@ export class Queue extends DisTubeBase {
     this.voice.pause();
     return this;
   }
+
   /**
    * Resume the guild stream
    * @returns {Queue} The guild queue
@@ -285,6 +295,7 @@ export class Queue extends DisTubeBase {
     this.voice.unpause();
     return this;
   }
+
   /**
    * Set the guild stream's volume
    * @param {number} percent The percentage of volume you want to set
@@ -339,6 +350,7 @@ export class Queue extends DisTubeBase {
       this.taskQueue.resolve();
     }
   }
+
   /**
    * Shuffle the queue's songs
    * @returns {Promise<Queue>} The guild queue
@@ -358,6 +370,7 @@ export class Queue extends DisTubeBase {
       this.taskQueue.resolve();
     }
   }
+
   /**
    * Jump to the song position in the queue.
    * The next one is 1, 2,...
@@ -398,6 +411,7 @@ export class Queue extends DisTubeBase {
       this.taskQueue.resolve();
     }
   }
+
   /**
    * Set the repeat mode of the guild queue.\
    * Toggle mode `(Disabled -> Song -> Queue -> Disabled ->...)` if `mode` is `undefined`
@@ -413,6 +427,7 @@ export class Queue extends DisTubeBase {
     else this.repeatMode = mode;
     return this.repeatMode;
   }
+
   /**
    * Enable or disable filter(s) of the queue.
    * 
@@ -450,6 +465,7 @@ export class Queue extends DisTubeBase {
     this.queues.playSong(this);
     return this.filters;
   }
+
   /**
    * Set the playing time to another position
    * @param {number} time Time in seconds
@@ -462,6 +478,7 @@ export class Queue extends DisTubeBase {
     this.queues.playSong(this);
     return this;
   }
+
   /**
    * Add a related song of the playing song to the queue
    * @returns {Promise<Song>} The added song
@@ -476,6 +493,7 @@ export class Queue extends DisTubeBase {
     this.addToQueue(song);
     return song;
   }
+
   /**
    * Stop the guild stream
    */
@@ -490,6 +508,7 @@ export class Queue extends DisTubeBase {
       this.taskQueue.resolve();
     }
   }
+
   /**
    * Delete the queue from the manager
    * (This does not leave the queue even if {@link DisTubeOptions|DisTubeOptions.leaveOnStop} is enabled)
@@ -507,6 +526,7 @@ export class Queue extends DisTubeBase {
     this.queues.delete(this.id);
     this.emit("deleteQueue", this);
   }
+
   /**
    * Toggle autoplay mode
    * @returns {boolean} Autoplay mode state

@@ -21,8 +21,8 @@ export const validateAudioURL = async (httpModule: typeof http | typeof https, p
   if (new URL(url).protocol.toLowerCase() !== protocol) {
     return false;
   }
-  const headers = await getResponseHeaders(httpModule, url),
-    type = headers["content-type"];
+  const headers = await getResponseHeaders(httpModule, url);
+    const type = headers["content-type"];
   if (type?.startsWith("audio")) {
     return true;
   }

@@ -24,12 +24,15 @@ export abstract class BaseManager<V> extends DisTubeBase {
     this.collection.set(id, data);
     return data;
   }
+
   get(idOrInstance: GuildIDResolvable): V | undefined {
     return this.collection.get(resolveGuildID(idOrInstance));
   }
+
   delete(idOrInstance: GuildIDResolvable): void {
     this.collection.delete(resolveGuildID(idOrInstance));
   }
+
   has(idOrInstance: GuildIDResolvable): boolean {
     return this.collection.has(resolveGuildID(idOrInstance));
   }

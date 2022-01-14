@@ -1,7 +1,6 @@
-import { DisTubeError, QueueManager, Queue as _Queue, defaultOptions } from "../../..";
+import { DisTubeError, QueueManager, DisTubeVoiceManager as _DTVM, Queue as _Queue , defaultOptions } from "../../..";
 import type { Song } from "../../..";
 
-import { DisTubeVoiceManager as _DTVM } from "../../..";
 
 jest.mock("../../voice/DisTubeVoiceManager");
 jest.mock("../../../struct/Queue");

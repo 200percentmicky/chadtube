@@ -35,6 +35,7 @@ export class DisTubeVoiceManager extends BaseManager<DisTubeVoice> {
     }
     return new DisTubeVoice(this, channel);
   }
+
   /**
    * Join a voice channel
    * @param {Discord.BaseGuildVoiceChannel} channel A voice channel to join
@@ -45,6 +46,7 @@ export class DisTubeVoiceManager extends BaseManager<DisTubeVoice> {
     if (existing) return existing.join(channel);
     return this.create(channel).join();
   }
+
   /**
    * Leave the connected voice channel in a guild
    * @param {GuildIDResolvable} guild Queue Resolvable

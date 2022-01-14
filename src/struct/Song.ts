@@ -38,6 +38,7 @@ export class Song<T = unknown> {
     name?: string;
     url?: string;
   };
+
   age_restricted!: boolean;
   chapters!: Chapter[];
   reposts!: number;
@@ -50,6 +51,7 @@ export class Song<T = unknown> {
     source?: string,
     metadata?: T,
   );
+
   /**
    * Create a Song
    * @param {ytdl.videoInfo|SearchResult|OtherSongInfo} info Raw info
@@ -66,6 +68,7 @@ export class Song<T = unknown> {
       metadata?: T;
     },
   );
+
   constructor(
     info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo,
     options:

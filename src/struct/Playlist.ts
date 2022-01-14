@@ -28,6 +28,7 @@ export class Playlist<T = unknown> implements PlaylistInfo {
     properties?: Record<string, any>,
     metadata?: T,
   );
+
   /**
    * Create a playlist
    * @param {Song[]|PlaylistInfo} playlist Playlist
@@ -44,6 +45,7 @@ export class Playlist<T = unknown> implements PlaylistInfo {
       metadata?: T;
     },
   );
+
   constructor(
     playlist: Song[] | ytpl.result | PlaylistInfo,
     options:

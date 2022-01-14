@@ -1,6 +1,6 @@
-import { DisTubeVoiceManager } from "..";
+import { DisTubeVoiceManager , DisTubeVoice as _DTV } from "..";
 
-import { DisTubeVoice as _DTV } from "..";
+
 import * as _DiscordVoice from "@discordjs/voice";
 
 jest.mock("../DisTubeVoice");

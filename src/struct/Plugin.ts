@@ -26,6 +26,7 @@ export abstract class Plugin {
      */
     this.distube = distube;
   }
+
   /**
    * Type of the plugin
    * @name Plugin#type
@@ -40,6 +41,7 @@ export abstract class Plugin {
   emit(eventName: keyof DisTubeEvents, ...args: any): boolean {
     return this.distube.emit(eventName, ...args);
   }
+
   /**
    * Emit error event
    * @param {Error} error error
@@ -48,6 +50,7 @@ export abstract class Plugin {
   emitError(error: Error, channel?: GuildTextBasedChannel) {
     this.distube.emitError(error, channel);
   }
+
   /**
    * The queue manager
    * @type {QueueManager}
@@ -56,6 +59,7 @@ export abstract class Plugin {
   get queues(): QueueManager {
     return this.distube.queues;
   }
+
   /**
    * The voice manager
    * @type {DisTubeVoiceManager}
@@ -64,6 +68,7 @@ export abstract class Plugin {
   get voices(): DisTubeVoiceManager {
     return this.distube.voices;
   }
+
   /**
    * Discord.js client
    * @type {Discord.Client}
@@ -72,6 +77,7 @@ export abstract class Plugin {
   get client(): Client {
     return this.distube.client;
   }
+
   /**
    * DisTube options
    * @type {DisTubeOptions}
@@ -80,6 +86,7 @@ export abstract class Plugin {
   get options(): Options {
     return this.distube.options;
   }
+
   /**
    * DisTube handler
    * @type {DisTubeHandler}
@@ -88,6 +95,7 @@ export abstract class Plugin {
   get handler(): DisTubeHandler {
     return this.distube.handler;
   }
+
   /**
    * Check if the url is working with this plugin
    * @param {string} url Input url
@@ -96,6 +104,7 @@ export abstract class Plugin {
   async validate(url: string): Promise<boolean> {
     return false;
   }
+
   /**
    * Get the stream url from {@link Song#url}. Returns {@link Song#url} by default.
    * Not needed if the plugin plays song from YouTube.

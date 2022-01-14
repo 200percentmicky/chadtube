@@ -16,6 +16,7 @@ export class YouTubeDLPlugin extends ExtractorPlugin {
       /* eslint-enable no-console */
     }
   }
+
   // eslint-disable-next-line @typescript-eslint/require-await
   async validate() {
     return true;
@@ -39,6 +40,7 @@ export class YouTubeDLPlugin extends ExtractorPlugin {
     }
     return new Song(info, { member, source: info.extractor, metadata });
   }
+
   async getStreamURL(url: string) {
     const info = await youtubeDlExec(url, {
       dumpSingleJson: true,

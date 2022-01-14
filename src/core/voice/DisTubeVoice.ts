@@ -78,15 +78,18 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
      * @type {number}
      */
   }
+
   get channel() {
     return this.#channel;
   }
+
   set channel(channel: VoiceBasedChannel) {
     if (!isSupportedVoiceChannel(channel)) throw new DisTubeError("NOT_SUPPORTED_VOICE");
     if (channel.guild.id !== this.id) throw new DisTubeError("VOICE_CHANGE_GUILD");
     this.connection = this.#join(channel);
     this.#channel = channel;
   }
+
   #join(channel: VoiceBasedChannel) {
     return joinVoiceChannel({
       channelId: channel.id,
@@ -94,6 +97,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
       adapterCreator: (channel.guild.voiceAdapterCreator as any) || createDiscordJSAdapter(channel as any),
     });
   }
+
   /**
    * Join a voice channel with this connection
    * @param {Discord.BaseGuildVoiceChannel} [channel] A voice channel
@@ -117,6 +121,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
     }
     return this;
   }
+
   /**
    * Leave the voice channel of this connection
    * @param {Error} [error] Optional, an error to emit with 'error' event.
@@ -130,6 +135,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
     if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) this.connection.destroy();
     this.voices.delete(this.id);
   }
+
   /**
    * Stop the playing stream
    * @param {boolean} [force=false] If true, will force the {@link DisTubeVoice#audioPlayer} to enter the Idle state
@@ -139,6 +145,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   stop(force = false) {
     this.audioPlayer.stop(force);
   }
+
   /**
    * Play a readable stream
    * @private
@@ -159,6 +166,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
     this.volume = this.volume;
     this.audioPlayer.play(this.audioResource);
   }
+
   set volume(volume: number) {
     if (typeof volume !== "number" || isNaN(volume)) {
       throw new DisTubeError("INVALID_TYPE", "number", volume, "volume");
@@ -169,9 +177,11 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
     this.#volume = volume;
     this.audioResource?.volume?.setVolume(Math.pow(this.#volume / 100, 0.5 / Math.log10(2)));
   }
+
   get volume() {
     return this.#volume;
   }
+
   /**
    * Playback duration of the audio resource in seconds
    * @type {number}
@@ -179,12 +189,15 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   get playbackDuration() {
     return (this.audioResource?.playbackDuration ?? 0) / 1000;
   }
+
   pause() {
     this.audioPlayer.pause();
   }
+
   unpause() {
     this.audioPlayer.unpause();
   }
+
   /**
    * Whether the bot is self-deafened
    * @type {boolean}
@@ -192,6 +205,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   get selfDeaf(): boolean {
     return this.connection.joinConfig.selfDeaf;
   }
+
   /**
    * Whether the bot is self-muted
    * @type {boolean}
@@ -199,6 +213,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   get selfMute(): boolean {
     return this.connection.joinConfig.selfMute;
   }
+
   /**
    * Self-deafens/undeafens the bot.
    * @param {boolean} selfDeaf Whether or not the bot should be self-deafened
@@ -213,6 +228,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
       selfDeaf,
     });
   }
+
   /**
    * Self-mutes/unmutes the bot.
    * @param {boolean} selfMute Whether or not the bot should be self-muted
@@ -227,6 +243,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
       selfMute,
     });
   }
+
   /**
    * The voice state of this connection
    * @type {Discord.VoiceState?}

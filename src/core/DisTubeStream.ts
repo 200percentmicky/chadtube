@@ -49,6 +49,7 @@ export class DisTubeStream {
     if (!bestFormat) throw new DisTubeError("UNPLAYABLE_FORMATS");
     return new DisTubeStream(bestFormat.url, options);
   }
+
   /**
    * Create a stream from a stream url
    * @param {string} url stream url
@@ -65,6 +66,7 @@ export class DisTubeStream {
     }
     return new DisTubeStream(url, options);
   }
+
   type: StreamType.Raw;
   stream: FFmpeg;
   url: string;
