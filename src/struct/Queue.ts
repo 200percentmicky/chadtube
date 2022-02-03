@@ -1,8 +1,8 @@
 import { DisTubeBase } from "../core";
 import { DisTubeError, RepeatMode, Song, TaskQueue, formatDuration } from "..";
 import _ from "lodash";
+import type { DisTube, DisTubeVoice, DisTubeVoiceEvents } from "..";
 import type { GuildMember, GuildTextBasedChannel, Snowflake } from "discord.js";
-import type { DisTube, DisTubeVoice, DisTubeVoiceEvents, SearchResult } from "..";
 
 /**
  * Represents a queue.
@@ -59,7 +59,7 @@ export class Queue extends DisTubeBase {
    * Enabled audio filters.
    * Available filters: {@link Filters}
    */
-  filters: Record<string, unknown>[];
+  filters: Array<string>;
   /**
    * What time in the song to begin (in seconds).
    */
@@ -95,7 +95,11 @@ export class Queue extends DisTubeBase {
      * The client user as a `GuildMember` of this queue's guild
      * @type {Discord.GuildMember}
      */
-    this.clientMember = voice.channel.guild?.me as GuildMember;
+    this.clientMember =
+      voice.channel.guild?.me ??
+      (() => {
+        throw new DisTubeError("INVALID_TYPE", "GuildMember", null, "<VoiceChannel>.guild.me");
+      })();
     /**
      * Voice connection of this queue.
      * @type {DisTubeVoice}
@@ -246,29 +250,30 @@ export class Queue extends DisTubeBase {
   }
 
   /**
+   * @private
    * Add a Song or an array of Song to the queue
    * @param {Song|Song[]} song Song to add
-   * @param {number} [position=-1] Position to add, < 0 to add to the end of the queue
-   * @param {boolean} [queuing=true] Wether or not waiting for unfinished tasks
+   * @param {number} [position=0] Position to add, <= 0 to add to the end of the queue
    * @throws {Error}
    * @returns {Queue} The guild queue
    */
-  addToQueue(song: Song | SearchResult | (Song | SearchResult)[], position = -1): Queue {
-    const isArray = Array.isArray(song);
-    if (!song || (isArray && !(song as Song[]).length)) {
-      throw new DisTubeError("INVALID_TYPE", ["Song", "SearchResult", "Array<Song|SearchResult>"], song, "song");
+  addToQueue(song: Song | Song[], position = 0): Queue {
+    if (!song || (Array.isArray(song) && !song.length)) {
+      throw new DisTubeError("INVALID_TYPE", ["Song", "Array<Song>"], song, "song");
     }
-    if (position === 0) throw new DisTubeError("ADD_BEFORE_PLAYING");
-    if (position < 0) {
-      if (isArray) this.songs.push(...(song as Song[]));
-      else this.songs.push(song as Song);
-    } else if (isArray) {
-      this.songs.splice(position, 0, ...(song as Song[]));
+    if (typeof position !== "number" || !Number.isInteger(position)) {
+      throw new DisTubeError("INVALID_TYPE", "integer", position, "position");
+    }
+    if (position <= 0) {
+      if (Array.isArray(song)) this.songs.push(...song);
+      else this.songs.push(song);
+    } else if (Array.isArray(song)) {
+      this.songs.splice(position, 0, ...song);
     } else {
-      this.songs.splice(position, 0, song as Song);
+      this.songs.splice(position, 0, song);
     }
-    if (isArray) (song as Song[]).map(s => delete s.formats);
-    else delete (song as Song).formats;
+    if (Array.isArray(song)) song.map(s => delete s.formats);
+    else delete song.formats;
     return this;
   }
 
@@ -358,8 +363,8 @@ export class Queue extends DisTubeBase {
   async shuffle(): Promise<Queue> {
     await this.taskQueue.queuing();
     try {
-      if (!this.songs.length) return this;
-      const playing = this.songs.shift() as Song;
+      const playing = this.songs.shift();
+      if (playing === undefined) return this;
       for (let i = this.songs.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [this.songs[i], this.songs[j]] = [this.songs[j], this.songs[i]];
@@ -391,11 +396,7 @@ export class Queue extends DisTubeBase {
         if (this.options.savePreviousSongs) {
           this.previousSongs.push(...this.songs);
         } else {
-          this.previousSongs.push(
-            ...this.songs.map(s => {
-              return { id: s.id } as Song;
-            }),
-          );
+          this.previousSongs.push(...this.songs.map(s => ({ id: s.id } as Song)));
         }
         this.songs = nextSongs;
         this.next = true;
@@ -440,7 +441,7 @@ export class Queue extends DisTubeBase {
    * @returns {Array<string>} Enabled filters.
    * @throws {Error}
    */
-  setFilter(filter: string | string[] | false, ffargs: string | false): Record<string, unknown>[] {
+  setFilter(filter: string | string[] | false, ffargs: string | false): Array<string> {
     const filterList = this.filters.find(x => x.name === filter);
     if (ffargs == false) {
       if (!this.filters) throw new TypeError("No filters are applied to the player.");
@@ -488,14 +489,14 @@ export class Queue extends DisTubeBase {
     if (!this.songs?.[0]) throw new DisTubeError("NO_PLAYING");
     const related = this.songs[0].related.find(v => !this.previousSongs.map(s => s.id).includes(v.id));
     if (!related || !(related instanceof Song)) throw new DisTubeError("NO_RELATED");
-    const song = await this.handler.resolveSong(related.url, { member: this.clientMember, metadata: related.metadata });
+    const song = await this.handler.resolveSong(related, { member: this.clientMember, metadata: related.metadata });
     if (!(song instanceof Song)) throw new DisTubeError("CANNOT_PLAY_RELATED");
     this.addToQueue(song);
     return song;
   }
 
   /**
-   * Stop the guild stream
+   * Stop the guild stream and delete the queue
    */
   async stop() {
     await this.taskQueue.queuing();
@@ -511,7 +512,7 @@ export class Queue extends DisTubeBase {
 
   /**
    * Delete the queue from the manager
-   * (This does not leave the queue even if {@link DisTubeOptions|DisTubeOptions.leaveOnStop} is enabled)
+   * (This does not leave the voice channel even if {@link DisTubeOptions|DisTubeOptions.leaveOnStop} is enabled)
    * @private
    */
   delete() {

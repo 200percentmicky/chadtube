@@ -105,7 +105,9 @@ export interface DisTubeOptions {
   searchCooldown?: number;
   youtubeCookie?: string;
   youtubeIdentityToken?: string;
+  /** @deprecated */
   youtubeDL?: boolean;
+  /** @deprecated */
   updateYouTubeDL?: boolean;
   customFilters?: Filters;
   ytdlOptions?: ytdl.downloadOptions;
@@ -114,7 +116,7 @@ export interface DisTubeOptions {
   emitAddListWhenCreatingQueue?: boolean;
 }
 
-export type GuildIDResolvable =
+export type GuildIdResolvable =
   | Queue
   | DisTubeVoice
   | Snowflake
@@ -139,7 +141,7 @@ export interface OtherSongInfo {
   webpage_url?: string;
   url: string;
   thumbnail?: string;
-  related?: Song[];
+  related?: RelatedSong[];
   view_count?: string | number;
   views?: string | number;
   like_count?: string | number;
@@ -148,7 +150,7 @@ export interface OtherSongInfo {
   dislikes?: string | number;
   repost_count?: string | number;
   reposts?: string | number;
-  uploader?: string;
+  uploader?: string | { name: string; url: string };
   uploader_url?: string;
   age_limit?: string | number;
   chapters?: Chapter[];
@@ -187,4 +189,16 @@ export interface PlaylistInfo {
    * Playlist thumbnail.
    */
   thumbnail?: string;
+}
+
+export type RelatedSong = Omit<Song, "related">;
+
+export interface CustomPluginPlayOptions {
+  skip?: boolean;
+  /** @deprecated Use `options.position` instead */
+  unshift?: boolean;
+  position?: number;
+  member?: GuildMember;
+  textChannel?: GuildTextBasedChannel;
+  metadata?: any;
 }
