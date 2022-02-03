@@ -46,7 +46,7 @@ export class QueueManager extends BaseManager<Queue> {
    * Get a Queue from this QueueManager.
    * @method get
    * @memberof QueueManager#
-   * @param {GuildIDResolvable} queue Resolvable thing from a guild
+   * @param {GuildIdResolvable} queue Resolvable thing from a guild
    * @returns {Queue?}
    */
   /**
@@ -127,7 +127,7 @@ export class QueueManager extends BaseManager<Queue> {
     const song = queue.songs.shift() as Song;
     try {
       error.name = "PlayingError";
-      error.message = `${error.message}\nID: ${song.id}\nName: ${song.name}`;
+      error.message = `${error.message}\nId: ${song.id}\nName: ${song.name}`;
     } catch {}
     this.emitError(error, queue.textChannel);
     if (queue.songs.length > 0) {
@@ -159,7 +159,10 @@ export class QueueManager extends BaseManager<Queue> {
       if (source !== "youtube" && !streamURL) {
         for (const plugin of [...this.distube.extractorPlugins, ...this.distube.customPlugins]) {
           if (await plugin.validate(url)) {
-            song.streamURL = await plugin.getStreamURL(url);
+            const info = [plugin.getStreamURL(url), plugin.getRelatedSongs(url)] as const;
+            const result = await Promise.all(info);
+            song.streamURL = result[0];
+            song.related = result[1];
             break;
           }
         }

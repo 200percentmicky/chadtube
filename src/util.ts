@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { DisTubeError, DisTubeVoice, Queue } from ".";
 import { Intents, SnowflakeUtil } from "discord.js";
-import type { GuildIDResolvable } from ".";
+import type { GuildIdResolvable } from ".";
 import type { EventEmitter } from "node:events";
 import type { AudioPlayer, AudioPlayerStatus, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import type {
@@ -166,17 +166,22 @@ export function isGuildInstance(guild: any): guild is Guild {
   return !!guild && isSnowflake(guild.id) && typeof guild.fetchAuditLogs === "function";
 }
 
-export function resolveGuildID(resolvable: GuildIDResolvable): Snowflake {
-  let guildID: string | undefined;
+export function resolveGuildId(resolvable: GuildIdResolvable): Snowflake {
+  let guildId: string | undefined;
   if (typeof resolvable === "string") {
-    guildID = resolvable;
+    guildId = resolvable;
   } else if (typeof resolvable === "object") {
-    if (resolvable instanceof Queue || resolvable instanceof DisTubeVoice) guildID = resolvable.id;
-    else if ("guild" in resolvable && isGuildInstance(resolvable.guild)) guildID = resolvable.guild.id;
-    else if ("id" in resolvable && isGuildInstance(resolvable)) guildID = resolvable.id;
+    if (resolvable instanceof Queue || resolvable instanceof DisTubeVoice) guildId = resolvable.id;
+    else if ("guild" in resolvable && isGuildInstance(resolvable.guild)) guildId = resolvable.guild.id;
+    else if ("id" in resolvable && isGuildInstance(resolvable)) guildId = resolvable.id;
   }
-  if (!isSnowflake(guildID)) throw new DisTubeError("INVALID_TYPE", "GuildIDResolvable", resolvable);
-  return guildID;
+  if (!isSnowflake(guildId)) throw new DisTubeError("INVALID_TYPE", "GuildIdResolvable", resolvable);
+  return guildId;
+}
+
+export function resolveGuildID(resolvable: GuildIdResolvable): Snowflake {
+  process.emitWarning("resolveGuildID() is deprecated, use resolveGuildId() instead.", "DeprecationWarning");
+  return resolveGuildId(resolvable);
 }
 
 export function isClientInstance(client: any): client is Client {

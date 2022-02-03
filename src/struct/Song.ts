@@ -2,7 +2,7 @@ import { Playlist } from "./Playlist";
 import { DisTubeError, formatDuration, isMemberInstance, parseNumber, toSecond } from "..";
 import type ytdl from "@distube/ytdl-core";
 import type { GuildMember, User } from "discord.js";
-import type { Chapter, OtherSongInfo, SearchResult } from "..";
+import type { Chapter, OtherSongInfo, RelatedSong, SearchResult } from "..";
 
 // TODO: Clean parameters on the next major version.
 
@@ -30,7 +30,7 @@ export class Song<T = unknown> {
   url!: string;
   streamURL?: string;
   thumbnail?: string;
-  related!: Omit<Song, "related">[];
+  related!: RelatedSong[];
   views!: number;
   likes!: number;
   dislikes!: number;
@@ -60,7 +60,7 @@ export class Song<T = unknown> {
    * @param {T} [options.metadata] Song metadata
    */
   constructor(
-    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo,
+    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo | RelatedSong,
     options?: {
       member?: GuildMember;
       source?: string;
@@ -68,7 +68,7 @@ export class Song<T = unknown> {
     },
   );
   constructor(
-    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo,
+    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo | RelatedSong,
     options:
       | GuildMember
       | {
@@ -100,17 +100,17 @@ export class Song<T = unknown> {
      * @type {string}
      */
     this.source = ((info as OtherSongInfo)?.src || source).toLowerCase();
+    /**
+     * Optional metadata that can be used to identify the song.
+     * @type {T}
+     */
+    this.metadata = metadata as T;
     this._patchMember(member);
     if (this.source === "youtube") {
       this._patchYouTube(info as ytdl.videoInfo);
     } else {
       this._patchOther(info as OtherSongInfo);
     }
-    /**
-     * Optional metadata that can be used to identify the song.
-     * @type {T}
-     */
-    this.metadata = metadata as T;
   }
 
   _patchYouTube(i: ytdl.videoInfo | SearchResult) {
@@ -140,7 +140,7 @@ export class Song<T = unknown> {
      */
     this.id = details.videoId || details.id;
     /**
-     * Song name aka video title.
+     * Song name.
      * @type {string?}
      */
     this.name = details.title || details.name;
@@ -174,17 +174,16 @@ export class Song<T = unknown> {
      * @type {string?}
      */
     this.thumbnail =
-      details.thumbnails?.sort((a: any, b: any) => b.width - a.width)[0].url ||
+      details.thumbnails?.sort((a: any, b: any) => b.width - a.width)?.[0]?.url ||
       details.thumbnail?.url ||
       details.thumbnail;
     /**
      * Related songs (without {@link Song#related} properties)
      * @type {Song[]}
      */
-    this.related =
-      info?.related_videos?.map((v: any) => new Song(v, { source: this.source, metadata: this.metadata })) ||
-      details.related ||
-      [];
+    this.related = info?.related_videos || details.related || [];
+    if (!Array.isArray(this.related)) throw new DisTubeError("INVALID_TYPE", "Array", this.related, "Song#related");
+    this.related = this.related.map((v: any) => new Song(v, { source: this.source, metadata: this.metadata }));
     /**
      * Song views count
      * @type {number}
@@ -238,23 +237,31 @@ export class Song<T = unknown> {
    * @private
    */
   _patchOther(info: OtherSongInfo) {
-    if (info.id) this.id = info.id;
-    if (info.title) this.name = info.title;
-    else if (info.name) this.name = info.name;
+    this.id = info.id;
+    this.name = info.title || info.name;
     this.isLive = Boolean(info.is_live || info.isLive);
     this.duration = this.isLive ? 0 : toSecond(info._duration_raw || info.duration);
     this.formattedDuration = this.isLive ? "Live" : formatDuration(this.duration);
     this.url = info.webpage_url || info.url;
     this.thumbnail = info.thumbnail;
     this.related = info.related || [];
+    if (!Array.isArray(this.related)) throw new DisTubeError("INVALID_TYPE", "Array", this.related, "Song#related");
+    this.related = this.related.map(i => new Song(i, { source: this.source, metadata: this.metadata }));
     this.views = parseNumber(info.view_count || info.views);
     this.likes = parseNumber(info.like_count || info.likes);
     this.dislikes = parseNumber(info.dislike_count || info.dislikes);
     this.reposts = parseNumber(info.repost_count || info.reposts);
-    this.uploader = {
-      name: info.uploader,
-      url: info.uploader_url,
-    };
+    if (typeof info.uploader === "string") {
+      this.uploader = {
+        name: info.uploader,
+        url: info.uploader_url,
+      };
+    } else {
+      this.uploader = {
+        name: info.uploader?.name,
+        url: info.uploader?.url,
+      };
+    }
     this.age_restricted = info.age_restricted || (!!info.age_limit && parseNumber(info.age_limit) >= 18);
     this.chapters = info.chapters || [];
   }
@@ -273,7 +280,7 @@ export class Song<T = unknown> {
      * @type {Playlist?}
      */
     this.playlist = playlist;
-    return this._patchMember(member);
+    return this._patchMember(playlist.member ?? member);
   }
 
   /**
@@ -282,16 +289,18 @@ export class Song<T = unknown> {
    * @returns {Song}
    */
   _patchMember(member?: GuildMember) {
-    /**
-     * User requested
-     * @type {Discord.GuildMember?}
-     */
-    this.member = member;
-    /**
-     * User requested
-     * @type {Discord.User?}
-     */
-    this.user = member?.user;
+    if (member) {
+      /**
+       * User requested
+       * @type {Discord.GuildMember?}
+       */
+      this.member = member;
+      /**
+       * User requested
+       * @type {Discord.User?}
+       */
+      this.user = member.user;
+    }
     return this;
   }
 
@@ -302,6 +311,7 @@ export class Song<T = unknown> {
    */
   _patchMetadata<S = unknown>(metadata: S) {
     this.metadata = metadata as unknown as T;
+    this.related.map(s => s._patchMetadata(metadata));
     return this as unknown as Song<S>;
   }
 }
