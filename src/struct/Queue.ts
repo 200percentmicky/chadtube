@@ -109,7 +109,7 @@ export class Queue extends DisTubeBase {
      * @type {boolean}
      */
     this.autoplay = false;
-    this.#filters = new FilterManager(distube, this);
+    this.#filters = new FilterManager(this);
     /**
      * What time in the song to begin (in seconds).
      * @type {number}

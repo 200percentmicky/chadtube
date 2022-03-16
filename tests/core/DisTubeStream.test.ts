@@ -1,6 +1,6 @@
 import { StreamType } from "@discordjs/voice";
-import { liveFormats, regularFormats } from "./raw/videoFormats";
-import { DisTubeError, DisTubeStream, chooseBestVideoFormat } from "../..";
+import { liveFormats, regularFormats } from "../raw";
+import { DisTubeError, DisTubeStream, chooseBestVideoFormat } from "@";
 
 import { FFmpeg as _FFmpeg } from "prism-media";
 
@@ -33,7 +33,7 @@ describe("DisTubeStream.YouTube()", () => {
     const url = regularFormats.find(f => f.itag === regularItag).url;
     expect(stream).toMatchObject({
       url,
-      type: StreamType.Raw,
+      type: StreamType.OggOpus,
       stream: expect.any(FFmpeg),
     });
     expect(FFmpeg).toBeCalledWith(
@@ -67,7 +67,7 @@ describe("DisTubeStream.YouTube()", () => {
     const url = liveFormats.find(f => f.itag === liveItag).url;
     expect(stream).toMatchObject({
       url,
-      type: StreamType.Raw,
+      type: StreamType.OggOpus,
       stream: expect.any(FFmpeg),
     });
     expect(FFmpeg).toBeCalledWith(
@@ -119,7 +119,7 @@ describe("DisTubeStream.DirectLink()", () => {
     const stream = DisTubeStream.DirectLink(url);
     expect(stream).toMatchObject({
       url,
-      type: StreamType.Raw,
+      type: StreamType.OggOpus,
       stream: expect.any(FFmpeg),
     });
     expect(FFmpeg).toBeCalledWith(

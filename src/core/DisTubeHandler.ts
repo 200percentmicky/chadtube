@@ -1,7 +1,17 @@
 import ytdl from "@distube/ytdl-core";
 import ytpl from "@distube/ytpl";
 import { DisTubeBase } from ".";
-import { DisTubeError, Playlist, Queue, SearchResult, Song, isMessageInstance, isURL, isVoiceChannelEmpty } from "..";
+import {
+  DisTubeError,
+  Playlist,
+  Queue,
+  SearchResult,
+  SearchResultType,
+  Song,
+  isMessageInstance,
+  isURL,
+  isVoiceChannelEmpty,
+} from "..";
 import type { DisTube, OtherSongInfo } from "..";
 import type { GuildMember, GuildTextBasedChannel, Message, TextChannel, VoiceBasedChannel } from "discord.js";
 import { isObject } from "../util";
@@ -71,6 +81,53 @@ export class DisTubeHandler extends DisTubeBase {
     return ytdl.getInfo(url, this.ytdlOptions);
   }
 
+  resolveSong<T = unknown>(
+    song: Song<T>,
+    options: {
+      member?: GuildMember;
+    },
+  ): Promise<Song<T>>;
+  resolveSong<T = unknown>(
+    song: Playlist<T>,
+    options: {
+      member?: GuildMember;
+    },
+  ): Promise<Playlist<T>>;
+  resolveSong<T = undefined>(
+    song: string | SearchResult,
+    options?: {
+      member?: GuildMember;
+      metadata?: T;
+    },
+  ): Promise<Song<T> | Playlist<T>>;
+  resolveSong<T = undefined>(
+    song: ytdl.videoInfo | OtherSongInfo | ytdl.relatedVideo,
+    options?: {
+      member?: GuildMember;
+      metadata?: T;
+    },
+  ): Promise<Song<T>>;
+  resolveSong<T = unknown>(
+    song: string | ytdl.videoInfo | Song<any> | SearchResult | OtherSongInfo | ytdl.relatedVideo,
+    options: {
+      member?: GuildMember;
+      metadata: T;
+    },
+  ): Promise<Song<T>>;
+  resolveSong<T = unknown>(
+    song: string | Playlist<any> | SearchResult,
+    options: {
+      member?: GuildMember;
+      metadata: T;
+    },
+  ): Promise<Playlist<T>>;
+  resolveSong(
+    song: string | ytdl.videoInfo | Song | Playlist | SearchResult | OtherSongInfo | ytdl.relatedVideo,
+    options?: {
+      member?: GuildMember;
+      metadata?: any;
+    },
+  ): Promise<Song | Playlist>;
   /**
    * Resolve a Song
    * @param {string|Song|SearchResult|Playlist} song URL | Search string | {@link Song}
@@ -92,7 +149,7 @@ export class DisTubeHandler extends DisTubeBase {
       return song;
     }
     if (song instanceof SearchResult) {
-      if (song.type === "video") return new Song(song, options);
+      if (song.type === SearchResultType.VIDEO) return new Song(song, options);
       return this.resolvePlaylist(song.url, options);
     }
     if (isObject(song)) return new Song(song, options);
@@ -106,6 +163,21 @@ export class DisTubeHandler extends DisTubeBase {
     throw new DisTubeError("CANNOT_RESOLVE_SONG", song);
   }
 
+  resolvePlaylist<T = unknown>(
+    playlist: Playlist<T> | Song<T>[] | string,
+    options?: {
+      member?: GuildMember;
+      source?: string;
+    },
+  ): Promise<Playlist<T>>;
+  resolvePlaylist<T = undefined>(
+    playlist: Playlist<any> | Song[] | string,
+    options: {
+      member?: GuildMember;
+      source?: string;
+      metadata?: T;
+    },
+  ): Promise<Playlist<T>>;
   /**
    * Resolve Song[] or url to a Playlist
    * @param {Playlist|Song[]|string} playlist Resolvable playlist
@@ -125,8 +197,8 @@ export class DisTubeHandler extends DisTubeBase {
   ): Promise<Playlist> {
     const { member, source, metadata } = { source: "youtube", ...options };
     if (playlist instanceof Playlist) {
-      if (metadata) playlist._patchMetadata(metadata);
-      if (member) playlist._patchMember(member);
+      if ("metadata" in options) playlist.metadata = metadata;
+      if ("member" in options) playlist.member = member;
       return playlist;
     }
     let solvablePlaylist: Song[] | ytpl.result;

@@ -1,17 +1,18 @@
-import { firstPlaylistInfo, playlistResults, videoResults } from "./raw";
-import { DisTubeError, DisTubeHandler, Playlist, SearchResult, Song, defaultFilters, defaultOptions } from "../..";
-import type { DisTubeOptions } from "../..";
+import { firstPlaylistInfo, playlistResults, videoResults } from "../raw";
+import { DisTubeError, DisTubeHandler, SearchResult, defaultFilters, defaultOptions } from "@";
+import { Playlist, Song } from "@/struct";
+import type { DisTubeOptions } from "@";
 
 import * as _ytpl from "@distube/ytpl";
 import * as _ytdl from "@distube/ytdl-core";
-import * as _Util from "../../util";
-import * as _Queue from "../../struct/Queue";
+import * as _Util from "@/util";
+import * as _Queue from "@/struct/Queue";
 
 jest.useFakeTimers();
 jest.mock("@distube/ytpl");
 jest.mock("@distube/ytdl-core");
-jest.mock("../../util");
-jest.mock("../../struct/Queue");
+jest.mock("@/util");
+jest.mock("@/struct/Queue");
 
 const ytpl = _ytpl as unknown as jest.Mocked<typeof _ytpl>;
 const ytdl = _ytdl as unknown as jest.Mocked<typeof _ytdl>;

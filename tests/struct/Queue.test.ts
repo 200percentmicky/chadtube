@@ -1,5 +1,5 @@
-import { DisTubeError, Queue, Song, defaultFilters, defaultOptions } from "../..";
-import type { DisTubeOptions } from "../..";
+import { DisTubeError, Queue, Song, defaultFilters, defaultOptions } from "@";
+import type { DisTubeOptions } from "@";
 
 function createFakeHandler() {
   return {
