@@ -311,8 +311,12 @@ describe("DisTubeHandler#resolveSong()", () => {
   const handler = new DisTubeHandler(distube as any);
 
   test("Parameter is null or undefined", async () => {
-    await expect(handler.resolveSong(null, { member, metadata })).resolves.toBe(null);
-    await expect(handler.resolveSong(null, { member, metadata })).resolves.toBe(null);
+    await expect(handler.resolveSong(null, { member, metadata })).rejects.toThrowError(
+      new DisTubeError("CANNOT_RESOLVE_SONG", null),
+    );
+    await expect(handler.resolveSong(undefined, { member, metadata })).rejects.toThrowError(
+      new DisTubeError("CANNOT_RESOLVE_SONG", undefined),
+    );
   });
 
   test("Parameter is Song or Playlist", async () => {
@@ -321,6 +325,7 @@ describe("DisTubeHandler#resolveSong()", () => {
   });
 
   test("Parameter is a SearchResult", async () => {
+    Util.isRecord.mockReturnValue(true);
     await expect(handler.resolveSong(songResult, { member, metadata })).resolves.toBeInstanceOf(Song);
     (ytpl as unknown as jest.Mock).mockReturnValue(firstPlaylistInfo);
     await expect(handler.resolveSong(plResult, { member, metadata })).resolves.toBeInstanceOf(Playlist);
@@ -328,6 +333,7 @@ describe("DisTubeHandler#resolveSong()", () => {
 
   test("Parameter is a song info object", async () => {
     const songInfo = { id: "z", url: "z url", src: "test" };
+    Util.isObject.mockReturnValue(true);
     await expect(handler.resolveSong(songInfo, { member, metadata })).resolves.toBeInstanceOf(Song);
   });
 
@@ -364,7 +370,7 @@ describe("DisTubeHandler#resolveSong()", () => {
   test("Parameter is a number", async () => {
     const url: any = 1;
     Util.isURL.mockReturnValue(false);
-    await expect(handler.resolveSong(url)).rejects.toThrow(new DisTubeError("CANNOT_RESOLVE_SONG", typeof url));
+    await expect(handler.resolveSong(url)).rejects.toThrow(new DisTubeError("CANNOT_RESOLVE_SONG", url));
   });
 });
 
@@ -377,6 +383,7 @@ describe("DisTubeHandler#resolvePlaylist()", () => {
   });
 
   test("playlist is a Song array", async () => {
+    Util.isRecord.mockReturnValue(true);
     const result = handler.resolvePlaylist([song, anotherSong, nsfwSong], { member, metadata });
     await expect(result).resolves.toStrictEqual(playlist);
     await expect(result).resolves.not.toBe(playlist);
