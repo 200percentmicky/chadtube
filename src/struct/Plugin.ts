@@ -96,7 +96,6 @@ export abstract class Plugin {
   get handler(): DisTubeHandler {
     return this.distube.handler;
   }
-
   /**
    * Get the stream url from {@link Song#url}. Returns {@link Song#url} by default.
    * Not needed if the plugin plays song from YouTube.
