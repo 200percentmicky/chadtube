@@ -1,17 +1,13 @@
 import { URL } from "url";
 import { DisTubeError, DisTubeVoice, Queue } from ".";
-import { Intents, SnowflakeUtil } from "discord.js";
+import { Constants, GatewayIntentBits, IntentsBitField, SnowflakeUtil } from "discord.js";
 import type { GuildIdResolvable } from ".";
-import type { EventEmitter } from "node:events";
-import type { AudioPlayer, AudioPlayerStatus, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
 import type {
-  BitFieldResolvable,
   Client,
   ClientOptions,
   Guild,
   GuildMember,
   GuildTextBasedChannel,
-  IntentsString,
   Message,
   Snowflake,
   VoiceBasedChannel,
@@ -66,7 +62,7 @@ export function parseNumber(input: any): number {
  * @param {string} input input
  * @returns {boolean}
  */
-export function isURL(input: any): boolean {
+export function isURL(input: any): input is `http://${string}` | `https://${string}` {
   if (typeof input !== "string" || input.includes(" ")) return false;
   try {
     const url = new URL(input);
@@ -81,13 +77,8 @@ export function isURL(input: any): boolean {
  * @param {ClientOptions} options options
  */
 export function checkIntents(options: ClientOptions): void {
-  const requiredIntents: BitFieldResolvable<IntentsString, number>[] = ["GUILD_VOICE_STATES"];
-  const bitfield: BitFieldResolvable<IntentsString, number> = options.intents ?? (options?.ws as any)?.intents;
-  if (typeof bitfield === "undefined") return;
-  const intents = new Intents(bitfield);
-  for (const intent of requiredIntents) {
-    if (!intents.has(intent)) throw new DisTubeError("MISSING_INTENTS", intent.toString());
-  }
+  const intents = new IntentsBitField(options.intents);
+  if (!intents.has(GatewayIntentBits.GuildVoiceStates)) throw new DisTubeError("MISSING_INTENTS", "GuildVoiceStates");
 }
 
 /**
@@ -96,7 +87,10 @@ export function checkIntents(options: ClientOptions): void {
  * @returns {boolean}
  */
 export function isVoiceChannelEmpty(voiceState: VoiceState): boolean {
-  const voiceChannel = voiceState.guild?.me?.voice?.channel;
+  const guild = voiceState.guild;
+  const clientId = voiceState.client.user?.id;
+  if (!guild || !clientId) return false;
+  const voiceChannel = guild.members.me?.voice?.channel;
   if (!voiceChannel) return false;
   const members = voiceChannel.members.filter(m => !m.user.bot);
   return !members.size;
@@ -104,7 +98,7 @@ export function isVoiceChannelEmpty(voiceState: VoiceState): boolean {
 
 export function isSnowflake(id: any): id is Snowflake {
   try {
-    return SnowflakeUtil.deconstruct(id).timestamp > SnowflakeUtil.EPOCH;
+    return SnowflakeUtil.deconstruct(id).timestamp > SnowflakeUtil.epoch;
   } catch {
     return false;
   }
@@ -124,9 +118,12 @@ export function isTextChannelInstance(channel: any): channel is GuildTextBasedCh
   return (
     !!channel &&
     isSnowflake(channel.id) &&
-    isSnowflake(channel.guild?.id) &&
-    typeof channel.send === "function" &&
-    typeof channel.awaitMessages === "function"
+    isSnowflake(channel.guildId) &&
+    typeof channel.name === "string" &&
+    Constants.TextBasedChannelTypes.includes(channel.type) &&
+    typeof channel.nsfw === "boolean" &&
+    "messages" in channel &&
+    typeof channel.send === "function"
   );
 }
 
@@ -135,35 +132,25 @@ export function isMessageInstance(message: any): message is Message<true> {
   return (
     !!message &&
     isSnowflake(message.id) &&
-    isSnowflake(message.guild?.id) &&
-    isTextChannelInstance(message.channel) &&
+    isSnowflake(message.guildId) &&
     isMemberInstance(message.member) &&
-    isSnowflake(message.author?.id) &&
-    message.member.id === message.author.id &&
-    message.guild.id === message.channel.guild.id
+    isTextChannelInstance(message.channel) &&
+    Constants.NonSystemMessageTypes.includes(message.type) &&
+    message.member.id === message.author?.id
   );
 }
 
 export function isSupportedVoiceChannel(channel: any): channel is VoiceBasedChannel {
   return (
     !!channel &&
-    typeof channel.joinable === "boolean" &&
     isSnowflake(channel.id) &&
-    isSnowflake(channel.guild?.id) &&
-    typeof channel.full === "boolean" &&
-    [
-      // Djs v12
-      "voice",
-      "stage",
-      // Djs v13
-      "GUILD_VOICE",
-      "GUILD_STAGE_VOICE",
-    ].includes(channel.type)
+    isSnowflake(channel.guildId) &&
+    Constants.VoiceBasedChannelTypes.includes(channel.type)
   );
 }
 
 export function isGuildInstance(guild: any): guild is Guild {
-  return !!guild && isSnowflake(guild.id) && typeof guild.fetchAuditLogs === "function";
+  return !!guild && isSnowflake(guild.id) && isSnowflake(guild.ownerId) && typeof guild.name === "string";
 }
 
 export function resolveGuildId(resolvable: GuildIdResolvable): Snowflake {
@@ -171,9 +158,13 @@ export function resolveGuildId(resolvable: GuildIdResolvable): Snowflake {
   if (typeof resolvable === "string") {
     guildId = resolvable;
   } else if (isObject(resolvable)) {
-    if (resolvable instanceof Queue || resolvable instanceof DisTubeVoice) guildId = resolvable.id;
-    else if ("guild" in resolvable && isGuildInstance(resolvable.guild)) guildId = resolvable.guild.id;
-    else if ("id" in resolvable && isGuildInstance(resolvable)) guildId = resolvable.id;
+    if ("guildId" in resolvable && resolvable.guildId) {
+      guildId = resolvable.guildId;
+    } else if (resolvable instanceof Queue || resolvable instanceof DisTubeVoice || isGuildInstance(resolvable)) {
+      guildId = resolvable.id;
+    } else if ("guild" in resolvable && isGuildInstance(resolvable.guild)) {
+      guildId = resolvable.guild.id;
+    }
   }
   if (!isSnowflake(guildId)) throw new DisTubeError("INVALID_TYPE", "GuildIdResolvable", resolvable);
   return guildId;
@@ -194,37 +185,23 @@ export function checkInvalidKey(
   sourceName: string,
 ) {
   if (!isObject(target)) throw new DisTubeError("INVALID_TYPE", "object", target, sourceName);
-  const sourceKeys = Array.isArray(source) ? source : Object.keys(source);
-  const invalidKey = Object.keys(target).find(key => !sourceKeys.includes(key));
+  const sourceKeys = Array.isArray(source) ? source : objectKeys(source);
+  const invalidKey = objectKeys(target).find(key => !sourceKeys.includes(key));
   if (invalidKey) throw new DisTubeError("INVALID_KEY", sourceName, invalidKey);
 }
 
-async function waitEvent(target: EventEmitter, status: string, maxTime: number) {
-  let cleanup = () => undefined as any;
-  try {
-    await new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error(`Didn't trigger ${status} within ${maxTime}ms`)), maxTime);
-      target.once(status, resolve);
-      target.once("error", reject);
-      cleanup = () => {
-        clearTimeout(timeout);
-        target.off(status, resolve);
-        target.off("error", reject);
-      };
-    });
-    return target;
-  } finally {
-    cleanup();
-  }
+export function isObject(obj: any): obj is object {
+  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
 }
 
-export async function entersState<T extends VoiceConnection | AudioPlayer>(
-  target: T,
-  status: T extends VoiceConnection ? VoiceConnectionStatus : AudioPlayerStatus,
-  maxTime: number,
-) {
-  if (target.state.status === status) return target;
-  return waitEvent(target, status, maxTime) as Promise<T>;
+export function isRecord<T = unknown>(obj: any): obj is Record<string, T> {
+  return isObject(obj);
+}
+
+type KeyOf<T> = T extends object ? (keyof T)[] : [];
+export function objectKeys<T>(obj: T): KeyOf<T> {
+  if (!isObject(obj)) return [] as KeyOf<T>;
+  return Object.keys(obj) as KeyOf<T>;
 }
 
 export function isObject(obj: any): obj is object {

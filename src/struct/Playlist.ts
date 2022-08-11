@@ -1,9 +1,6 @@
 import { DisTubeError, formatDuration, isMemberInstance, isRecord } from "..";
-import type ytpl from "@distube/ytpl";
 import type { PlaylistInfo, Song } from "..";
 import type { GuildMember } from "discord.js";
-
-// TODO: Remove ! on the next major version
 
 /**
  * Class representing a playlist.
@@ -19,14 +16,6 @@ export class Playlist<T = unknown> implements PlaylistInfo {
   url?: string;
   thumbnail?: string;
   [x: string]: any;
-  constructor(playlist: Song[] | ytpl.result | PlaylistInfo);
-  /** @deprecated Passing GuildMember for DisTube#Playlist() is deprecated. */
-  constructor(
-    playlist: Song[] | ytpl.result | PlaylistInfo,
-    member?: GuildMember,
-    properties?: Record<string, any>,
-    metadata?: T,
-  );
   /**
    * Create a playlist
    * @param {Song[]|PlaylistInfo} playlist Playlist
@@ -36,80 +25,76 @@ export class Playlist<T = unknown> implements PlaylistInfo {
    * @param {T} [options.metadata] Playlist metadata
    */
   constructor(
-    playlist: Song[] | ytpl.result | PlaylistInfo,
-    options?: {
+    playlist: Song[] | PlaylistInfo,
+    options: {
       member?: GuildMember;
       properties?: Record<string, any>;
       metadata?: T;
-    },
-  );
-  constructor(
-    playlist: Song[] | ytpl.result | PlaylistInfo,
-    options:
-      | GuildMember
-      | {
-          member?: GuildMember;
-          properties?: Record<string, any>;
-          metadata?: T;
-        } = {},
-    props?: Record<string, any>,
-    meta?: T,
+    } = {},
   ) {
-    if (isMemberInstance(options)) {
-      process.emitWarning(
-        "Passing GuildMember for DisTube#Playlist() is deprecated, read the docs for more.",
-        "DeprecationWarning",
-      );
-      return new Playlist(playlist, { member: options, properties: props, metadata: meta });
-    }
-
     const { member, properties, metadata } = options;
 
-    if (typeof playlist !== "object") {
-      throw new DisTubeError("INVALID_TYPE", ["Array<Song>", "object"], playlist, "playlist");
+    if (
+      typeof playlist !== "object" ||
+      (!Array.isArray(playlist) && ["source", "songs"].some(key => !(key in playlist)))
+    ) {
+      throw new DisTubeError("INVALID_TYPE", ["Array<Song>", "PlaylistInfo"], playlist, "playlist");
     }
-    if (typeof properties !== "undefined" && !isRecord(properties)) {
+    if (typeof properties !== "undefined" && !isRecord<any>(properties)) {
       throw new DisTubeError("INVALID_TYPE", "object", properties, "properties");
     }
-    // FIXME
-    const info = playlist as any;
-    /**
-     * The source of the playlist
-     * @type {string}
-     */
-    this.source = (info.source || properties?.source || "youtube").toLowerCase();
-    /**
-     * Playlist songs.
-     * @type {Array<Song>}
-     */
-    this.songs = Array.isArray(info) ? info : info.items || info.songs;
-    if (!Array.isArray(this.songs) || !this.songs.length) {
-      throw new DisTubeError("EMPTY_PLAYLIST");
+
+    if (Array.isArray(playlist)) {
+      /**
+       * The source of the playlist
+       * @type {string}
+       */
+      this.source = "youtube";
+      if (!playlist.length) throw new DisTubeError("EMPTY_PLAYLIST");
+      /**
+       * Playlist songs.
+       * @type {Array<Song>}
+       */
+      this.songs = playlist;
+      /**
+       * Playlist name.
+       * @type {string}
+       */
+      this.name = this.songs[0].name
+        ? `${this.songs[0].name} and ${this.songs.length - 1} more songs.`
+        : `${this.songs.length} songs playlist`;
+      this.thumbnail = this.songs[0].thumbnail;
+      this.member = member || undefined;
+    } else {
+      this.source = (playlist.source || "youtube").toLowerCase();
+      if (!Array.isArray(playlist.songs) || !playlist.songs.length) throw new DisTubeError("EMPTY_PLAYLIST");
+      this.songs = playlist.songs;
+      this.name =
+        playlist.name ||
+        // eslint-disable-next-line deprecation/deprecation
+        playlist.title ||
+        (this.songs[0].name
+          ? `${this.songs[0].name} and ${this.songs.length - 1} more songs.`
+          : `${this.songs.length} songs playlist`);
+      /**
+       * Playlist URL.
+       * @type {string}
+       */
+      // eslint-disable-next-line deprecation/deprecation
+      this.url = playlist.url || playlist.webpage_url;
+      /**
+       * Playlist thumbnail.
+       * @type {string?}
+       */
+      this.thumbnail = playlist.thumbnail || this.songs[0].thumbnail;
+      this.member = member || playlist.member || undefined;
     }
     this.songs.map(s => s.constructor.name === "Song" && (s.playlist = this));
-    this.member = member || info.member || undefined;
-    /**
-     * Playlist name.
-     * @type {string}
-     */
-    this.name =
-      info.name ||
-      info.title ||
-      (this.songs[0].name
-        ? `${this.songs[0].name} and ${this.songs.length - 1} more songs.`
-        : `${this.songs.length} songs playlist`);
-    /**
-     * Playlist URL.
-     * @type {string}
-     */
-    this.url = info.url || info.webpage_url;
-    /**
-     * Playlist thumbnail.
-     * @type {string?}
-     */
-    this.thumbnail = info.thumbnail?.url || info.thumbnail || this.songs[0].thumbnail;
     if (properties) for (const [key, value] of Object.entries(properties)) this[key] = value;
-
+    /**
+     * Optional metadata that can be used to identify the playlist.
+     * @type {T}
+     */
     this.metadata = metadata as T;
   }
 
@@ -138,7 +123,7 @@ export class Playlist<T = unknown> implements PlaylistInfo {
   }
 
   set member(member: GuildMember | undefined) {
-    if (!member) return;
+    if (!isMemberInstance(member)) return;
     this.#member = member;
     this.songs.map(s => s.constructor.name === "Song" && (s.member = this.member));
   }
@@ -151,10 +136,6 @@ export class Playlist<T = unknown> implements PlaylistInfo {
     return this.member?.user;
   }
 
-  /**
-   * Optional metadata that can be used to identify the playlist.
-   * @type {T}
-   */
   get metadata() {
     return this.#metadata;
   }

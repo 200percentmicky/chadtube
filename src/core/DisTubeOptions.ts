@@ -1,4 +1,4 @@
-import { DisTubeError, checkInvalidKey, defaultOptions } from "..";
+import { DisTubeError, StreamType, checkInvalidKey, defaultOptions } from "..";
 import type ytdl from "@distube/ytdl-core";
 import type { CustomPlugin, DisTubeOptions, ExtractorPlugin, Filters } from "..";
 
@@ -14,13 +14,14 @@ export class Options {
   searchCooldown: number;
   youtubeCookie?: string;
   youtubeIdentityToken?: string;
-  youtubeDL: boolean;
-  updateYouTubeDL: boolean;
   customFilters?: Filters;
   ytdlOptions: ytdl.getInfoOptions;
   nsfw: boolean;
   emitAddSongWhenCreatingQueue: boolean;
   emitAddListWhenCreatingQueue: boolean;
+  joinNewVoiceChannel: boolean;
+  streamType: StreamType;
+  directLink: boolean;
   constructor(options: DisTubeOptions) {
     if (typeof options !== "object" || Array.isArray(options)) {
       throw new DisTubeError("INVALID_TYPE", "object", options, "DisTubeOptions");
@@ -32,10 +33,6 @@ export class Options {
     this.leaveOnFinish = opts.leaveOnFinish;
     this.leaveOnStop = opts.leaveOnStop;
     this.savePreviousSongs = opts.savePreviousSongs;
-    /* eslint-disable deprecation/deprecation */
-    this.youtubeDL = opts.youtubeDL;
-    this.updateYouTubeDL = opts.updateYouTubeDL;
-    /* eslint-enable deprecation/deprecation */
     this.searchSongs = opts.searchSongs;
     this.youtubeCookie = opts.youtubeCookie;
     this.youtubeIdentityToken = opts.youtubeIdentityToken;
@@ -46,6 +43,9 @@ export class Options {
     this.nsfw = opts.nsfw;
     this.emitAddSongWhenCreatingQueue = opts.emitAddSongWhenCreatingQueue;
     this.emitAddListWhenCreatingQueue = opts.emitAddListWhenCreatingQueue;
+    this.joinNewVoiceChannel = opts.joinNewVoiceChannel;
+    this.streamType = opts.streamType;
+    this.directLink = opts.directLink;
     checkInvalidKey(opts, this, "DisTubeOptions");
     this.#validateOptions();
     if (this.youtubeDL) {
@@ -72,11 +72,13 @@ export class Options {
     if (typeof options.savePreviousSongs !== "boolean") {
       throw new DisTubeError("INVALID_TYPE", "boolean", options.savePreviousSongs, "DisTubeOptions.savePreviousSongs");
     }
-    if (typeof options.youtubeDL !== "boolean") {
-      throw new DisTubeError("INVALID_TYPE", "boolean", options.youtubeDL, "DisTubeOptions.youtubeDL");
-    }
-    if (typeof options.updateYouTubeDL !== "boolean") {
-      throw new DisTubeError("INVALID_TYPE", "boolean", options.updateYouTubeDL, "DisTubeOptions.updateYouTubeDL");
+    if (typeof options.joinNewVoiceChannel !== "boolean") {
+      throw new DisTubeError(
+        "INVALID_TYPE",
+        "boolean",
+        options.joinNewVoiceChannel,
+        "DisTubeOptions.joinNewVoiceChannel",
+      );
     }
     if (typeof options.youtubeCookie !== "undefined" && typeof options.youtubeCookie !== "string") {
       throw new DisTubeError("INVALID_TYPE", "string", options.youtubeCookie, "DisTubeOptions.youtubeCookie");
@@ -128,6 +130,12 @@ export class Options {
         options.emitAddListWhenCreatingQueue,
         "DisTubeOptions.emitAddListWhenCreatingQueue",
       );
+    }
+    if (typeof options.streamType !== "number" || isNaN(options.streamType) || !StreamType[options.streamType]) {
+      throw new DisTubeError("INVALID_TYPE", "StreamType", options.streamType, "DisTubeOptions.streamType");
+    }
+    if (typeof options.directLink !== "boolean") {
+      throw new DisTubeError("INVALID_TYPE", "boolean", options.directLink, "DisTubeOptions.directLink");
     }
   }
 }

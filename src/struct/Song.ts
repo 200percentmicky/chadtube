@@ -4,8 +4,6 @@ import type ytdl from "@distube/ytdl-core";
 import type { GuildMember } from "discord.js";
 import type { Chapter, OtherSongInfo, RelatedSong, SearchResult } from "..";
 
-// TODO: Clean parameters on the next major version.
-
 /**
  * Class representing a song.
  *
@@ -42,14 +40,6 @@ export class Song<T = unknown> {
   chapters!: Chapter[];
   reposts!: number;
   #playlist?: Playlist;
-  constructor(info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo);
-  /** @deprecated Passing GuildMember for DisTube#Song() is deprecated. */
-  constructor(
-    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo,
-    member?: GuildMember,
-    source?: string,
-    metadata?: T,
-  );
   /**
    * Create a Song
    * @param {ytdl.videoInfo|SearchResult|OtherSongInfo} info Raw info
@@ -60,32 +50,12 @@ export class Song<T = unknown> {
    */
   constructor(
     info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo | RelatedSong,
-    options?: {
+    options: {
       member?: GuildMember;
       source?: string;
       metadata?: T;
-    },
-  );
-  constructor(
-    info: ytdl.videoInfo | SearchResult | OtherSongInfo | ytdl.relatedVideo | RelatedSong,
-    options:
-      | GuildMember
-      | {
-          member?: GuildMember;
-          source?: string;
-          metadata?: T;
-        } = {},
-    src = "youtube",
-    meta?: T,
+    } = {},
   ) {
-    if (isMemberInstance(options)) {
-      process.emitWarning(
-        "Passing GuildMember for DisTube#Song() is deprecated, read the docs for more.",
-        "DeprecationWarning",
-      );
-      return new Song(info, { member: options, source: src, metadata: meta });
-    }
-
     const { member, source, metadata } = { source: "youtube", ...options };
 
     if (
@@ -100,7 +70,7 @@ export class Song<T = unknown> {
      */
     this.source = ((info as OtherSongInfo)?.src || source).toLowerCase();
     /**
-     * Optional metadata that can be used to identify the song.
+     * Optional metadata that can be used to identify the song. This is attached by the {@link DisTube#play} method.
      * @type {T}
      */
     this.metadata = metadata as T;
@@ -115,7 +85,7 @@ export class Song<T = unknown> {
   _patchYouTube(i: ytdl.videoInfo | SearchResult) {
     // FIXME
     const info = i as any;
-    if ((info as any).full === true) {
+    if (info.full === true) {
       /**
        * Stream formats (Available if the song is from YouTube and playing)
        * @type {ytdl.videoFormat[]?}
@@ -288,8 +258,7 @@ export class Song<T = unknown> {
   }
 
   set member(member: GuildMember | undefined) {
-    if (!member) return;
-    this.#member = member;
+    if (isMemberInstance(member)) this.#member = member;
   }
 
   /**
