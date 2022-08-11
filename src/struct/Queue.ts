@@ -144,6 +144,21 @@ export class Queue extends DisTubeBase {
   get filters() {
     return this.#filters;
   }
+  /**
+   * The client user as a `GuildMember` of this queue's guild
+   * @type {Discord.GuildMember?}
+   */
+  get clientMember() {
+    return this.voice.channel.guild.members.me ?? undefined;
+  }
+  /**
+   * The filter manager of the queue
+   * @type {FilterManager}
+   * @readonly
+   */
+  get filters() {
+    return this.#filters;
+  }
 
   /**
    * Formatted duration string.
@@ -380,7 +395,10 @@ export class Queue extends DisTubeBase {
     else this.repeatMode = mode;
     return this.repeatMode;
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 93f15ba7cde94f8cb1e3a35c5de0b43b2b0d66b1
   /**
    * Set the playing time to another position
    * @param {number} time Time in seconds

@@ -203,11 +203,3 @@ export function objectKeys<T>(obj: T): KeyOf<T> {
   if (!isObject(obj)) return [] as KeyOf<T>;
   return Object.keys(obj) as KeyOf<T>;
 }
-
-export function isObject(obj: any): obj is object {
-  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
-}
-
-export function isRecord(obj: any): obj is Record<string, unknown> {
-  return isObject(obj);
-}

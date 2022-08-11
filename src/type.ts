@@ -371,15 +371,3 @@ export enum Events {
   SEARCH_INVALID_ANSWER = "searchInvalidAnswer",
   SEARCH_RESULT = "searchResult",
 }
-
-export type RelatedSong = Omit<Song, "related">;
-
-export interface CustomPluginPlayOptions {
-  skip?: boolean;
-  /** @deprecated Use `options.position` instead */
-  unshift?: boolean;
-  position?: number;
-  member?: GuildMember;
-  textChannel?: GuildTextBasedChannel;
-  metadata?: any;
-}
