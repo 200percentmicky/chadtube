@@ -46,7 +46,7 @@
   "homepage": "https://distube.js.org/",
   "dependencies": {
     "@distube/youtube-dl": "^2.2.4",
-    "@distube/ytdl-core": "^4.9.2",
+    "@distube/ytdl-core": "^4.11.2",
     "@distube/ytpl": "^1.1.1",
     "@distube/ytsr": "^1.1.5",
     "@types/lodash": "^4.14.172",
