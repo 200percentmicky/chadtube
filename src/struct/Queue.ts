@@ -395,10 +395,7 @@ export class Queue extends DisTubeBase {
     else this.repeatMode = mode;
     return this.repeatMode;
   }
-<<<<<<< HEAD
 
-=======
->>>>>>> 93f15ba7cde94f8cb1e3a35c5de0b43b2b0d66b1
   /**
    * Set the playing time to another position
    * @param {number} time Time in seconds
