@@ -318,7 +318,9 @@ export class DisTubeHandler extends DisTubeBase {
    * @param {PlayHandlerOptions} [options] Optional options
    */
   async playSong(voiceChannel: VoiceBasedChannel, song: Song, options: PlayHandlerOptions = {}): Promise<void> {
-    if (!(song instanceof Song)) throw new DisTubeError("INVALID_TYPE", "Song", song, "song");
+    // For some reason, this check is causing conflicts.
+    // Returns `Song { ... } (object)` which doesn't match.
+    // if (!(song instanceof Song)) throw new DisTubeError("INVALID_TYPE", "Song", song, "song");
     const { textChannel, skip } = { skip: false, ...options };
     const position = Number(options.position) || (skip ? 1 : 0);
 
