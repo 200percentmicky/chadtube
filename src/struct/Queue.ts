@@ -144,21 +144,6 @@ export class Queue extends DisTubeBase {
   get filters() {
     return this.#filters;
   }
-  /**
-   * The client user as a `GuildMember` of this queue's guild
-   * @type {Discord.GuildMember?}
-   */
-  get clientMember() {
-    return this.voice.channel.guild.members.me ?? undefined;
-  }
-  /**
-   * The filter manager of the queue
-   * @type {FilterManager}
-   * @readonly
-   */
-  get filters() {
-    return this.#filters;
-  }
 
   /**
    * Formatted duration string.
