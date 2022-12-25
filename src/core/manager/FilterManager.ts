@@ -29,7 +29,9 @@ export class FilterManager extends BaseManager<FilterResolvable> {
   }
 
   #apply() {
-    this.queue.beginTime = this.queue.currentTime;
+    if (!this.queue.songs[0].isLive) {
+      this.queue.beginTime = this.queue.currentTime;
+    }
     this.queues.playSong(this.queue);
   }
 
