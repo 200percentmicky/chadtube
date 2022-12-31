@@ -60,7 +60,7 @@
   ],
   "homepage": "https://distube.js.org/",
   "dependencies": {
-    "@distube/ytdl-core": "^4.11.3",
+    "@distube/ytdl-core": "^4.11.7",
     "@distube/ytpl": "^1.1.1",
     "@distube/ytsr": "^1.1.8",
     "libsodium-wrappers": "^0.7.10",
