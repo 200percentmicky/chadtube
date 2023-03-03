@@ -70,6 +70,20 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
           this.leave(new DisTubeError("VOICE_RECONNECT_FAILED"));
         }
       })
+      // Implementing fix due to UDP discovery change.
+      // https://github.com/discordjs/discord.js/issues/9185
+      .on('stateChange', (oldState, newState) => {
+        const oldNetworking = Reflect.get(oldState, 'networking');
+        const newNetworking = Reflect.get(newState, 'networking');
+
+        const networkStateChangeHandler = (oldNetworkState: any, newNetworkState: any) => {
+          const newUdp = Reflect.get(newNetworkState, 'udp');
+          clearInterval(newUdp?.keepAliveInterval);
+        }
+
+        oldNetworking?.off('stateChange', networkStateChangeHandler);
+        newNetworking?.on('stateChange', networkStateChangeHandler);
+      })
       .on(VoiceConnectionStatus.Destroyed, () => {
         this.leave();
       })
