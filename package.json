@@ -25,6 +25,7 @@
     "prepublishOnly": "yarn lint && yarn test",
     "prepack": "yarn build && pinst --disable",
     "postpack": "pinst --enable"
+    "postinstall": "husky install",
   },
   "repository": {
     "type": "git",
