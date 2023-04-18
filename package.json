@@ -20,7 +20,6 @@
     "build": "tsup",
     "build:check": "tsc --noEmit",
     "update": "ncu -u && yarn up '**' -R",
-    "postinstall": "husky install",
     "prepublishOnly": "yarn lint && yarn test",
     "prepack": "yarn build && pinst --disable",
     "prepare": "npm run build",
