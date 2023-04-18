@@ -14,16 +14,15 @@
   ],
   "scripts": {
     "test": "jest",
-    "docs": "docgen -s src/**/*.ts -o docs.json -c pages/index.yml -g -j jsdoc.config.json",
     "lint": "prettier --check . && eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --write \"**/*.{ts,json,yml,yaml,md}\"",
     "build": "tsup",
     "build:check": "tsc --noEmit",
     "update": "ncu -u && yarn up '**' -R",
-    "postinstall": "tsup",
+    "postinstall": "husky --install",
     "prepublishOnly": "yarn lint && yarn test",
-    "prepack": "yarn build && pinst --disable",
+    "prepack": "npm run build && pinst --disable",
     "postpack": "pinst --enable"
   },
   "repository": {
