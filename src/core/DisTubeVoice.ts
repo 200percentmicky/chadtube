@@ -52,9 +52,10 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
       });
     this.connection
       .on(VoiceConnectionStatus.Disconnected, (_, newState) => {
-        if (newState.reason === VoiceConnectionDisconnectReason.Manual) {
-          this.leave();
-        } else if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
+        // User disconnect
+        if (newState.reason === VoiceConnectionDisconnectReason.Manual) return this.leave();
+        // Move to other channel
+        if (newState.reason === VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode === 4014) {
           entersState(this.connection, VoiceConnectionStatus.Connecting, 5e3).catch(() => {
             if (
               ![VoiceConnectionStatus.Ready, VoiceConnectionStatus.Connecting].includes(this.connection.state.status)
@@ -62,12 +63,21 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
               this.leave();
             }
           });
-        } else if (this.connection.rejoinAttempts < 5) {
-          setTimeout(() => {
-            this.connection.rejoin();
-          }, (this.connection.rejoinAttempts + 1) * 5e3).unref();
-        } else if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
-          this.leave(new DisTubeError("VOICE_RECONNECT_FAILED"));
+          return;
+        }
+        // Try to rejoin
+        if (this.connection.rejoinAttempts < 5) {
+          setTimeout(
+            () => {
+              this.connection.rejoin();
+            },
+            (this.connection.rejoinAttempts + 1) * 5e3,
+          ).unref();
+          return;
+        }
+        // Leave after 5 attempts
+        if (this.connection.state.status !== VoiceConnectionStatus.Destroyed) {
+          return this.leave(new DisTubeError("VOICE_RECONNECT_FAILED"));
         }
       })
       // Implementing fix due to UDP discovery change.
@@ -202,7 +212,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
       inlineVolume: true,
     });
     this.volume = this.#volume;
-    this.audioPlayer.play(this.audioResource);
+    if (this.audioPlayer.state.status !== AudioPlayerStatus.Paused) this.audioPlayer.play(this.audioResource);
   }
 
   set volume(volume: number) {
@@ -233,6 +243,9 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
   }
 
   unpause() {
+    const state = this.audioPlayer.state;
+    if (state.status !== AudioPlayerStatus.Paused) return;
+    if (this.audioResource && state.resource !== this.audioResource) return this.audioPlayer.play(this.audioResource);
     this.audioPlayer.unpause();
   }
 
