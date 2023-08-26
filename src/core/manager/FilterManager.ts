@@ -1,31 +1,24 @@
 import { BaseManager } from ".";
-import type { FilterResolvable, Queue } from "../..";
 import _ from "lodash";
+import { DisTubeError } from "../..";
+import type { Filter, FilterResolvable, Queue } from "../..";
 
 /**
  * Manage filters of a playing {@link Queue}
  * @extends {BaseManager}
  */
-export class FilterManager extends BaseManager<FilterResolvable> {
-  [x: string]: any;
+export class FilterManager extends BaseManager<Filter> {
   /**
-   * Collection of {@link FilterResolvable}.
+   * Collection of {@link Filter}.
    * @name FilterManager#collection
    * @type {Discord.Collection<string, DisTubeVoice>}
    */
   queue: Queue;
+  filters: any[];
   constructor(queue: Queue) {
     super(queue.distube);
     this.queue = queue;
     this.filters = [];
-  }
-
-  #resolveName(filter: FilterResolvable): string {
-    return typeof filter === "string" ? filter : filter.name;
-  }
-
-  #resolveValue(filter: FilterResolvable): string {
-    return typeof filter === "string" ? this.distube.filters[filter] : filter.value;
   }
 
   #apply() {
@@ -76,16 +69,25 @@ export class FilterManager extends BaseManager<FilterResolvable> {
   }
 
   /**
-   * Array of enabled filter name
+   * Array of enabled filter names
    * @type {Array<string>}
    * @readonly
    */
-  get names() {
-    return this.collection.map(f => this.#resolveName(f));
+  get names(): string[] {
+    return [...this.collection.keys()];
   }
 
-  get values() {
-    return this.collection.map(f => this.#resolveValue(f));
+  /**
+   * Array of enabled filters
+   * @type {Array<Filter>}
+   * @readonly
+   */
+  get values(): Filter[] {
+    return [...this.collection.values()];
+  }
+
+  get ffmpegArgs(): string[] {
+    return this.size ? ["-af", this.values.map(f => f.value).join(",")] : [];
   }
 
   override toString() {
