@@ -59,9 +59,9 @@
   ],
   "homepage": "https://distube.js.org/",
   "dependencies": {
-    "@distube/ytdl-core": "^4.12.1",
-    "@distube/ytpl": "^1.1.4",
-    "@distube/ytsr": "^1.1.10",
+    "@distube/ytdl-core": "^4.13.2",
+    "@distube/ytpl": "^1.2.1",
+    "@distube/ytsr": "^1.2.0",
     "libsodium-wrappers": "^0.7.10",
     "lodash": "^4.17.21",
     "prism-media": "npm:@distube/prism-media@latest",
