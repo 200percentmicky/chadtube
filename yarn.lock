@@ -1717,7 +1717,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@distube/ytdl-core@npm:^4.12.1":
+"@distube/ytdl-core@npm:^4.13.2":
   version: 4.13.2
   resolution: "@distube/ytdl-core@npm:4.13.2"
   dependencies:
@@ -4313,7 +4313,7 @@ __metadata:
     "@commitlint/cli": ^17.7.1
     "@commitlint/config-conventional": ^17.7.0
     "@discordjs/voice": ^0.16.0
-    "@distube/ytdl-core": ^4.12.1
+    "@distube/ytdl-core": ^4.13.2
     "@distube/ytpl": ^1.2.1
     "@distube/ytsr": ^1.2.0
     "@distubejs/docgen": distubejs/docgen
