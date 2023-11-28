@@ -22,6 +22,7 @@ export class Options {
   joinNewVoiceChannel: boolean;
   streamType: StreamType;
   directLink: boolean;
+  youtubeDL: any;
   constructor(options: DisTubeOptions) {
     if (typeof options !== "object" || Array.isArray(options)) {
       throw new DisTubeError("INVALID_TYPE", "object", options, "DisTubeOptions");

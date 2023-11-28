@@ -83,6 +83,7 @@ export class DisTubeVoice extends TypedEmitter<DisTubeVoiceEvents> {
         const oldNetworking = Reflect.get(oldState, 'networking');
         const newNetworking = Reflect.get(newState, 'networking');
 
+        // @ts-ignore
         const networkStateChangeHandler = (oldNetworkState: any, newNetworkState: any) => {
           const newUdp = Reflect.get(newNetworkState, 'udp');
           clearInterval(newUdp?.keepAliveInterval);

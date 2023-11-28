@@ -78,7 +78,7 @@ export function isURL(input: any): input is `${(typeof SUPPORTED_PROTOCOL)[numbe
  * @param {ClientOptions} options options
  */
 export function checkIntents(options: ClientOptions): void {
-  const intents = new IntentsBitField(options.intents.bitfield);
+  const intents = new IntentsBitField(options.intents);
   if (!intents.has(GatewayIntentBits.GuildVoiceStates)) throw new DisTubeError("MISSING_INTENTS", "GuildVoiceStates");
 }
 

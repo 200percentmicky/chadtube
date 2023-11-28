@@ -1,7 +1,6 @@
 import { BaseManager } from ".";
 import _ from "lodash";
-import { DisTubeError } from "../..";
-import type { Filter, FilterResolvable, Queue } from "../..";
+import type { Filter, Queue } from "../..";
 
 /**
  * Manage filters of a playing {@link Queue}
