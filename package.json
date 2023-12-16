@@ -105,7 +105,7 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "@discordjs/opus": "*",
+    "@discordjs/opus": "^0.9.0",
     "@discordjs/voice": "*",
     "discord.js": "14"
   },
