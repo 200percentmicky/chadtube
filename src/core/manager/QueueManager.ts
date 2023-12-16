@@ -165,12 +165,16 @@ export class QueueManager extends GuildIdManager<Queue> {
    * @returns {DisTubeStream}
    */
   createStream(queue: Queue): DisTubeStream {
-    const { duration, formats, isLive, source, streamURL } = queue.songs[0];
+    const song = queue.songs[0];
+    const { duration, source, streamURL } = song;
     const filterValues = queue.filters.filters.map(x => x.values);
     const ffmpegArgs = filterValues.length ? ["-af", filterValues.join(",")] : undefined;
-    const seek = duration ? queue.beginTime : undefined;
-    const streamOptions = { ffmpegArgs, seek, isLive, type: this.options.streamType };
-    if (source === "youtube") return DisTubeStream.YouTube(formats, streamOptions);
+    const streamOptions = {
+      ffmpegArgs,
+      seek: duration ? queue.beginTime : undefined,
+      type: this.options.streamType,
+    };
+    if (source === "youtube") return DisTubeStream.YouTube(song, streamOptions);
     return DisTubeStream.DirectLink(streamURL as string, streamOptions);
   }
 
