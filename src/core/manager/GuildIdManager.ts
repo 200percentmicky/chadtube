@@ -1,3 +1,4 @@
+import type { Collection } from "discord.js";
 import { BaseManager } from ".";
 import { resolveGuildId } from "../..";
 import type { GuildIdResolvable } from "../..";
@@ -9,7 +10,7 @@ import type { GuildIdResolvable } from "../..";
  * @extends BaseManager
  */
 export abstract class GuildIdManager<V> extends BaseManager<V> {
-  add(idOrInstance: GuildIdResolvable, data: V) {
+  add(idOrInstance: GuildIdResolvable, data: V): this | Collection<string, V> {
     const id = resolveGuildId(idOrInstance);
     const existing = this.get(id);
     if (existing) return this;
