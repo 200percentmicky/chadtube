@@ -78,7 +78,7 @@ export function isURL(input: any): input is `${(typeof SUPPORTED_PROTOCOL)[numbe
  * @param {ClientOptions} options options
  */
 export function checkIntents(options: ClientOptions): void {
-  // @ts-ignore
+  // @ts-expect-error "options.intents" returns an object. "bitfield" is the object that needs to be defined.
   const intents = new IntentsBitField(options.intents.bitfield);
   if (!intents.has(GatewayIntentBits.GuildVoiceStates)) throw new DisTubeError("MISSING_INTENTS", "GuildVoiceStates");
 }
