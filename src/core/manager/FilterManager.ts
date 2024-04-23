@@ -1,16 +1,13 @@
 import { BaseManager } from ".";
 import _ from "lodash";
-import type { Filter, Queue } from "../..";
+import type { FFmpegOptions, Filter, Queue } from "../..";
 
 /**
  * Manage filters of a playing {@link Queue}
- * @extends {BaseManager}
  */
 export class FilterManager extends BaseManager<Filter> {
   /**
    * Collection of {@link Filter}.
-   * @name FilterManager#collection
-   * @type {Discord.Collection<string, DisTubeVoice>}
    */
   queue: Queue;
   filters: any[];
@@ -29,7 +26,6 @@ export class FilterManager extends BaseManager<Filter> {
 
   /**
    * Clear enabled filters of the manager
-   * @returns {FilterManager}
    */
   clear() {
     return this.set();
@@ -69,8 +65,6 @@ export class FilterManager extends BaseManager<Filter> {
 
   /**
    * Array of enabled filter names
-   * @type {Array<string>}
-   * @readonly
    */
   get names(): string[] {
     return [...this.collection.keys()];
@@ -78,15 +72,13 @@ export class FilterManager extends BaseManager<Filter> {
 
   /**
    * Array of enabled filters
-   * @type {Array<Filter>}
-   * @readonly
    */
   get values(): Filter[] {
     return [...this.collection.values()];
   }
 
-  get ffmpegArgs(): string[] {
-    return this.size ? ["-af", this.values.map(f => f.value).join(",")] : [];
+  get ffmpegArgs(): FFmpegOptions {
+    return this.size ? { af: this.values.map(f => f.value).join(",") } : {};
   }
 
   override toString() {

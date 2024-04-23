@@ -4,12 +4,12 @@ import { DisTubeBase } from ".";
 import { Cookie } from "tough-cookie";
 import {
   DisTubeError,
+  Events,
   Playlist,
   Queue,
   SearchResultPlaylist,
   SearchResultVideo,
   Song,
-  chooseBestVideoFormat,
   isMessageInstance,
   isNsfwChannel,
   isObject,
@@ -29,8 +29,6 @@ import type {
 
 /**
  * DisTube's Handler
- * @extends DisTubeBase
- * @private
  */
 export class DisTubeHandler extends DisTubeBase {
   #cookie: ytdl.Cookie[] | string = "";
@@ -59,7 +57,7 @@ export class DisTubeHandler extends DisTubeBase {
             delete queue._emptyTimeout;
             if (isVoiceChannelEmpty(oldState)) {
               queue.voice.leave();
-              this.emit("empty", queue);
+              this.emit(Events.EMPTY, queue);
               if (queue.stopped) queue.remove();
             }
           }, this.options.emptyCooldown * 1e3).unref();
@@ -99,9 +97,8 @@ export class DisTubeHandler extends DisTubeBase {
   }
 
   /**
-   * @param {string} url url
-   * @param {boolean} [basic=false] getBasicInfo?
-   * @returns {Promise<ytdl.videoInfo>}
+   * @param url   - url
+   * @param basic - getBasicInfo?
    */
   getYouTubeInfo(url: string, basic = false): Promise<ytdl.videoInfo> {
     if (basic) return ytdl.getBasicInfo(url, this.ytdlOptions);
@@ -122,10 +119,13 @@ export class DisTubeHandler extends DisTubeBase {
   ): Promise<Song | Playlist>;
   /**
    * Resolve a url or a supported object to a {@link Song} or {@link Playlist}
-   * @param {string|Song|SearchResult|Playlist} song URL | {@link Song}| {@link SearchResult} | {@link Playlist}
-   * @param {ResolveOptions} [options] Optional options
-   * @returns {Promise<Song|Playlist|null>} Resolved
-   * @throws {DisTubeError}
+   *
+   * @throws {@link DisTubeError}
+   *
+   * @param song    - URL | {@link Song}| {@link SearchResult} | {@link Playlist}
+   * @param options - Optional options
+   *
+   * @returns Resolved
    */
   async resolve(
     song: string | ytdl.videoInfo | Song | Playlist | SearchResult | OtherSongInfo | ytdl.relatedVideo,
@@ -164,9 +164,9 @@ export class DisTubeHandler extends DisTubeBase {
   resolvePlaylist(playlist: Playlist | Song[] | string, options?: ResolvePlaylistOptions): Promise<Playlist>;
   /**
    * Resolve Song[] or YouTube playlist url to a Playlist
-   * @param {Playlist|Song[]|string} playlist Resolvable playlist
-   * @param {ResolvePlaylistOptions} options Optional options
-   * @returns {Promise<Playlist>}
+   *
+   * @param playlist - Resolvable playlist
+   * @param options  - Optional options
    */
   async resolvePlaylist(playlist: Playlist | Song[] | string, options: ResolvePlaylistOptions = {}): Promise<Playlist> {
     const { member, source, metadata } = { source: "youtube", ...options };
@@ -196,11 +196,14 @@ export class DisTubeHandler extends DisTubeBase {
   }
 
   /**
-   * Search for a song, fire {@link DisTube#event:error} if not found.
-   * @param {Discord.Message} message The original message from an user
-   * @param {string} query The query string
-   * @returns {Promise<SearchResult?>} Song info
-   * @throws {DisTubeError}
+   * Search for a song, fire {@link DisTube#error} if not found.
+   *
+   * @throws {@link DisTubeError}
+   *
+   * @param message - The original message from an user
+   * @param query   - The query string
+   *
+   * @returns Song info
    */
   async searchSong(message: Message<true>, query: string): Promise<SearchResult | null> {
     if (!isMessageInstance(message)) throw new DisTubeError("INVALID_TYPE", "Discord.Message", message, "message");
@@ -213,7 +216,7 @@ export class DisTubeHandler extends DisTubeBase {
         safeSearch: this.options.nsfw ? false : !isNsfwChannel(message.channel),
       })
       .catch(() => {
-        if (!this.emit("searchNoResult", message, query)) {
+        if (!this.emit(Events.SEARCH_NO_RESULT, message, query)) {
           // eslint-disable-next-line no-console
           console.warn("searchNoResult event does not have any listeners! Emits `error` event instead.");
           throw new DisTubeError("NO_RESULT");
@@ -226,13 +229,16 @@ export class DisTubeHandler extends DisTubeBase {
   /**
    * Create a message collector for selecting search results.
    *
-   * Needed events: {@link DisTube#event:searchResult}, {@link DisTube#event:searchCancel},
-   * {@link DisTube#event:searchInvalidAnswer}, {@link DisTube#event:searchDone}.
-   * @param {Discord.Message} message The original message from an user
-   * @param {Array<SearchResult|Song|Playlist>} results The search results
-   * @param {string?} [query] The query string
-   * @returns {Promise<SearchResult|Song|Playlist|null>} Selected result
-   * @throws {DisTubeError}
+   * Needed events: {@link DisTube#searchResult}, {@link DisTube#searchCancel},
+   * {@link DisTube#searchInvalidAnswer}, {@link DisTube#searchDone}.
+   *
+   * @throws {@link DisTubeError}
+   *
+   * @param message - The original message from an user
+   * @param results - The search results
+   * @param query   - The query string
+   *
+   * @returns Selected result
    */
   async createSearchMessageCollector<R extends SearchResult | Song | Playlist>(
     message: Message<true>,
@@ -245,12 +251,12 @@ export class DisTubeHandler extends DisTubeBase {
     }
     if (this.options.searchSongs > 1) {
       const searchEvents = [
-        "searchNoResult",
-        "searchResult",
-        "searchCancel",
-        "searchInvalidAnswer",
-        "searchDone",
-      ] as const;
+        Events.SEARCH_NO_RESULT,
+        Events.SEARCH_RESULT,
+        Events.SEARCH_CANCEL,
+        Events.SEARCH_INVALID_ANSWER,
+        Events.SEARCH_DONE,
+      ];
       for (const evn of searchEvents) {
         if (this.distube.listenerCount(evn) === 0) {
           /* eslint-disable no-console */
@@ -268,7 +274,7 @@ export class DisTubeHandler extends DisTubeBase {
     let result = results[0];
     if (limit > 1) {
       results.splice(limit);
-      this.emit("searchResult", message, results, query);
+      this.emit(Events.SEARCH_RESULT, message, results, query);
       const answers = await message.channel
         .awaitMessages({
           filter: (m: Message) => m.author.id === message.author.id,
@@ -279,15 +285,15 @@ export class DisTubeHandler extends DisTubeBase {
         .catch(() => undefined);
       const ans = answers?.first();
       if (!ans) {
-        this.emit("searchCancel", message, query);
+        this.emit(Events.SEARCH_CANCEL, message, query);
         return null;
       }
       const index = parseInt(ans.content, 10);
       if (isNaN(index) || index > results.length || index < 1) {
-        this.emit("searchInvalidAnswer", message, ans, query);
+        this.emit(Events.SEARCH_INVALID_ANSWER, message, ans, query);
         return null;
       }
-      this.emit("searchDone", message, ans, query);
+      this.emit(Events.SEARCH_DONE, message, ans, query);
       result = results[index - 1];
     }
     return result;
@@ -295,11 +301,12 @@ export class DisTubeHandler extends DisTubeBase {
 
   /**
    * Play or add a {@link Playlist} to the queue.
-   * @param {Discord.BaseGuildVoiceChannel} voiceChannel A voice channel
-   * @param {Playlist|string} playlist A YouTube playlist url | a Playlist
-   * @param {PlayHandlerOptions} [options] Optional options
-   * @returns {Promise<void>}
-   * @throws {DisTubeError}
+   *
+   * @throws {@link DisTubeError}
+   *
+   * @param voiceChannel - A voice channel
+   * @param playlist     - A YouTube playlist url | a Playlist
+   * @param options      - Optional options
    */
   async playPlaylist(
     voiceChannel: VoiceBasedChannel,
@@ -323,23 +330,24 @@ export class DisTubeHandler extends DisTubeBase {
       if (this.options.joinNewVoiceChannel) queue.voice.channel = voiceChannel;
       queue.addToQueue(playlist.songs, position);
       if (skip) queue.skip();
-      else this.emit("addList", queue, playlist);
+      else this.emit(Events.ADD_LIST, queue, playlist);
     } else {
       const newQueue = await this.queues.create(voiceChannel, playlist.songs, textChannel);
       if (newQueue instanceof Queue) {
-        if (this.options.emitAddListWhenCreatingQueue) this.emit("addList", newQueue, playlist);
-        this.emit("playSong", newQueue, newQueue.songs[0]);
+        if (this.options.emitAddListWhenCreatingQueue) this.emit(Events.ADD_LIST, newQueue, playlist);
+        this.emit(Events.PLAY_SONG, newQueue, newQueue.songs[0]);
       }
     }
   }
 
   /**
    * Play or add a {@link Song} to the queue.
-   * @param {Discord.BaseGuildVoiceChannel} voiceChannel A voice channel
-   * @param {Song} song A YouTube playlist url | a Playlist
-   * @param {PlayHandlerOptions} [options] Optional options
-   * @returns {Promise<void>}
-   * @throws {DisTubeError}
+   *
+   * @throws {@link DisTubeError}
+   *
+   * @param voiceChannel - A voice channel
+   * @param song         - A YouTube playlist url | a Playlist
+   * @param options      - Optional options
    */
   async playSong(voiceChannel: VoiceBasedChannel, song: Song, options: PlayHandlerOptions = {}): Promise<void> {
     // For some reason, this check is causing conflicts.
@@ -356,27 +364,26 @@ export class DisTubeHandler extends DisTubeBase {
       if (this.options.joinNewVoiceChannel) queue.voice.channel = voiceChannel;
       queue.addToQueue(song, position);
       if (skip) queue.skip();
-      else this.emit("addSong", queue, song);
+      else this.emit(Events.ADD_SONG, queue, song);
     } else {
       const newQueue = await this.queues.create(voiceChannel, song, textChannel);
       if (newQueue instanceof Queue) {
-        if (this.options.emitAddSongWhenCreatingQueue) this.emit("addSong", newQueue, song);
-        this.emit("playSong", newQueue, song);
+        if (this.options.emitAddSongWhenCreatingQueue) this.emit(Events.ADD_SONG, newQueue, song);
+        this.emit(Events.PLAY_SONG, newQueue, song);
       }
     }
   }
 
   /**
    * Get {@link Song}'s stream info and attach it to the song.
-   * @param {Song} song A Song
+   *
+   * @param song - A Song
    */
   async attachStreamInfo(song: Song) {
-    const { url, source, formats, streamURL } = song;
+    const { url, source } = song;
     if (source === "youtube") {
-      if (!formats || !chooseBestVideoFormat(song)) {
-        song._patchYouTube(await this.handler.getYouTubeInfo(url));
-      }
-    } else if (!streamURL) {
+      song._patchYouTube(await this.handler.getYouTubeInfo(url));
+    } else {
       for (const plugin of [...this.distube.extractorPlugins, ...this.distube.customPlugins]) {
         if (await plugin.validate(url)) {
           const info = [plugin.getStreamURL(url), plugin.getRelatedSongs(url)] as const;

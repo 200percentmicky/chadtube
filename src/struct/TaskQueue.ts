@@ -12,20 +12,17 @@ class Task {
 
 /**
  * Task queuing system
- * @private
  */
 export class TaskQueue {
   /**
    * The task array
-   * @type {Task[]}
-   * @private
    */
   #tasks: Task[] = [];
 
   /**
    * Waits for last task finished and queues a new task
-   * @param {boolean} [resolveInfo=false] Whether the task is a resolving info task
-   * @returns {Promise<void>}
+   *
+   * @param resolveInfo - Whether the task is a resolving info task
    */
   public queuing(resolveInfo = false): Promise<void> {
     const next = this.remaining ? this.#tasks[this.#tasks.length - 1].promise : Promise.resolve();
@@ -42,7 +39,6 @@ export class TaskQueue {
 
   /**
    * The remaining number of tasks
-   * @type {number}
    */
   public get remaining(): number {
     return this.#tasks.length;
@@ -50,7 +46,6 @@ export class TaskQueue {
 
   /**
    * Whether or not having a resolving info task
-   * @type {boolean}
    */
   public get hasResolveTask(): boolean {
     return this.#tasks.some(t => t.resolveInfo);
