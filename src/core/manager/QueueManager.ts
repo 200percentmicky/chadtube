@@ -1,5 +1,5 @@
 import { GuildIdManager } from ".";
-import { DisTubeError, DisTubeStream, Events, Queue, RepeatMode, objectKeys } from "../..";
+import { DisTubeError, DisTubeStream, Events, Queue, RepeatMode, checkFFmpeg, objectKeys } from "../..";
 import type { Song } from "../..";
 import type { GuildTextBasedChannel, VoiceBasedChannel } from "discord.js";
 
@@ -30,6 +30,7 @@ export class QueueManager extends GuildIdManager<Queue> {
     const queue = new Queue(this.distube, voice, song, textChannel);
     await queue._taskQueue.queuing();
     try {
+      checkFFmpeg(this.distube);
       await voice.join();
       this.#voiceEventHandler(queue);
       this.add(queue.id, queue);
@@ -161,19 +162,22 @@ export class QueueManager extends GuildIdManager<Queue> {
   createStream(queue: Queue): DisTubeStream {
     const song = queue.songs[0];
     const { duration, source, streamURL } = song;
-    const filterValues = queue.filters.filters.map(x => x.values);
-    const ffmpegArgs = filterValues.length ? ["-af", filterValues.join(",")] : undefined;
     const streamOptions = {
       ffmpeg: {
-        path: this.options.ffmpegPath,
-        args: ffmpegArgs,
+        path: this.options.ffmpeg.path,
+        args: {
+          global: { ...this.options.ffmpeg.args.global },
+          input: { ...this.options.ffmpeg.args.input },
+          output: { ...this.options.ffmpeg.args.output, ...queue.filters.ffmpegArgs },
+        },
       },
       seek: duration ? queue.beginTime : undefined,
       type: this.options.streamType,
     };
 
     if (source === "youtube") return DisTubeStream.YouTube(song, streamOptions);
-    return DisTubeStream.DirectLink(streamURL!, streamOptions);
+    if (!streamURL) throw new Error("No streamURL, something went wrong");
+    return DisTubeStream.DirectLink(streamURL, streamOptions);
   }
 
   /**
