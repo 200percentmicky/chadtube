@@ -1,16 +1,13 @@
 import { BaseManager } from ".";
 import _ from "lodash";
-import type { Filter, Queue } from "../..";
+import type { FFmpegArgs, Filter, Queue } from "../..";
 
 /**
  * Manage filters of a playing {@link Queue}
- * @extends {BaseManager}
  */
 export class FilterManager extends BaseManager<Filter> {
   /**
    * Collection of {@link Filter}.
-   * @name FilterManager#collection
-   * @type {Discord.Collection<string, DisTubeVoice>}
    */
   queue: Queue;
   filters: any[];
@@ -29,7 +26,6 @@ export class FilterManager extends BaseManager<Filter> {
 
   /**
    * Clear enabled filters of the manager
-   * @returns {FilterManager}
    */
   clear() {
     return this.set();
@@ -40,9 +36,12 @@ export class FilterManager extends BaseManager<Filter> {
    * 
    * @param {string | null} filterName The name of the filter, or null to remove all filters.
    * @param {string | undefined} filterValue The value of the filter, or undefined to remove the filter.
-   * @returns {Array<string>}
+   * @returns {Filter[]}
    */
-  set(filterName: string | undefined = undefined, filterValue: string | undefined = undefined) {
+  set(
+    filterName: string | undefined = undefined,
+    filterValue: string | undefined = undefined
+  ): Filter[] {
     const filterList = this.filters?.find((x: { name: string | null; }) => x.name === filterName);
     if (filterName && !filterValue) { // Assuming that you want to remove the filter.
       if (!this.filters) throw new TypeError("No filters are applied to the player.");
@@ -56,12 +55,12 @@ export class FilterManager extends BaseManager<Filter> {
       } else {
         const filterPush = {
           name: filterName,
-          values: filterValue
+          value: filterValue
         }
         this.filters?.push(filterPush)
       }
     } else {
-      filterList.values = filterValue;
+      filterList.value = filterValue;
     }
     this.#apply()
     return this.filters;
@@ -69,24 +68,20 @@ export class FilterManager extends BaseManager<Filter> {
 
   /**
    * Array of enabled filter names
-   * @type {Array<string>}
-   * @readonly
    */
   get names(): string[] {
-    return [...this.collection.keys()];
+    return [...this.filters.map(f => f.name)];
   }
 
   /**
    * Array of enabled filters
-   * @type {Array<Filter>}
-   * @readonly
    */
   get values(): Filter[] {
-    return [...this.collection.values()];
+    return [...this.filters.map(f => f.value)];
   }
 
-  get ffmpegArgs(): string[] {
-    return this.size ? ["-af", this.values.map(f => f.value).join(",")] : [];
+  get ffmpegArgs(): FFmpegArgs {
+    return this.filters.length > 0 ? { af: this.filters.map(f => f.value).join(",") } : {};
   }
 
   override toString() {

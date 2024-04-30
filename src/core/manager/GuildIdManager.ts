@@ -5,16 +5,16 @@ import type { GuildIdResolvable } from "../..";
 
 /**
  * Manages the collection of a data model paired with a guild id.
- * @abstract
- * @private
- * @extends BaseManager
+ *
+ * @virtual
  */
 export abstract class GuildIdManager<V> extends BaseManager<V> {
   add(idOrInstance: GuildIdResolvable, data: V): this | Collection<string, V> {
     const id = resolveGuildId(idOrInstance);
     const existing = this.get(id);
     if (existing) return this;
-    return this.collection.set(id, data);
+    this.collection.set(id, data);
+    return this;
   }
   get(idOrInstance: GuildIdResolvable): V | undefined {
     return this.collection.get(resolveGuildId(idOrInstance));

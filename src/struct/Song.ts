@@ -8,12 +8,12 @@ import type { Chapter, OtherSongInfo, RelatedSong, SearchResult } from "..";
 /**
  * Class representing a song.
  *
- * <info>If {@link Song} is added from a YouTube {@link SearchResult} or {@link Playlist},
- * some info will be missing to save your resources. It will be filled when emitting {@link DisTube#playSong} event.
+ * <info>If {@link Song} is added from a YouTube {@link SearchResult} or {@link
+ * Playlist}, some info will be missing to save your resources. It will be filled
+ * when emitting {@link DisTube#playSong} event.
  *
  * Missing info: {@link Song#likes}, {@link Song#dislikes}, {@link Song#streamURL},
  * {@link Song#related}, {@link Song#chapters}, {@link Song#age_restricted}</info>
- * @template T - The type for the metadata (if any) of the song
  */
 export class Song<T = unknown> {
   source!: string;
@@ -43,11 +43,9 @@ export class Song<T = unknown> {
   #playlist?: Playlist;
   /**
    * Create a Song
-   * @param {ytdl.videoInfo|SearchResult|OtherSongInfo} info Raw info
-   * @param {Object} [options] Optional options
-   * @param {Discord.GuildMember} [options.member] Requested user
-   * @param {string} [options.source="youtube"] Song source
-   * @param {T} [options.metadata] Song metadata
+   *
+   * @param info             - Raw info
+   * @param options          - Optional options
    */
   constructor(
     info:
@@ -73,12 +71,11 @@ export class Song<T = unknown> {
     }
     /**
      * The source of the song
-     * @type {string}
      */
     this.source = ((info as OtherSongInfo)?.src || source).toLowerCase();
     /**
-     * Optional metadata that can be used to identify the song. This is attached by the {@link DisTube#play} method.
-     * @type {T}
+     * Optional metadata that can be used to identify the song. This is attached by the
+     * {@link DisTube#play} method.
      */
     this.metadata = metadata as T;
     this.member = member;
@@ -95,8 +92,6 @@ export class Song<T = unknown> {
     if (info.full === true) {
       /**
        * Stream formats (Available if the song is from YouTube and playing)
-       * @type {ytdl.videoFormat[]?}
-       * @private
        */
       this.formats = info.formats;
       // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
@@ -112,42 +107,34 @@ export class Song<T = unknown> {
     const details = info.videoDetails || info;
     /**
      * YouTube video id
-     * @type {string?}
      */
     this.id = details.videoId || details.id;
     /**
      * Song name.
-     * @type {string?}
      */
     this.name = details.title || details.name;
     /**
      * Indicates if the video is an active live.
-     * @type {boolean}
      */
     this.isLive = Boolean(details.isLive);
     /**
      * Song duration.
-     * @type {number}
      */
     this.duration = this.isLive ? 0 : toSecond(details.lengthSeconds || details.length_seconds || details.duration);
     /**
      * Formatted duration string (`hh:mm:ss`, `mm:ss` or `Live`).
-     * @type {string?}
      */
     this.formattedDuration = this.isLive ? "Live" : formatDuration(this.duration);
     /**
      * Song URL.
-     * @type {string}
      */
     this.url = `https://www.youtube.com/watch?v=${this.id}`;
     /**
      * Stream / Download URL (Available if the song is playing)
-     * @type {string?}
      */
     this.streamURL = undefined;
     /**
      * Song thumbnail.
-     * @type {string?}
      */
     this.thumbnail =
       details.thumbnails?.sort((a: any, b: any) => b.width - a.width)?.[0]?.url ||
@@ -155,31 +142,24 @@ export class Song<T = unknown> {
       details.thumbnail;
     /**
      * Related songs (without {@link Song#related} properties)
-     * @type {Song[]}
      */
     this.related = info?.related_videos || details.related || [];
     if (!Array.isArray(this.related)) throw new DisTubeError("INVALID_TYPE", "Array", this.related, "Song#related");
     this.related = this.related.map((v: any) => new Song(v, { source: this.source, metadata: this.metadata }));
     /**
      * Song views count
-     * @type {number}
      */
     this.views = parseNumber(details.viewCount || details.view_count || details.views);
     /**
      * Song like count
-     * @type {number}
      */
     this.likes = parseNumber(details.likes);
     /**
      * Song dislike count
-     * @type {number}
      */
     this.dislikes = parseNumber(details.dislikes);
     /**
      * Song uploader
-     * @type {Object}
-     * @prop {string?} name Uploader name
-     * @prop {string?} url Uploader url
      */
     this.uploader = {
       name: info.uploader?.name || details.author?.name,
@@ -187,30 +167,23 @@ export class Song<T = unknown> {
     };
     /**
      * Whether or not an age-restricted content
-     * @type {boolean}
      */
     this.age_restricted = Boolean(details.age_restricted);
-    /**
-     * @typedef {Object} Chapter
-     * @prop {string} title Chapter title
-     * @prop {number} start_time Chapter start time in seconds
-     */
+
     /**
      * Chapters information (YouTube only)
-     * @type {Chapter[]}
      */
     this.chapters = details.chapters || [];
     /**
      * Song repost count
-     * @type {number}
      */
     this.reposts = 0;
   }
 
   /**
    * Patch data from other source
-   * @param {OtherSongInfo} info Video info
-   * @private
+   *
+   * @param info - Video info
    */
   _patchOther(info: OtherSongInfo) {
     this.id = info.id;
@@ -244,7 +217,6 @@ export class Song<T = unknown> {
 
   /**
    * The playlist added this song
-   * @type {Playlist?}
    */
   get playlist() {
     return this.#playlist;
@@ -258,7 +230,6 @@ export class Song<T = unknown> {
 
   /**
    * User requested.
-   * @type {Discord.GuildMember?}
    */
   get member() {
     return this.#member;
@@ -270,7 +241,6 @@ export class Song<T = unknown> {
 
   /**
    * User requested.
-   * @type {Discord.User?}
    */
   get user() {
     return this.member?.user;

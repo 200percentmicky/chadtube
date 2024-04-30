@@ -6,8 +6,8 @@ import type { Awaitable, PlayOptions } from "..";
 
 /**
  * Custom Plugin
- * @extends Plugin
- * @abstract
+ *
+ * @virtual
  */
 export abstract class CustomPlugin extends Plugin {
   readonly type = PluginType.CUSTOM;
@@ -16,19 +16,16 @@ export abstract class CustomPlugin extends Plugin {
 
 /**
  * This method will be executed if the url is validated.
- * @param {Discord.BaseGuildVoiceChannel} voiceChannel The voice channel will be joined
- * @param {string} song Validated `song`
- * @param {PlayOptions} [options] Optional options
- * @returns {Promise<void>}
- * @abstract
- * @method play
- * @memberof CustomPlugin#
+ *
+ * @virtual
+ *
+ * @param voiceChannel - The voice channel will be joined
+ * @param song         - Validated `song`
+ * @param options      - Optional options
  */
 
 /**
  * Check if the string is working with this plugin
- * @param {string} string String need to validate
- * @returns {boolean|Promise<boolean>}
- * @method validate
- * @memberof CustomPlugin#
+ *
+ * @param string - String need to validate
  */

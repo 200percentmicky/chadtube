@@ -29,5 +29,18 @@
     "downlevelIteration": true,
     "skipLibCheck": true,
     "isolatedModules": true
+  },
+  "typedocOptions": {
+    "name": "DisTube API Documentation",
+    "plugin": ["typedoc-material-theme"],
+    "themeColor": "#ED4245",
+    "entryPoints": ["src/index.ts"],
+    "out": "docs",
+    "sidebarLinks": {
+      "GitHub": "https://github.com/skick1234/DisTube",
+      "Discord": "https://discord.gg/feaDd9h",
+      "Guide": "https://github.com/skick1234/DisTube/wiki"
+    },
+    "sitemapBaseUrl": "https://distube.js.org"
   }
 }

@@ -1,7 +1,7 @@
 import { DisTubeError, StreamType, checkInvalidKey, defaultOptions } from "..";
 import type ytdl from "@distube/ytdl-core";
-import type { CustomPlugin, DisTubeOptions, ExtractorPlugin, Filters } from "..";
 import type { Cookie } from "@distube/ytdl-core";
+import type { CustomPlugin, DisTubeOptions, ExtractorPlugin, FFmpegArgs, FFmpegOptions, Filters } from "..";
 
 export class Options {
   plugins: (CustomPlugin | ExtractorPlugin)[];
@@ -22,7 +22,11 @@ export class Options {
   joinNewVoiceChannel: boolean;
   streamType: StreamType;
   directLink: boolean;
-  youtubeDL: any;
+  /** @deprecated */
+  ffmpegPath: undefined = undefined;
+  /** @deprecated */
+  ffmpegDefaultArgs: undefined = undefined;
+  ffmpeg: FFmpegOptions;
   constructor(options: DisTubeOptions) {
     if (typeof options !== "object" || Array.isArray(options)) {
       throw new DisTubeError("INVALID_TYPE", "object", options, "DisTubeOptions");
@@ -46,14 +50,9 @@ export class Options {
     this.joinNewVoiceChannel = opts.joinNewVoiceChannel;
     this.streamType = opts.streamType;
     this.directLink = opts.directLink;
+    this.ffmpeg = this.#ffmpegOption(options);
     checkInvalidKey(opts, this, "DisTubeOptions");
     this.#validateOptions();
-    if (this.youtubeDL) {
-      process.emitWarning(
-        "DisTubeOptions.youtubeDL is deprecated, set it to false and use `@distube/yt-dlp` instead.",
-        "DeprecationWarning",
-      );
-    }
   }
 
   #validateOptions(options = this) {
@@ -71,7 +70,7 @@ export class Options {
     ]);
     const numberOptions = new Set(["searchCooldown", "emptyCooldown", "searchSongs"]);
     const stringOptions = new Set();
-    const objectOptions = new Set(["customFilters", "ytdlOptions"]);
+    const objectOptions = new Set(["customFilters", "ytdlOptions", "ffmpeg"]);
     const optionalOptions = new Set(["youtubeCookie", "customFilters"]);
 
     for (const [key, value] of Object.entries(options)) {
@@ -100,5 +99,31 @@ export class Options {
         }
       }
     }
+  }
+
+  #ffmpegOption(opts: DisTubeOptions) {
+    let path: string;
+    const args: {
+      global: FFmpegArgs;
+      input: FFmpegArgs;
+      output: FFmpegArgs;
+    } = { global: {}, input: {}, output: {} };
+    /* eslint-disable deprecation/deprecation,no-console */
+    if (opts.ffmpegPath) {
+      console.warn("`DisTubeOptions.ffmpegPath` is deprecated. Use `ffmpeg.path` instead.");
+      path = opts.ffmpegPath;
+    }
+    if (opts.ffmpegDefaultArgs) {
+      console.warn("`DisTubeOptions.ffmpegDefaultArgs` is deprecated. Use `ffmpeg.args` instead.");
+      args.global = opts.ffmpegDefaultArgs;
+    }
+    /* eslint-enable deprecation/deprecation,no-console */
+    path ??= opts.ffmpeg?.path ?? "ffmpeg";
+    if (opts.ffmpeg?.args) {
+      if (opts.ffmpeg.args.global) args.global = opts.ffmpeg.args.global;
+      if (opts.ffmpeg.args.input) args.input = opts.ffmpeg.args.input;
+      if (opts.ffmpeg.args.output) args.output = opts.ffmpeg.args.output;
+    }
+    return { path, args };
   }
 }

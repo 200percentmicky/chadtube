@@ -2,45 +2,49 @@ name: Documentation Generator
 on:
   push:
     branches:
-      - "*"
-      - "!docs"
-    tags:
-      - "*"
+      - "main"
 jobs:
   docs:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: "yarn"
-          cache-dependency-path: yarn.lock
+          node-version: 20
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: yarn --immutable
+        run: pnpm install --frozen-lockfile
 
       - name: Checkout docs branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: "docs"
-          path: "docs"
+          repository: distubejs/distubejs.github.io
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.DISTUBE_TOKEN }}
+
+      - name: Delete old docs
+        run: find gh-pages -mindepth 1 ! -regex 'gh-pages/\.git.*' ! -name 'CNAME' -exec rm -rf {} +
 
       - name: Generate documentation
-        run: yarn docs
-
-      - name: Move generated docs file
-        run: mv docs.json docs/${{ github.ref_name }}.json
+        run: pnpm run docs
 
       - name: Commit and push
         run: |
-          cd docs
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          rsync -av docs/ gh-pages/
+          cd gh-pages
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add .
-          git commit -m "Docs build for ${{ github.ref_type }} ${{ github.ref_name }}: ${{ github.sha }}"
+          git commit -m "${{ github.repository }}@${{ github.sha }} 🚀"
           git push

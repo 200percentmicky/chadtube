@@ -1,26 +1,24 @@
 import { GuildIdManager } from ".";
-import { DisTubeError, DisTubeStream, Queue, RepeatMode, objectKeys } from "../..";
+import { DisTubeError, DisTubeStream, Events, Queue, RepeatMode, checkFFmpeg, objectKeys } from "../..";
 import type { Song } from "../..";
 import type { GuildTextBasedChannel, VoiceBasedChannel } from "discord.js";
 
 /**
  * Queue manager
- * @extends GuildIdManager
  */
 export class QueueManager extends GuildIdManager<Queue> {
   /**
    * Collection of {@link Queue}.
-   * @name QueueManager#collection
-   * @type {Discord.Collection<string, Queue>}
    */
 
   /**
    * Create a {@link Queue}
-   * @private
-   * @param {Discord.BaseGuildVoiceChannel} channel A voice channel
-   * @param {Song|Song[]} song First song
-   * @param {Discord.BaseGuildTextChannel} textChannel Default text channel
-   * @returns {Promise<Queue|true>} Returns `true` if encounter an error
+   *
+   * @param channel     - A voice channel
+   * @param song        - First song
+   * @param textChannel - Default text channel
+   *
+   * @returns Returns `true` if encounter an error
    */
   async create(
     channel: VoiceBasedChannel,
@@ -32,10 +30,11 @@ export class QueueManager extends GuildIdManager<Queue> {
     const queue = new Queue(this.distube, voice, song, textChannel);
     await queue._taskQueue.queuing();
     try {
+      checkFFmpeg(this.distube);
       await voice.join();
       this.#voiceEventHandler(queue);
       this.add(queue.id, queue);
-      this.emit("initQueue", queue);
+      this.emit(Events.INIT_QUEUE, queue);
       const err = await this.playSong(queue);
       return err || queue;
     } finally {
@@ -45,22 +44,20 @@ export class QueueManager extends GuildIdManager<Queue> {
 
   /**
    * Get a Queue from this QueueManager.
-   * @method get
-   * @memberof QueueManager#
-   * @param {GuildIdResolvable} guild Resolvable thing from a guild
-   * @returns {Queue?}
+   *
+   * @param guild - Resolvable thing from a guild
    */
 
   /**
    * Listen to DisTubeVoice events and handle the Queue
-   * @private
-   * @param {Queue} queue Queue
+   *
+   * @param queue - Queue
    */
   #voiceEventHandler(queue: Queue) {
     queue._listeners = {
       disconnect: error => {
         queue.remove();
-        this.emit("disconnect", queue);
+        this.emit(Events.DISCONNECT, queue);
         if (error) this.emitError(error, queue.textChannel);
       },
       error: error => this.#handlePlayingError(queue, error),
@@ -73,9 +70,8 @@ export class QueueManager extends GuildIdManager<Queue> {
 
   /**
    * Whether or not emit playSong event
-   * @param {Queue} queue Queue
-   * @private
-   * @returns {boolean}
+   *
+   * @param queue - Queue
    */
   #emitPlaySong(queue: Queue): boolean {
     return (
@@ -87,12 +83,11 @@ export class QueueManager extends GuildIdManager<Queue> {
 
   /**
    * Handle the queue when a Song finish
-   * @private
-   * @param {Queue} queue queue
-   * @returns {Promise<void>}
+   *
+   * @param queue - queue
    */
   async #handleSongFinish(queue: Queue): Promise<void> {
-    this.emit("finishSong", queue, queue.songs[0]);
+    this.emit(Events.FINISH_SONG, queue, queue.songs[0]);
     await queue._taskQueue.queuing();
     try {
       if (queue.stopped) return;
@@ -106,12 +101,12 @@ export class QueueManager extends GuildIdManager<Queue> {
           try {
             await queue.addRelatedSong();
           } catch {
-            this.emit("noRelated", queue);
+            this.emit(Events.NO_RELATED, queue);
           }
         }
         if (queue.songs.length <= 1) {
           if (this.options.leaveOnFinish) queue.voice.leave();
-          if (!queue.autoplay) this.emit("finish", queue);
+          if (!queue.autoplay) this.emit(Events.FINISH, queue);
           queue.remove();
           return;
         }
@@ -127,7 +122,7 @@ export class QueueManager extends GuildIdManager<Queue> {
       queue._next = queue._prev = false;
       queue.beginTime = 0;
       const err = await this.playSong(queue);
-      if (!err && emitPlaySong) this.emit("playSong", queue, queue.songs[0]);
+      if (!err && emitPlaySong) this.emit(Events.PLAY_SONG, queue, queue.songs[0]);
     } finally {
       queue._taskQueue.resolve();
     }
@@ -135,9 +130,9 @@ export class QueueManager extends GuildIdManager<Queue> {
 
   /**
    * Handle error while playing
-   * @private
-   * @param {Queue} queue queue
-   * @param {Error} error error
+   *
+   * @param queue - queue
+   * @param error - error
    */
   #handlePlayingError(queue: Queue, error: Error) {
     const song = queue.songs.shift() as Song;
@@ -152,7 +147,7 @@ export class QueueManager extends GuildIdManager<Queue> {
       queue._next = queue._prev = false;
       queue.beginTime = 0;
       this.playSong(queue).then(e => {
-        if (!e) this.emit("playSong", queue, queue.songs[0]);
+        if (!e) this.emit(Events.PLAY_SONG, queue, queue.songs[0]);
       });
     } else {
       queue.stop();
@@ -161,28 +156,36 @@ export class QueueManager extends GuildIdManager<Queue> {
 
   /**
    * Create a ytdl stream
-   * @param {Queue} queue Queue
-   * @returns {DisTubeStream}
+   *
+   * @param queue - Queue
    */
   createStream(queue: Queue): DisTubeStream {
     const song = queue.songs[0];
     const { duration, source, streamURL } = song;
-    const filterValues = queue.filters.filters.map(x => x.values);
-    const ffmpegArgs = filterValues.length ? ["-af", filterValues.join(",")] : undefined;
     const streamOptions = {
-      ffmpegArgs,
+      ffmpeg: {
+        path: this.options.ffmpeg.path,
+        args: {
+          global: { ...this.options.ffmpeg.args.global },
+          input: { ...this.options.ffmpeg.args.input },
+          output: { ...this.options.ffmpeg.args.output, ...queue.filters.ffmpegArgs },
+        },
+      },
       seek: duration ? queue.beginTime : undefined,
       type: this.options.streamType,
     };
+
     if (source === "youtube") return DisTubeStream.YouTube(song, streamOptions);
-    return DisTubeStream.DirectLink(streamURL as string, streamOptions);
+    if (!streamURL) throw new Error("No streamURL, something went wrong");
+    return DisTubeStream.DirectLink(streamURL, streamOptions);
   }
 
   /**
    * Play a song on voice connection
-   * @private
-   * @param {Queue} queue The guild queue
-   * @returns {Promise<boolean>} error?
+   *
+   * @param queue - The guild queue
+   *
+   * @returns error?
    */
   async playSong(queue: Queue): Promise<boolean> {
     if (!queue) return true;
@@ -198,6 +201,7 @@ export class QueueManager extends GuildIdManager<Queue> {
         return true;
       }
       const stream = this.createStream(queue);
+      stream.on("debug", data => this.emit(Events.FFMPEG_DEBUG, `[${queue.id}]: ${data}`));
       queue.voice.play(stream);
       song.streamURL = stream.url;
       return false;

@@ -2,8 +2,20 @@ import { Options, defaultOptions } from "@";
 
 test("Default DisTubeOptions", () => {
   expect(new Options({})).toEqual({
+    directLink: true,
+    emitAddListWhenCreatingQueue: true,
+    emitAddSongWhenCreatingQueue: true,
     emitNewSongOnly: false,
     emptyCooldown: 60,
+    ffmpeg: {
+      args: {
+        global: {},
+        input: {},
+        output: {},
+      },
+      path: "ffmpeg",
+    },
+    joinNewVoiceChannel: true,
     leaveOnEmpty: true,
     leaveOnFinish: false,
     leaveOnStop: true,
@@ -12,13 +24,8 @@ test("Default DisTubeOptions", () => {
     savePreviousSongs: true,
     searchCooldown: 60,
     searchSongs: 0,
-    youtubeCookie: undefined,
-    ytdlOptions: {},
-    emitAddListWhenCreatingQueue: true,
-    emitAddSongWhenCreatingQueue: true,
-    joinNewVoiceChannel: true,
     streamType: 0,
-    directLink: true,
+    ytdlOptions: {},
   });
 });
 
@@ -34,13 +41,12 @@ const typeOfOption = (option: string) => {
 };
 
 test("Validate DisTubeOptions", () => {
-  const n: any = NaN;
   expect(() => {
-    new Options(n);
+    new Options(<any>NaN);
   }).toThrow("Expected 'object' for 'DisTubeOptions', but got NaN");
   for (const option of Object.keys(defaultOptions)) {
     const options = {};
-    options[option] = n;
+    options[option] = NaN;
     expect(() => {
       new Options(options);
     }).toThrow(`Expected '${typeOfOption(option)}' for 'DisTubeOptions.${option}', but got NaN`);
