@@ -21,7 +21,6 @@
     "build": "tsup",
     "build:check": "tsc --noEmit",
     "update": "pnpm up -L",
-    "postinstall": "husky",
     "prepublishOnly": "pnpm run lint && pnpm run test",
     "prepack": "pnpm run build && pinst --disable",
     "prepare": "npm run build",
