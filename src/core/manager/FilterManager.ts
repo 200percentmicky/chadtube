@@ -1,6 +1,6 @@
 import { BaseManager } from ".";
-import { DisTubeError } from "../..";
-import type { FFmpegArg as FFmpegArgsValue, Filter, FilterResolvable, Queue } from "../..";
+import _ from "lodash";
+import type { FFmpegArg as FFmpegArgsValue, Filter, Queue } from "../..";
 
 /**
  * Manage filters of a playing {@link Queue}
@@ -10,109 +10,76 @@ export class FilterManager extends BaseManager<Filter> {
    * The queue to manage
    */
   queue: Queue;
+  filters: any[];
   constructor(queue: Queue) {
     super(queue.distube);
     this.queue = queue;
-  }
-
-  #resolve(filter: FilterResolvable): Filter {
-    if (typeof filter === "object" && typeof filter.name === "string" && typeof filter.value === "string") {
-      return filter;
-    }
-    if (typeof filter === "string" && Object.prototype.hasOwnProperty.call(this.distube.filters, filter)) {
-      return {
-        name: filter,
-        value: this.distube.filters[filter],
-      };
-    }
-    throw new DisTubeError("INVALID_TYPE", "FilterResolvable", filter, "filter");
+    this.filters = [];
   }
 
   #apply() {
-    this.queue._beginTime = this.queue.currentTime;
-    this.queue.play(false);
-  }
-
-  /**
-   * Enable a filter or multiple filters to the manager
-   * @param filterOrFilters - The filter or filters to enable
-   * @param override        - Wether or not override the applied filter with new filter value
-   */
-  add(filterOrFilters: FilterResolvable | FilterResolvable[], override = false) {
-    if (Array.isArray(filterOrFilters)) {
-      for (const filter of filterOrFilters) {
-        const ft = this.#resolve(filter);
-        if (override || !this.has(ft)) this.collection.set(ft.name, ft);
-      }
-    } else {
-      const ft = this.#resolve(filterOrFilters);
-      if (override || !this.has(ft)) this.collection.set(ft.name, ft);
+    if (!this.queue.songs[0].isLive) {
+      this.queue._beginTime = this.queue.currentTime;
     }
-    this.#apply();
-    return this;
+    this.queues.playSong(this.queue);
   }
 
   /**
    * Clear enabled filters of the manager
    */
   clear() {
-    return this.set([]);
+    return this.set();
   }
 
   /**
-   * Set the filters applied to the manager
-   * @param filters - The filters to apply
+   * Set the filters applied to the manager.
+   *
+   * @param {string | null} filterName The name of the filter, or null to remove all filters.
+   * @param {string | undefined} filterValue The value of the filter, or undefined to remove the filter.
+   * @returns {Filter[]}
    */
-  set(filters: FilterResolvable[]) {
-    if (!Array.isArray(filters)) throw new DisTubeError("INVALID_TYPE", "Array<FilterResolvable>", filters, "filters");
-    this.collection.clear();
-    for (const f of filters) {
-      const filter = this.#resolve(f);
-      this.collection.set(filter.name, filter);
+  set(filterName: string | undefined = undefined, filterValue: string | undefined = undefined): Filter[] {
+    const filterList = this.filters?.find((x: { name: string | null }) => x.name === filterName);
+    if (filterName && !filterValue) {
+      // Assuming that you want to remove the filter.
+      if (!this.filters) throw new TypeError("No filters are applied to the player.");
+      if (!filterList) throw new TypeError(`The filter ${filterName} is not applied to the player.`);
+      _.remove(this.filters, n => n === filterList);
+    }
+    if (!filterList) {
+      if (!filterName) {
+        if (this.filters?.length === 0) throw new TypeError("No filters are applied to the player.");
+        this.filters = [];
+      } else {
+        const filterPush = {
+          name: filterName,
+          value: filterValue,
+        };
+        this.filters?.push(filterPush);
+      }
+    } else {
+      filterList.value = filterValue;
     }
     this.#apply();
-    return this;
-  }
-
-  #removeFn(f: FilterResolvable) {
-    return this.collection.delete(this.#resolve(f).name);
-  }
-
-  /**
-   * Disable a filter or multiple filters
-   * @param filterOrFilters - The filter or filters to disable
-   */
-  remove(filterOrFilters: FilterResolvable | FilterResolvable[]) {
-    if (Array.isArray(filterOrFilters)) filterOrFilters.forEach(f => this.#removeFn(f));
-    else this.#removeFn(filterOrFilters);
-    this.#apply();
-    return this;
-  }
-
-  /**
-   * Check whether a filter enabled or not
-   * @param filter - The filter to check
-   */
-  has(filter: FilterResolvable) {
-    return this.collection.has(typeof filter === "string" ? filter : this.#resolve(filter).name);
+    return this.filters;
   }
 
   /**
    * Array of enabled filter names
    */
   get names(): string[] {
-    return [...this.collection.keys()];
+    return [...this.filters.map(f => f.name)];
   }
 
   /**
    * Array of enabled filters
    */
   get values(): Filter[] {
-    return [...this.collection.values()];
+    return [...this.filters.map(f => f.value)];
   }
 
   get ffmpegArgs(): FFmpegArgsValue {
-    return this.size ? { af: this.values.map(f => f.value).join(",") } : {};
+    return this.filters.length > 0 ? { af: this.filters.map(f => f.value).join(",") } : {};
   }
 
   override toString() {
