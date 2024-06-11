@@ -51,6 +51,8 @@
   "funding": "https://github.com/skick1234/DisTube?sponsor",
   "homepage": "https://distube.js.org/",
   "dependencies": {
+    "@types/lodash": "^4.17.5",
+    "lodash": "^4.17.21",
     "tiny-typed-emitter": "^2.1.0",
     "undici": "^6.18.2"
   },
