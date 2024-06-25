@@ -20,10 +20,10 @@
     "prettier": "prettier --write \"**/*.{ts,json,yml,yaml,md}\"",
     "build": "tsup",
     "type": "tsc --noEmit",
-    "update": "npm up -L \"!eslint\"",
+    "update": "pnpm up -L \"!eslint\"",
     "prepare": "husky",
-    "prepublishOnly": "npm run lint && npm run test",
-    "prepack": "npm run build"
+    "prepublishOnly": "pnpm run lint && pnpm run test",
+    "prepack": "pnpm run build"
   },
   "repository": {
     "type": "git",
