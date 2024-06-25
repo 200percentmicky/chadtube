@@ -21,7 +21,7 @@
     "build": "tsup",
     "type": "tsc --noEmit",
     "update": "npm up -L \"!eslint\"",
-    "prepare": "husky",
+    "prepare": "husky && npm run build",
     "prepublishOnly": "npm run lint && npm run test",
     "prepack": "npm run build"
   },
