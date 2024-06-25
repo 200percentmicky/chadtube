@@ -23,8 +23,7 @@
     "update": "pnpm up -L \"!eslint\"",
     "prepare": "husky",
     "prepublishOnly": "pnpm run lint && pnpm run test",
-    "prepack": "npm run build",
-    "dev:add-docs-to-worktree": "git worktree add --track -b docs docs origin/docs"
+    "prepack": "pnpm run build"
   },
   "repository": {
     "type": "git",
