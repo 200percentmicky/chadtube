@@ -21,7 +21,7 @@ export class FilterManager extends BaseManager<Filter> {
     if (!this.queue.songs[0].isLive) {
       this.queue._beginTime = this.queue.currentTime;
     }
-    this.queues.playSong(this.queue);
+    this.queue.play(false);
   }
 
   /**
