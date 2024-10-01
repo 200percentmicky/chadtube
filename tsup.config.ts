@@ -4,7 +4,7 @@ import { esbuildPluginVersionInjector } from "esbuild-plugin-version-injector";
 export default defineConfig({
   platform: "node",
   clean: true,
-  dts: true,
+  dts: false,
   entry: ["src/index.ts"],
   format: ["cjs", "esm"],
   minify: false,
