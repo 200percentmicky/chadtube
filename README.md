@@ -1,3 +1,23 @@
+# ChadTube
+A fork of DisTube!
+
+This fork is mainly used for [ChadMusic](https://github.com/200percentmicky/chadmusic), but can be used for your project if you like. It adds support for multiple filters with interchangable values during playback. All arguments for each provided filter can be changed at anytime, and static filters will no longer need to be provided when initializing the client.
+
+The following has been changed:
+- `FilterManager`
+ - Live streams are refreshed when filters are applied.
+ - `add()`, `remove()`, and `has()` have been removed. Instead, `set()` manages all filters within the manager.
+ - `set()` parameters and types are as followed:
+   - `set(filterName: string | undefined, filterValue: string | undefined) => Filter[]`
+   - `filterName` is the name of the filter.
+   - `filterValue` is the ffmpeg argument to provide to the filter.
+- lodash has been added as a dependency.
+
+> [!WARNING]
+> I will only be providing support for the functionality that was altered or added in this fork. For all other issues pertaining to DisTube, please create an issue in the main repository instead.
+
+...and now for something completely different.
+
 <div align="center">
   <p>
     <a href="https://www.npmjs.com/package/distube" target="_blank"><img src="https://nodei.co/npm/distube.png?downloads=true&downloadRank=true&stars=true"/></a>
