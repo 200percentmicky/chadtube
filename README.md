@@ -18,6 +18,8 @@ The following has been changed:
 
 ...and now for something completely different.
 
+-----
+
 <div align="center">
   <p>
     <a href="https://www.npmjs.com/package/distube" target="_blank"><img src="https://nodei.co/npm/distube.png?downloads=true&downloadRank=true&stars=true"/></a>
