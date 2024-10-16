@@ -5,12 +5,12 @@ This fork is mainly used for [ChadMusic](https://github.com/200percentmicky/chad
 
 The following has been changed:
 - `FilterManager`
- - Live streams are refreshed when filters are applied.
- - `add()`, `remove()`, and `has()` have been removed. Instead, `set()` manages all filters within the manager.
- - `set()` parameters and types are as followed:
-   - `set(filterName: string | undefined, filterValue: string | undefined) => Filter[]`
-   - `filterName` is the name of the filter.
-   - `filterValue` is the ffmpeg argument to provide to the filter.
+   - Live streams are refreshed when filters are applied.
+   - `add()`, `remove()`, and `has()` have been removed. Instead, `set()` manages all filters within the manager.
+   - `set()` parameters and types are as followed:
+     - `set(filterName: string | undefined, filterValue: string | undefined) => Filter[]`
+     - `filterName` is the name of the filter.
+     - `filterValue` is the ffmpeg argument to provide to the filter.
 - lodash has been added as a dependency.
 
 > [!WARNING]
