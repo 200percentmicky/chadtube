@@ -9,7 +9,7 @@ The following has been changed:
    - `add()`, `remove()`, and `has()` have been removed. Instead, `set()` manages all filters within the manager.
    - `set()` parameters and types are as followed:
      - `set(filterName: string | undefined, filterValue: string | undefined) => Filter[]`
-     - `filterName` is the name of the filter.
+     - `filterName` is the name of the filter. Providing a `null` value removes the filter.
      - `filterValue` is the ffmpeg argument to provide to the filter.
 - lodash has been added as a dependency.
 
