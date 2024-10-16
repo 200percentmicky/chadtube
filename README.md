@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This branch has become rather stale and hasn't been updated since the last release of DisTube v4. Please switch to the `v5` branch for an up to date build.
+
 <div align="center">
   <p>
     <a href="https://www.npmjs.com/package/distube" target="_blank"><img src="https://nodei.co/npm/distube.png?downloads=true&downloadRank=true&stars=true"/></a>
