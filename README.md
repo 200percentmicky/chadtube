@@ -10,7 +10,7 @@ The following has been changed:
    - `set()` parameters and types are as followed:
      - `set(filterName: string | undefined, filterValue: string | undefined) => Filter[]`
      - `filterName` is the name of the filter. Providing a `null` value removes all active filters.
-     - `filterValue` is the ffmpeg argument to provide to the filter. Providing a null value removes the specified filter.
+     - `filterValue` is the ffmpeg argument to provide to the filter. Providing a `null` value removes the specified filter.
 - lodash has been added as a dependency.
 
 > [!WARNING]
