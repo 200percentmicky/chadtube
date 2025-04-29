@@ -21,6 +21,7 @@
 - [@distube/yt-dlp](https://www.npmjs.com/package/@distube/yt-dlp): Use `yt-dlp` for supporting 700+ sites.
 - [@distube/direct-link](https://www.npmjs.com/package/@distube/direct-link): Support direct audio links.
 - [@distube/file](https://www.npmjs.com/package/@distube/file): Support local files.
+- [@distube/bandlab](https://www.npmjs.com/package/@distube/bandlab): Support BandLab.
 
 # Unofficial Plugins
 
@@ -29,6 +30,10 @@
 - [distube-apple-music](https://www.npmjs.com/package/distube-apple-music): Support Apple Music.
 - [distube-tidal](https://www.npmjs.com/package/distube-tidal): Support Tidal.
 - [distube-yandex-music-plugin](https://www.npmjs.com/package/distube-yandex-music-plugin): Support Yandex Music.
+
+### PlayableExtractorPlugin
+
+- [distube-vk-music-plugin](https://www.npmjs.com/package/distube-vk-music-plugin): Support VK Music.
 
 # Bots
 
