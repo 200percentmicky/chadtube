@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { Options, defaultOptions } from "@";
+import { defaultOptions, Options } from "@";
 
 test("Default DisTubeOptions", () => {
   expect(new Options({})).toEqual({
@@ -26,7 +26,7 @@ const typeOfOption = (option: string) => {
     case "plugins":
       return "Array<Plugin>";
     default:
-      return typeof defaultOptions[option];
+      return typeof (defaultOptions as any)[option];
   }
 };
 
@@ -36,7 +36,7 @@ test("Validate DisTubeOptions", () => {
   }).toThrow("Expected 'object' for 'DisTubeOptions', but got NaN");
   for (const option of Object.keys(defaultOptions)) {
     const options = {};
-    options[option] = NaN;
+    (options as any)[option] = NaN;
     expect(() => {
       new Options(options);
     }).toThrow(`Expected '${typeOfOption(option)}' for 'DisTubeOptions.${option}', but got NaN`);

@@ -1,7 +1,15 @@
-import { DisTubeBase, FilterManager } from "../core";
-import { DisTubeError, Events, RepeatMode, TaskQueue, formatDuration, objectKeys } from "..";
 import type { GuildTextBasedChannel, Snowflake } from "discord.js";
-import type { DisTube, DisTubeVoice, DisTubeVoiceEvents, FFmpegArgs, Song } from "..";
+import { DEFAULT_VOLUME } from "../constant";
+import { DisTubeBase } from "../core/DisTubeBase";
+import type { DisTubeVoice } from "../core/DisTubeVoice";
+import { FilterManager } from "../core/manager/FilterManager";
+import type { DisTube } from "../DisTube";
+import type { DisTubeVoiceEvents, FFmpegArgs, JumpOptions } from "../type";
+import { Events, RepeatMode } from "../type";
+import { formatDuration, objectKeys } from "../util";
+import { DisTubeError } from "./DisTubeError";
+import type { Song } from "./Song";
+import { TaskQueue } from "./TaskQueue";
 
 /**
  * Represents a queue.
@@ -28,7 +36,10 @@ export class Queue extends DisTubeBase {
    */
   stopped: boolean;
   /**
-   * Whether or not the stream is currently playing.
+   * Whether or not the queue is active.
+   *
+   * Note: This remains `true` when paused. It only becomes `false` when stopped.
+   * @deprecated Use `!queue.paused` to check if audio is playing. Will be removed in v6.0.
    */
   playing: boolean;
   /**
@@ -53,25 +64,25 @@ export class Queue extends DisTubeBase {
    * The text channel of the Queue. (Default: where the first command is called).
    */
   textChannel?: GuildTextBasedChannel;
-  #filters: FilterManager;
   /**
    * What time in the song to begin (in seconds).
+   * @internal
    */
   _beginTime: number;
+  #filters: FilterManager;
   /**
-   * Whether or not the last song was skipped to next song.
+   * Whether or not the queue is being updated manually (skip, jump, previous)
+   * @internal
    */
-  _next: boolean;
-  /**
-   * Whether or not the last song was skipped to previous song.
-   */
-  _prev: boolean;
+  _manualUpdate: boolean;
   /**
    * Task queuing system
+   * @internal
    */
   _taskQueue: TaskQueue;
   /**
    * {@link DisTubeVoice} listener
+   * @internal
    */
   _listeners?: DisTubeVoiceEvents;
   /**
@@ -84,12 +95,11 @@ export class Queue extends DisTubeBase {
     super(distube);
     this.voice = voice;
     this.id = voice.id;
-    this.volume = 50;
+    this.volume = DEFAULT_VOLUME;
     this.songs = [];
     this.previousSongs = [];
     this.stopped = false;
-    this._next = false;
-    this._prev = false;
+    this._manualUpdate = false;
     this.playing = false;
     this.paused = false;
     this.repeatMode = RepeatMode.DISABLED;
@@ -104,6 +114,23 @@ export class Queue extends DisTubeBase {
       input: { ...this.options.ffmpeg.args.input },
       output: { ...this.options.ffmpeg.args.output },
     };
+  }
+  #addToPreviousSongs(songs: Song | Song[]) {
+    if (Array.isArray(songs)) {
+      if (this.options.savePreviousSongs) {
+        this.previousSongs.push(...songs);
+      } else {
+        this.previousSongs.push(...songs.map(s => ({ id: s.id }) as Song));
+      }
+    } else if (this.options.savePreviousSongs) {
+      this.previousSongs.push(songs);
+    } else {
+      this.previousSongs.push({ id: songs.id } as Song);
+    }
+  }
+  #stop() {
+    this._manualUpdate = true;
+    this.voice.stop();
   }
   /**
    * The client user as a `GuildMember` of this queue's guild
@@ -133,7 +160,7 @@ export class Queue extends DisTubeBase {
    * What time in the song is playing (in seconds).
    */
   get currentTime() {
-    return this.voice.playbackDuration + this._beginTime;
+    return this.voice.playbackTime;
   }
   /**
    * Formatted {@link Queue#currentTime} string.
@@ -181,13 +208,15 @@ export class Queue extends DisTubeBase {
     return this;
   }
   /**
-   * @returns `true` if the queue is playing
+   * @returns `true` if the queue is active (not stopped)
+   * @deprecated Use `!queue.paused` to check if audio is playing. Will be removed in v6.0.
    */
   isPlaying(): boolean {
     return this.playing;
   }
   /**
    * @returns `true` if the queue is paused
+   * @deprecated Use `queue.paused` property instead. Will be removed in v6.0.
    */
   isPaused(): boolean {
     return this.paused;
@@ -236,22 +265,11 @@ export class Queue extends DisTubeBase {
    * Skip the playing song if there is a next song in the queue. <info>If {@link
    * Queue#autoplay} is `true` and there is no up next song, DisTube will add and
    * play a related song.</info>
+   * @param options - Skip options
    * @returns The song will skip to
    */
-  async skip(): Promise<Song> {
-    await this._taskQueue.queuing();
-    try {
-      if (this.songs.length <= 1) {
-        if (this.autoplay) await this.addRelatedSong();
-        else throw new DisTubeError("NO_UP_NEXT");
-      }
-      const song = this.songs[1];
-      this._next = true;
-      this.voice.stop();
-      return song;
-    } finally {
-      this._taskQueue.resolve();
-    }
+  async skip(options?: JumpOptions): Promise<Song> {
+    return this.jump(1, options);
   }
 
   /**
@@ -262,13 +280,15 @@ export class Queue extends DisTubeBase {
     await this._taskQueue.queuing();
     try {
       if (!this.options.savePreviousSongs) throw new DisTubeError("DISABLED_OPTION", "savePreviousSongs");
-      if (this.previousSongs?.length === 0 && this.repeatMode !== RepeatMode.QUEUE) {
+      if (this.previousSongs.length === 0 && this.repeatMode !== RepeatMode.QUEUE) {
         throw new DisTubeError("NO_PREVIOUS");
       }
       const song =
-        this.repeatMode === 2 ? this.songs[this.songs.length - 1] : this.previousSongs[this.previousSongs.length - 1];
-      this._prev = true;
-      this.voice.stop();
+        this.repeatMode === RepeatMode.QUEUE && this.previousSongs.length === 0
+          ? (this.songs[this.songs.length - 1] as Song)
+          : (this.previousSongs.pop() as Song);
+      this.songs.unshift(song);
+      this.#stop();
       return song;
     } finally {
       this._taskQueue.resolve();
@@ -298,35 +318,38 @@ export class Queue extends DisTubeBase {
    * one is -1, -2,...
    * if `num` is invalid number
    * @param position - The song position to play
+   * @param options  - Skip options
    * @returns The new Song will be played
    */
-  async jump(position: number): Promise<Song> {
+  async jump(position: number, options?: JumpOptions): Promise<Song> {
     await this._taskQueue.queuing();
     try {
       if (typeof position !== "number") throw new DisTubeError("INVALID_TYPE", "number", position, "position");
       if (!position || position > this.songs.length || -position > this.previousSongs.length) {
         throw new DisTubeError("NO_SONG_POSITION");
       }
-      let nextSong: Song;
       if (position > 0) {
-        const nextSongs = this.songs.splice(position - 1);
-        if (this.options.savePreviousSongs) {
-          this.previousSongs.push(...this.songs);
-        } else {
-          this.previousSongs.push(...this.songs.map(s => ({ id: s.id }) as Song));
+        if (position >= this.songs.length) {
+          if (this.autoplay) {
+            await this._addRelatedSong();
+          } else {
+            throw new DisTubeError("NO_UP_NEXT");
+          }
         }
-        this.songs = nextSongs;
-        this._next = true;
-        nextSong = nextSongs[1];
+        const skipped = this.songs.splice(0, position);
+        if (options?.requeue) {
+          this.songs.push(...skipped);
+        } else {
+          this.#addToPreviousSongs(skipped);
+        }
       } else if (!this.options.savePreviousSongs) {
         throw new DisTubeError("DISABLED_OPTION", "savePreviousSongs");
       } else {
-        this._prev = true;
-        if (position !== -1) this.songs.unshift(...this.previousSongs.splice(position + 1));
-        nextSong = this.previousSongs[this.previousSongs.length - 1];
+        const skipped = this.previousSongs.splice(position);
+        this.songs.unshift(...skipped);
       }
-      this.voice.stop();
-      return nextSong;
+      this.#stop();
+      return this.songs[0];
     } finally {
       this._taskQueue.resolve();
     }
@@ -351,12 +374,17 @@ export class Queue extends DisTubeBase {
    * @param time - Time in seconds
    * @returns The guild queue
    */
-  seek(time: number): Queue {
-    if (typeof time !== "number") throw new DisTubeError("INVALID_TYPE", "number", time, "time");
-    if (isNaN(time) || time < 0) throw new DisTubeError("NUMBER_COMPARE", "time", "bigger or equal to", 0);
-    this._beginTime = time;
-    this.play(false);
-    return this;
+  async seek(time: number): Promise<Queue> {
+    await this._taskQueue.queuing();
+    try {
+      if (typeof time !== "number") throw new DisTubeError("INVALID_TYPE", "number", time, "time");
+      if (Number.isNaN(time) || time < 0) throw new DisTubeError("NUMBER_COMPARE", "time", "bigger or equal to", 0);
+      this._beginTime = time;
+      await this.play(false);
+      return this;
+    } finally {
+      this._taskQueue.resolve();
+    }
   }
   async #getRelatedSong(current: Song): Promise<Song[]> {
     const plugin = await this.handler._getPluginFromSong(current);
@@ -364,11 +392,12 @@ export class Queue extends DisTubeBase {
     return [];
   }
   /**
-   * Add a related song of the playing song to the queue
-   * @returns The added song
+   * Internal implementation of addRelatedSong without task queue protection.
+   * Used by methods that already hold the task queue lock.
+   * @internal
    */
-  async addRelatedSong(): Promise<Song> {
-    const current = this.songs?.[0];
+  async _addRelatedSong(song?: Song): Promise<Song> {
+    const current = song ?? this.songs?.[0];
     if (!current) throw new DisTubeError("NO_PLAYING_SONG");
     const prevIds = this.previousSongs.map(p => p.id);
     const relatedSongs = (await this.#getRelatedSong(current)).filter(s => !prevIds.includes(s.id));
@@ -378,12 +407,25 @@ export class Queue extends DisTubeBase {
       if (altSong) relatedSongs.push(...(await this.#getRelatedSong(altSong)).filter(s => !prevIds.includes(s.id)));
       this.debug(`[${this.id}] Getting related songs from streamed song: ${altSong}`);
     }
-    const song = relatedSongs[0];
-    if (!song) throw new DisTubeError("NO_RELATED");
-    song.metadata = current.metadata;
-    song.member = this.clientMember;
-    this.addToQueue(song);
-    return song;
+    const nextSong = relatedSongs[0];
+    if (!nextSong) throw new DisTubeError("NO_RELATED");
+    nextSong.metadata = current.metadata;
+    nextSong.member = this.clientMember;
+    this.addToQueue(nextSong);
+    return nextSong;
+  }
+  /**
+   * Add a related song of the playing song to the queue
+   * @param song - The song to get related songs from. Defaults to the current playing song.
+   * @returns The added song
+   */
+  async addRelatedSong(song?: Song): Promise<Song> {
+    await this._taskQueue.queuing();
+    try {
+      return await this._addRelatedSong(song);
+    } finally {
+      this._taskQueue.resolve();
+    }
   }
   /**
    * Stop the guild stream and delete the queue
@@ -402,7 +444,7 @@ export class Queue extends DisTubeBase {
    */
   remove() {
     this.playing = false;
-    this.paused = false;
+    this.paused = true;
     this.stopped = true;
     this.songs = [];
     this.previousSongs = [];

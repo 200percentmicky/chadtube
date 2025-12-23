@@ -1,14 +1,4 @@
 import type {
-  DisTubeError,
-  DisTubeVoice,
-  ExtractorPlugin,
-  InfoExtractorPlugin,
-  PlayableExtractorPlugin,
-  Playlist,
-  Queue,
-  Song,
-} from ".";
-import type {
   Guild,
   GuildMember,
   GuildTextBasedChannel,
@@ -18,6 +8,16 @@ import type {
   VoiceBasedChannel,
   VoiceState,
 } from "discord.js";
+import type {
+  DisTubeError,
+  DisTubeVoice,
+  ExtractorPlugin,
+  InfoExtractorPlugin,
+  PlayableExtractorPlugin,
+  Playlist,
+  Queue,
+  Song,
+} from ".";
 
 export type Awaitable<T = any> = T | PromiseLike<T>;
 
@@ -238,6 +238,14 @@ export type PlayHandlerOptions = {
    */
   textChannel?: GuildTextBasedChannel;
 };
+
+export interface JumpOptions {
+  /**
+   * [Default: false] Whether or not skipped song(s) will be added to the end of the
+   * queue
+   */
+  requeue?: boolean;
+}
 
 export interface PlayOptions<T = unknown> extends PlayHandlerOptions, ResolveOptions<T> {
   /**

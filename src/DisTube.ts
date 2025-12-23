@@ -1,15 +1,28 @@
+import type { Client, VoiceBasedChannel } from "discord.js";
 import { TypedEmitter } from "tiny-typed-emitter";
+import { defaultFilters, version } from "./constant";
+import { DisTubeHandler } from "./core/DisTubeHandler";
+import { Options } from "./core/DisTubeOptions";
+import { DisTubeVoiceManager } from "./core/manager/DisTubeVoiceManager";
+import { QueueManager } from "./core/manager/QueueManager";
+import { DisTubeError } from "./struct/DisTubeError";
+import { Playlist } from "./struct/Playlist";
+import type { Queue } from "./struct/Queue";
+import { Song } from "./struct/Song";
+import type {
+  Awaitable,
+  CustomPlaylistOptions,
+  DisTubeOptions,
+  DisTubePlugin,
+  Filters,
+  GuildIdResolvable,
+  JumpOptions,
+  PlayOptions,
+  TypedDisTubeEvents,
+} from "./type";
+import { Events, type RepeatMode } from "./type";
 import {
-  DisTubeError,
-  DisTubeHandler,
-  DisTubeVoiceManager,
-  Events,
-  Options,
-  Playlist,
-  QueueManager,
-  Song,
   checkIntents,
-  defaultFilters,
   isClientInstance,
   isMemberInstance,
   isMessageInstance,
@@ -18,21 +31,7 @@ import {
   isSupportedVoiceChannel,
   isTextChannelInstance,
   isURL,
-  version,
-} from ".";
-import type { Client, VoiceBasedChannel } from "discord.js";
-import type {
-  Awaitable,
-  CustomPlaylistOptions,
-  DisTubeOptions,
-  DisTubePlugin,
-  Filters,
-  GuildIdResolvable,
-  PlayOptions,
-  Queue,
-  RepeatMode,
-  TypedDisTubeEvents,
-} from ".";
+} from "./util";
 
 /**
  * DisTube class
@@ -167,7 +166,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
     this.queues = new QueueManager(this);
     this.filters = { ...defaultFilters, ...this.options.customFilters };
     this.plugins = [...this.options.plugins];
-    this.plugins.forEach(p => p.init(this));
+    for (const p of this.plugins) p.init(this);
   }
 
   static get version() {
@@ -224,6 +223,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
       this.debug(`[${queue.id}] Playing input: ${song}`);
       const resolved = await this.handler.resolve(song, { member, metadata });
       const isNsfw = isNsfwChannel(queue?.textChannel || textChannel);
+      const isFirstSong = queue.songs.length === 0;
       if (resolved instanceof Playlist) {
         if (!this.options.nsfw && !isNsfw) {
           resolved.songs = resolved.songs.filter(s => !s.ageRestricted);
@@ -232,26 +232,29 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
         if (!resolved.songs.length) throw new DisTubeError("EMPTY_PLAYLIST");
         this.debug(`[${queue.id}] Adding playlist to queue: ${resolved.songs.length} songs`);
         queue.addToQueue(resolved.songs, position);
-        if (queue.playing || this.options.emitAddListWhenCreatingQueue) this.emit(Events.ADD_LIST, queue, resolved);
+        if (!isFirstSong || this.options.emitAddListWhenCreatingQueue) this.emit(Events.ADD_LIST, queue, resolved);
       } else {
         if (!this.options.nsfw && resolved.ageRestricted && !isNsfwChannel(queue?.textChannel || textChannel)) {
           throw new DisTubeError("NON_NSFW");
         }
         this.debug(`[${queue.id}] Adding song to queue: ${resolved.name || resolved.url || resolved.id || resolved}`);
         queue.addToQueue(resolved, position);
-        if (queue.playing || this.options.emitAddSongWhenCreatingQueue) this.emit(Events.ADD_SONG, queue, resolved);
+        if (!isFirstSong || this.options.emitAddSongWhenCreatingQueue) this.emit(Events.ADD_SONG, queue, resolved);
       }
 
-      if (!queue.playing) await queue.play();
+      if (isFirstSong) await queue.play();
       else if (skip) await queue.skip();
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (!(e instanceof DisTubeError)) {
-        this.debug(`[${queue.id}] Unexpected error while playing song: ${e.stack || e.message}`);
-        try {
-          e.name = "PlayError";
-          e.message = `${typeof song === "string" ? song : song.url}\n${e.message}`;
-        } catch {
-          // Throw original error
+        const errorMessage = e instanceof Error ? (e.stack ?? e.message) : String(e);
+        this.debug(`[${queue.id}] Unexpected error while playing song: ${errorMessage}`);
+        if (e instanceof Error) {
+          try {
+            e.name = "PlayError";
+            e.message = `${typeof song === "string" ? song : song.url}\n${e.message}`;
+          } catch {
+            // Some errors have read-only properties, throw original error
+          }
         }
       }
       throw e;
@@ -320,6 +323,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * Pause the guild stream
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The guild queue
+   * @deprecated Use `distube.getQueue(guild).pause()` instead. Will be removed in v6.0.
    */
   pause(guild: GuildIdResolvable): Promise<Queue> {
     return this.#getQueue(guild).pause();
@@ -329,6 +333,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * Resume the guild stream
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The guild queue
+   * @deprecated Use `distube.getQueue(guild).resume()` instead. Will be removed in v6.0.
    */
   resume(guild: GuildIdResolvable): Promise<Queue> {
     return this.#getQueue(guild).resume();
@@ -337,6 +342,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
   /**
    * Stop the guild stream
    * @param guild - The type can be resolved to give a {@link Queue}
+   * @deprecated Use `distube.getQueue(guild).stop()` instead. Will be removed in v6.0.
    */
   stop(guild: GuildIdResolvable): Promise<void> {
     return this.#getQueue(guild).stop();
@@ -347,6 +353,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * @param guild   - The type can be resolved to give a {@link Queue}
    * @param percent - The percentage of volume you want to set
    * @returns The guild queue
+   * @deprecated Use `distube.getQueue(guild).setVolume(percent)` instead. Will be removed in v6.0.
    */
   setVolume(guild: GuildIdResolvable, percent: number): Queue {
     return this.#getQueue(guild).setVolume(percent);
@@ -358,15 +365,17 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * play a related song.</info>
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The new Song will be played
+   * @deprecated Use `distube.getQueue(guild).skip(options)` instead. Will be removed in v6.0.
    */
-  skip(guild: GuildIdResolvable): Promise<Song> {
-    return this.#getQueue(guild).skip();
+  skip(guild: GuildIdResolvable, options?: JumpOptions): Promise<Song> {
+    return this.#getQueue(guild).skip(options);
   }
 
   /**
    * Play the previous song
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The new Song will be played
+   * @deprecated Use `distube.getQueue(guild).previous()` instead. Will be removed in v6.0.
    */
   previous(guild: GuildIdResolvable): Promise<Song> {
     return this.#getQueue(guild).previous();
@@ -376,6 +385,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * Shuffle the guild queue songs
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The guild queue
+   * @deprecated Use `distube.getQueue(guild).shuffle()` instead. Will be removed in v6.0.
    */
   shuffle(guild: GuildIdResolvable): Promise<Queue> {
     return this.#getQueue(guild).shuffle();
@@ -387,9 +397,10 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * @param guild - The type can be resolved to give a {@link Queue}
    * @param num   - The song number to play
    * @returns The new Song will be played
+   * @deprecated Use `distube.getQueue(guild).jump(num, options)` instead. Will be removed in v6.0.
    */
-  jump(guild: GuildIdResolvable, num: number): Promise<Song> {
-    return this.#getQueue(guild).jump(num);
+  jump(guild: GuildIdResolvable, num: number, options?: JumpOptions): Promise<Song> {
+    return this.#getQueue(guild).jump(num, options);
   }
 
   /**
@@ -398,6 +409,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * @param guild - The type can be resolved to give a {@link Queue}
    * @param mode  - The repeat modes (toggle if `undefined`)
    * @returns The new repeat mode
+   * @deprecated Use `distube.getQueue(guild).setRepeatMode(mode)` instead. Will be removed in v6.0.
    */
   setRepeatMode(guild: GuildIdResolvable, mode?: RepeatMode): RepeatMode {
     return this.#getQueue(guild).setRepeatMode(mode);
@@ -407,6 +419,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * Toggle autoplay mode
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns Autoplay mode state
+   * @deprecated Use `distube.getQueue(guild).toggleAutoplay()` instead. Will be removed in v6.0.
    */
   toggleAutoplay(guild: GuildIdResolvable): boolean {
     const queue = this.#getQueue(guild);
@@ -418,6 +431,7 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * Add related song to the queue
    * @param guild - The type can be resolved to give a {@link Queue}
    * @returns The guild queue
+   * @deprecated Use `distube.getQueue(guild).addRelatedSong()` instead. Will be removed in v6.0.
    */
   addRelatedSong(guild: GuildIdResolvable): Promise<Song> {
     return this.#getQueue(guild).addRelatedSong();
@@ -428,8 +442,9 @@ export class DisTube extends TypedEmitter<TypedDisTubeEvents> {
    * @param guild - The type can be resolved to give a {@link Queue}
    * @param time  - Time in seconds
    * @returns Seeked queue
+   * @deprecated Use `distube.getQueue(guild).seek(time)` instead. Will be removed in v6.0.
    */
-  seek(guild: GuildIdResolvable, time: number): Queue {
+  seek(guild: GuildIdResolvable, time: number): Promise<Queue> {
     return this.#getQueue(guild).seek(time);
   }
 

@@ -1,7 +1,7 @@
-import { GuildIdManager } from ".";
-import { DisTubeError, DisTubeStream, Events, Queue, RepeatMode, checkFFmpeg, objectKeys } from "../..";
-import type { Song } from "../..";
 import type { GuildTextBasedChannel, VoiceBasedChannel } from "discord.js";
+import type { Song } from "../..";
+import { checkFFmpeg, DisTubeError, DisTubeStream, Events, objectKeys, Queue, RepeatMode } from "../..";
+import { GuildIdManager } from "./GuildIdManager";
 
 /**
  * Queue manager
@@ -43,8 +43,8 @@ export class QueueManager extends GuildIdManager<Queue> {
         this.emit(Events.DISCONNECT, queue);
         if (error) this.emitError(error, queue, queue.songs?.[0]);
       },
-      error: error => this.#handlePlayingError(queue, error),
-      finish: () => this.#handleSongFinish(queue),
+      error: error => void this.#handlePlayingError(queue, error),
+      finish: () => void this.handleSongFinish(queue),
     };
     for (const event of objectKeys(queue._listeners)) {
       queue.voice.on(event, queue._listeners[event]);
@@ -52,61 +52,56 @@ export class QueueManager extends GuildIdManager<Queue> {
   }
 
   /**
-   * Whether or not emit playSong event
-   * @param queue - Queue
-   */
-  #emitPlaySong(queue: Queue): boolean {
-    if (!this.options.emitNewSongOnly) return true;
-    if (queue.repeatMode === RepeatMode.SONG) return queue._next || queue._prev;
-    return queue.songs[0].id !== queue.songs[1].id;
-  }
-
-  /**
    * Handle the queue when a Song finish
    * @param queue - queue
    */
-  async #handleSongFinish(queue: Queue): Promise<void> {
+  async handleSongFinish(queue: Queue): Promise<void> {
+    if (queue._manualUpdate) {
+      queue._manualUpdate = false;
+      await this.playSong(queue);
+      return;
+    }
     this.debug(`[QueueManager] Handling song finish: ${queue.id}`);
     const song = queue.songs[0];
-    this.emit(Events.FINISH_SONG, queue, queue.songs[0]);
+    this.emit(Events.FINISH_SONG, queue, song);
     await queue._taskQueue.queuing();
     try {
       if (queue.stopped) return;
-      if (queue.repeatMode === RepeatMode.QUEUE && !queue._prev) queue.songs.push(song);
-      if (queue._prev) {
-        if (queue.repeatMode === RepeatMode.QUEUE) queue.songs.unshift(queue.songs.pop() as Song);
-        else queue.songs.unshift(queue.previousSongs.pop() as Song);
-      }
-      if (queue.songs.length <= 1 && (queue._next || queue.repeatMode === RepeatMode.DISABLED)) {
-        if (queue.autoplay) {
-          try {
-            this.debug(`[QueueManager] Adding related song: ${queue.id}`);
-            await queue.addRelatedSong();
-          } catch (e: any) {
-            this.debug(`[${queue.id}] Add related song error: ${e.message}`);
-            this.emit(Events.NO_RELATED, queue, e);
-          }
-        }
-        if (queue.songs.length <= 1) {
-          this.debug(`[${queue.id}] Queue is empty, stopping...`);
-          if (!queue.autoplay) this.emit(Events.FINISH, queue);
-          queue.remove();
-          return;
-        }
-      }
-      const emitPlaySong = this.#emitPlaySong(queue);
-      if (!queue._prev && (queue.repeatMode !== RepeatMode.SONG || queue._next)) {
+      if (queue.repeatMode === RepeatMode.QUEUE) queue.songs.push(song);
+
+      if (queue.repeatMode !== RepeatMode.SONG) {
         const prev = queue.songs.shift() as Song;
         if (this.options.savePreviousSongs) queue.previousSongs.push(prev);
         else queue.previousSongs.push({ id: prev.id } as Song);
       }
-      queue._next = queue._prev = false;
-      queue._beginTime = 0;
+
+      if (queue.songs.length === 0 && queue.autoplay) {
+        try {
+          this.debug(`[QueueManager] Adding related song: ${queue.id}`);
+          await queue._addRelatedSong(song);
+        } catch (e: unknown) {
+          const errorMessage = e instanceof Error ? e.message : String(e);
+          this.debug(`[${queue.id}] Add related song error: ${errorMessage}`);
+          if (e instanceof DisTubeError) {
+            this.emit(Events.NO_RELATED, queue, e);
+          } else {
+            this.emit(Events.NO_RELATED, queue, new DisTubeError("NO_RELATED"));
+          }
+        }
+      }
+
+      if (queue.songs.length === 0) {
+        this.debug(`[${queue.id}] Queue is empty, stopping...`);
+        if (!queue.autoplay) this.emit(Events.FINISH, queue);
+        queue.remove();
+        return;
+      }
+
       if (song !== queue.songs[0]) {
         const playedSong = song.stream.playFromSource ? song : song.stream.song;
         if (playedSong?.stream.playFromSource) delete playedSong.stream.url;
       }
-      await this.playSong(queue, emitPlaySong);
+      await this.playSong(queue, true);
     } finally {
       queue._taskQueue.resolve();
     }
@@ -117,7 +112,7 @@ export class QueueManager extends GuildIdManager<Queue> {
    * @param queue - queue
    * @param error - error
    */
-  #handlePlayingError(queue: Queue, error: Error) {
+  async #handlePlayingError(queue: Queue, error: Error) {
     const song = queue.songs.shift()!;
     try {
       error.name = "PlayingError";
@@ -128,12 +123,10 @@ export class QueueManager extends GuildIdManager<Queue> {
     this.emitError(error, queue, song);
     if (queue.songs.length > 0) {
       this.debug(`[${queue.id}] Playing next song: ${queue.songs[0]}`);
-      queue._next = queue._prev = false;
-      queue._beginTime = 0;
-      this.playSong(queue);
+      await this.playSong(queue);
     } else {
       this.debug(`[${queue.id}] Queue is empty, stopping...`);
-      queue.stop();
+      await queue.stop();
     }
   }
 
@@ -145,7 +138,7 @@ export class QueueManager extends GuildIdManager<Queue> {
   async playSong(queue: Queue, emitPlaySong = true) {
     if (!queue) return;
     if (queue.stopped || !queue.songs.length) {
-      queue.stop();
+      await queue.stop();
       return;
     }
     try {
@@ -167,13 +160,15 @@ export class QueueManager extends GuildIdManager<Queue> {
         },
         seek: willPlaySong.duration ? queue._beginTime : undefined,
       };
+      queue._beginTime = 0;
       const dtStream = new DisTubeStream(stream.url, streamOptions);
       dtStream.on("debug", data => this.emit(Events.FFMPEG_DEBUG, `[${queue.id}] ${data}`));
       this.debug(`[${queue.id}] Started playing: ${willPlaySong}`);
       await queue.voice.play(dtStream);
       if (emitPlaySong) this.emit(Events.PLAY_SONG, queue, song);
-    } catch (e: any) {
-      this.#handlePlayingError(queue, e);
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      this.#handlePlayingError(queue, error);
     }
   }
 }
