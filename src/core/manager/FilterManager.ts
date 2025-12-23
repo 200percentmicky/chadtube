@@ -1,6 +1,7 @@
-import { BaseManager } from ".";
 import _ from "lodash";
-import type { FFmpegArg as FFmpegArgsValue, Filter, Queue } from "../..";
+import type { FFmpegArg as FFmpegArgsValue, Filter, FilterResolvable, Queue } from "../..";
+import { DisTubeError } from "../..";
+import { BaseManager } from "./BaseManager";
 
 /**
  * Manage filters of a playing {@link Queue}
@@ -15,6 +16,19 @@ export class FilterManager extends BaseManager<Filter> {
     super(queue.distube);
     this.queue = queue;
     this.filters = [];
+  }
+
+  #resolve(filter: FilterResolvable): Filter {
+    if (typeof filter === "object" && typeof filter.name === "string" && typeof filter.value === "string") {
+      return filter;
+    }
+    if (typeof filter === "string" && Object.hasOwn(this.distube.filters, filter)) {
+      return {
+        name: filter,
+        value: this.distube.filters[filter],
+      };
+    }
+    throw new DisTubeError("INVALID_TYPE", "FilterResolvable", filter, "filter");
   }
 
   #apply() {

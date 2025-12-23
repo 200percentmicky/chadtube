@@ -1,12 +1,15 @@
-import { Transform } from "stream";
-import { DisTubeError, Events } from "..";
-import { spawn, spawnSync } from "child_process";
-import { TypedEmitter } from "tiny-typed-emitter";
-import { StreamType, createAudioResource } from "@discordjs/voice";
-import type { TransformCallback } from "stream";
-import type { ChildProcess } from "child_process";
+import type { ChildProcess } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import type { TransformCallback } from "node:stream";
+import { Transform } from "node:stream";
 import type { AudioResource } from "@discordjs/voice";
-import type { Awaitable, DisTube, FFmpegArg, FFmpegOptions } from "..";
+import { createAudioResource, StreamType } from "@discordjs/voice";
+import { TypedEmitter } from "tiny-typed-emitter";
+import { AUDIO_CHANNELS, AUDIO_SAMPLE_RATE } from "../constant";
+import type { DisTube } from "../DisTube";
+import { DisTubeError } from "../struct/DisTubeError";
+import type { Awaitable, FFmpegArg, FFmpegOptions } from "../type";
+import { Events } from "../type";
 
 /**
  * Options for {@link DisTubeStream}
@@ -30,7 +33,10 @@ export const checkFFmpeg = (distube: DisTube) => {
   const debug = (str: string) => distube.emit(Events.FFMPEG_DEBUG, str);
   try {
     debug(`[test] spawn ffmpeg at '${path}' path`);
-    const process = spawnSync(path, ["-h"], { windowsHide: true, shell: true, encoding: "utf-8" });
+    const process = spawnSync(path, ["-h"], {
+      windowsHide: true,
+      encoding: "utf-8",
+    });
     if (process.error) throw process.error;
     if (process.stderr && !process.stdout) throw new Error(process.stderr);
 
@@ -38,8 +44,9 @@ export const checkFFmpeg = (distube: DisTube) => {
     const version = /ffmpeg version (\S+)/iu.exec(result)?.[1];
     if (!version) throw new Error("Invalid FFmpeg version");
     debug(`[test] ffmpeg version: ${version}`);
-  } catch (e: any) {
-    debug(`[test] failed to spawn ffmpeg at '${path}': ${e?.stack ?? e}`);
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? (e.stack ?? e.message) : String(e);
+    debug(`[test] failed to spawn ffmpeg at '${path}': ${errorMessage}`);
     throw new DisTubeError("FFMPEG_NOT_INSTALLED", path);
   }
   checked = true;
@@ -58,6 +65,10 @@ export class DisTubeStream extends TypedEmitter<{
   stream: VolumeTransformer;
   audioResource: AudioResource;
   /**
+   * The seek time in seconds that this stream started from
+   */
+  readonly seekTime: number;
+  /**
    * Create a DisTubeStream to play with {@link DisTubeVoice}
    * @param url     - Stream URL
    * @param options - Stream options
@@ -65,6 +76,7 @@ export class DisTubeStream extends TypedEmitter<{
   constructor(url: string, options: StreamOptions) {
     super();
     const { ffmpeg, seek } = options;
+    this.seekTime = typeof seek === "number" && seek > 0 ? seek : 0;
     const opts: FFmpegArg = {
       reconnect: 1,
       reconnect_streamed: 1,
@@ -74,8 +86,8 @@ export class DisTubeStream extends TypedEmitter<{
       ...ffmpeg.args.global,
       ...ffmpeg.args.input,
       i: url,
-      ar: 48000,
-      ac: 2,
+      ar: AUDIO_SAMPLE_RATE,
+      ac: AUDIO_CHANNELS,
       ...ffmpeg.args.output,
       f: "s16le",
     };
@@ -113,7 +125,10 @@ export class DisTubeStream extends TypedEmitter<{
       })
       .on("finish", () => this.debug("[stream] log: stream finished"));
 
-    this.audioResource = createAudioResource(this.stream, { inputType: StreamType.Raw, inlineVolume: false });
+    this.audioResource = createAudioResource(this.stream, {
+      inputType: StreamType.Raw,
+      inlineVolume: false,
+    });
   }
 
   spawn() {
@@ -166,7 +181,7 @@ export class DisTubeStream extends TypedEmitter<{
 // Based on prism-media
 class VolumeTransformer extends Transform {
   private buffer = Buffer.allocUnsafe(0);
-  private readonly extrema = [-Math.pow(2, 16 - 1), Math.pow(2, 16 - 1) - 1];
+  private readonly extrema = [-(2 ** (16 - 1)), 2 ** (16 - 1) - 1];
   vol = 1;
 
   override _transform(newChunk: Buffer, _encoding: BufferEncoding, done: TransformCallback): void {

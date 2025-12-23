@@ -8,7 +8,7 @@ DisTube doesn't support any music sources anymore. You have to use plugins to su
 
 Removed `streamType`, `youtubeCookie`, `ytdlOptions`, `searchSongs`, `directLink`, `leaveOnStop`, `leaveOnEmpty` and `leaveOnFinish` options.
 
-- `leaveOnEmpty`: Check [Handling Discord.js Events](https://github.com/skick1234/DisTube/wiki/Handling-Discord.js-Events)
+- `leaveOnEmpty`: Check [[Handling Discord.js Events]]
 - `leaveOnStop`: Add `queue.voice.leave()` after `queue.stop()` line
 - `leaveOnFinish`: Add `queue.voice.leave()` in the `finish` event
 - `directLink`: Use `@distube/direct-link` plugin
@@ -249,12 +249,12 @@ distube.on("playSong", (queue, song) => {
 
 New events on v3:
 
-- [deleteQueue](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-deleteQueue)
-- [disconnect](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-disconnect)
-- [finishSong](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-finishSong)
-- [searchDone](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-searchDone)
-- [searchInvalidAnswer](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-searchInvalidAnswer)
-- [searchNoResult](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=e-searchNoResult)
+- [deleteQueue](https://distube.js.org/classes/DisTube.html#deletequeue)
+- [disconnect](https://distube.js.org/classes/DisTube.html#disconnect)
+- [finishSong](https://distube.js.org/classes/DisTube.html#finishsong)
+- searchDone (removed in v5)
+- searchInvalidAnswer (removed in v5)
+- searchNoResult (removed in v5)
 
 Click above links and read the docs for more information.
 
@@ -319,9 +319,9 @@ distube.search("A query", {
 
 New methods on v3:
 
-- [playVoiceChannel](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=playVoiceChannel)
-- [addRelatedSong](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=addRelatedSong)
-- [previous](https://distube.js.org/#/docs/DisTube/v3/class/DisTube?scrollTo=previous)
+- playVoiceChannel (replaced with `play` in v4)
+- [addRelatedSong](https://distube.js.org/classes/Queue.html#addrelatedsong)
+- [previous](https://distube.js.org/classes/Queue.html#previous)
 
 Click above links and read the docs for more information.
 
@@ -405,4 +405,4 @@ Example:
 
 New options on v3: `#plugins`, `#savePreviousSongs`, `#ytdlOptions`, `#searchCooldown`, `#emptyCooldown`, `#nsfw`, `#emitAddSongWhenCreatingQueue`, and `#emitAddListWhenCreatingQueue`.
 
-You can check the feature of those options in the [DisTubeOptions](https://distube.js.org/#/docs/DisTube/v3/typedef/DisTubeOptions) documentation.
+You can check the feature of those options in the [DisTubeOptions](https://distube.js.org/types/DisTubeOptions.html) documentation.

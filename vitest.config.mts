@@ -3,11 +3,15 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      "@": new URL("./src", import.meta.url).pathname,
+    },
+  },
   test: {
     exclude: ["**/node_modules", "**/dist", ".idea", ".git"],
     coverage: {
       enabled: true,
-      all: true,
       reporter: ["text", "lcov", "cobertura"],
       provider: "v8",
       include: ["src"],
